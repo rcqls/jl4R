@@ -1,0 +1,8 @@
+Package: jl4R
+Version: 0.0.1
+Title: Julia Interface
+Author: Cqls Team
+Maintainer: Remy Drouilhet <remy.drouilhet@upmf-grenoble.fr>
+Description: Interface to julia
+License: GPL Version 2 or later.
+Archs: x86_64

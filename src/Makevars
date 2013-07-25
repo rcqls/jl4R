@@ -1,0 +1,2 @@
+PKG_CFLAGS = -I${JLAPI_HOME}/include/julia -I.
+PKG_LIBS = -L${JLAPI_HOME}/lib/julia  -Wl,-rpath,${JLAPI_HOME}/lib/julia -ljulia-release
