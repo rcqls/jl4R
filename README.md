@@ -27,9 +27,9 @@ If the last result is unexpected, see the Troubles section.
 ## Example
 ```{.R execute="false"}
 require(jl4R)
-# .jlInit() since automatically called once
+# no need .jlInit() since automatically called once
 .jl('using RDatasets') # A bit slow, julia and RDatasets initializations
-a<-.jl('iris=data("datasets","iris")')
+a<-.jl('iris=data("datasets","iris")') # yes, it is a bit weird, but it is for testing!
 .jl(vector(iris[2]))
 
 # a is then an R object
@@ -45,21 +45,16 @@ plot(.jl('vector(iris[1])')~.jl('vector(iris[2])'))
 ## Troubles
 
 1. htableh.inc in src/support directory is missing (copy it in include/julia of your julia directory). *Update*: htableh.inc is now in the package (src/jl4R) until the julia core solve the problem. 
-
-2. If (like me, on MacOSX) the result of the previous test is wrong, the reason may come from the fact that in the initialization of julia libpcre is required and failed to be loaded properly. Then, set
-
+1. For linux user, you should also put jl_bytestring_ptr in julia.expmap.
+1. If (like me, on MacOSX) the result of the previous test is wrong, the reason may come from the fact that in the initialization of julia libpcre is required and failed to be loaded properly. Then, set
 
 		LD_LIBRARY_PATH=<your julia home>/lib/julia
 
-
-If you don't want to set LD_LIBRARY_PATH, alternatives solutions would be:
-
-* Solution 1 (maybe the best): 
+If you don't want to set LD_LIBRARY_PATH, alternate solution would be: 
 
 change the base/client.jl file as follows: 
 
 split init_load_path into 2 functions
-
 ```{.julia execute="false"}
 	function init_load_path()
 		vers = "v$(VERSION.major).$(VERSION.minor)"
@@ -74,9 +69,7 @@ split init_load_path into 2 functions
 		]
 	end
 ```
-
 Notice that abspath is not used in the definition of DL_LOAD_PATH (since libpcre is required by abspath which depends of DL_LOAD_PATH needed by dlopen). 
 Of course, DL_LOAD_PATH depends on the definition of JULIA_HOME (supposed to be here: "your julia home"/lib) which normally is related to 
 the location of sys.ji. In such a case, you can install the R package.
 
-3. For linux user, you should also put jl_bytestring_ptr in julia.expmap.
