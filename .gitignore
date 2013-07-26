@@ -1,0 +1,15 @@
+
+*.exe
+*.dll
+*.do
+*.o
+*.so
+*.dylib
+*.dSYM
+*~
+*#
+.DS_Store
+.Rhistory
+.RData
+/src-i386
+/src-x86_64
