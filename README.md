@@ -2,6 +2,9 @@
 
 This is an attempt to embed the julia language in R. Actually, very basic julia types are converted to R objects (DataFrame coming soon!).
 
+## requirement
+
+[julia-api4rcqls](https://github.com/rcqls/julia-api4rcqls): since the current project is a work in progress and very experimental, we prefer to use the julia-api4rcqls tools. Furthermore, julia-api4rcqls is used both in [jl4R](https://github.com/rcqls/jl4R) and [jl4rb](https://github.com/rcqls/jl4rb) projects.
 
 ## Install
 
