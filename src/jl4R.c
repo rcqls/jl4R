@@ -26,7 +26,7 @@ SEXP jl4R_init(SEXP args)
     Rprintf("%s\n",julia_home_dir);
     jlapi_init(julia_home_dir);
     jl4R_julia_running=1;
-    printf("julia initialized!!!\n");
+    //printf("julia initialized!!!\n");
   }
   return R_NilValue;
 }
