@@ -4,7 +4,9 @@ This is an attempt to embed the julia language in R. Actually, very basic julia 
 
 ## requirement
 
-[julia-api4rcqls](https://github.com/rcqls/julia-api4rcqls): since the current project is a work in progress and very experimental, we prefer to use the julia-api4rcqls tools. Furthermore, julia-api4rcqls is used both in [jl4R](https://github.com/rcqls/jl4R) and [jl4rb](https://github.com/rcqls/jl4rb) projects.
+[julia-api4rcqls](https://github.com/rcqls/julia-api4rcqls): since the current project is a work in progress 
+and experimental, we prefer to use the julia-api4rcqls tools. 
+More, julia-api4rcqls is used both in [jl4R](https://github.com/rcqls/jl4R) and [jl4rb](https://github.com/rcqls/jl4rb) projects.
 
 ## Install
 
@@ -30,8 +32,6 @@ Then, the R console:
 require(jl4R)			# => true
 .jl('LOAD_PATH')	# => [<your julia home>/local/share/julia/site/v0.2", "<your julia home>/share/julia/site/v0.2"]
 ```
-
-If the last result is unexpected, see the Troubles section.
 
 ## Example
 ```{.R execute="false"}
