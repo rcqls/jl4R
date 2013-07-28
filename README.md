@@ -8,10 +8,16 @@ This is an attempt to embed the julia language in R. Actually, very basic julia 
 
 ## Install
 
-Clone this git and in the parent directory:
+In the parent directory,
 
 	R CMD INSTALL jl4R
-		
+	
+If you're using MacOSX with R version < 3.0.0 (default arch=i386),
+
+	R64 CMD INSTALL --no-multiarch jl4R
+
+since julia is (by default) based on x86_64 architecture. 
+
 ## Test
 
 First, in a terminal or in your .bashrc (or equivalent):
@@ -47,32 +53,5 @@ plot(.jl('vector(iris[1])')~.jl('vector(iris[2])'))
 
 ## Troubles
 
-1. htableh.inc in src/support directory is missing (copy it in include/julia of your julia directory). *Update*: htableh.inc is now in the package (src/jl4R) until the julia core solve the problem. 
+1. This package has been tested only in MacOSX system with R64 (not R, only working for i386) version 2.15.2 and R version 3.0.1 (default is 64bit).
 1. For linux user, you should also put jl_bytestring_ptr in julia.expmap.
-1. If (like me, on MacOSX) the result of the previous test is wrong, the reason may come from the fact that in the initialization of julia libpcre is required and failed to be loaded properly. Then, set
-
-		LD_LIBRARY_PATH=<your julia home>/lib/julia
-
-If you don't want to set LD_LIBRARY_PATH, alternate solution would be: 
-
-change the base/client.jl file as follows: 
-
-split init_load_path into 2 functions
-```{.julia execute="false"}
-	function init_load_path()
-		vers = "v$(VERSION.major).$(VERSION.minor)"
-		
-		global const DL_LOAD_PATH = ByteString[
-			join([JULIA_HOME,"..","lib","julia"],Base.path_separator)
-		]
-		
-		global const LOAD_PATH = ByteString[
-			abspath(JULIA_HOME,"..","local","share","julia","site",vers),
-			abspath(JULIA_HOME,"..","share","julia","site",vers)
-		]
-	end
-```
-Notice that abspath is not used in the definition of DL_LOAD_PATH (since libpcre is required by abspath which depends of DL_LOAD_PATH needed by dlopen). 
-Of course, DL_LOAD_PATH depends on the definition of JULIA_HOME (supposed to be here: "your julia home"/lib) which normally is related to 
-the location of sys.ji. In such a case, you can install the R package.
-
