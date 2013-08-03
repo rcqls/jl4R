@@ -5,8 +5,8 @@
 }
 
 
-.jlInit<-function(imgdir=file.path(Sys.getenv("JLAPI_HOME"),"lib")) {
-  .External("jl4R_init",imgdir ,PACKAGE="jl4R")
+.jlInit<-function(imgdir=file.path(Sys.getenv("JLAPI_HOME"),"lib"),mode="rcqls") {
+  .External("jl4R_init",imgdir,mode ,PACKAGE="jl4R")
   return(invisible())
 }
 

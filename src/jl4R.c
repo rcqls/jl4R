@@ -17,14 +17,16 @@ static int jl4R_julia_running=0;
 
 SEXP jl4R_init(SEXP args)
 {
-  char* julia_home_dir;
+  char *julia_home_dir,*mode;
 
   if(!jl4R_julia_running) {
     if(!isValidString(CADR(args)))
      error("invalid argument");
     julia_home_dir=(char*)CHAR(STRING_ELT(CADR(args), 0));
-    Rprintf("%s\n",julia_home_dir);
-    jlapi_init(julia_home_dir);
+    mode=(char*)CHAR(STRING_ELT(CADDR(args), 0));
+    Rprintf("julia_home_dir=%s\n",julia_home_dir);
+    Rprintf("mode=%s\n",julia_home_dir);
+    jlapi_init(julia_home_dir,mode);
     jl4R_julia_running=1;
     //printf("julia initialized!!!\n");
   }
