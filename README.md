@@ -54,6 +54,6 @@ plot(.jl('vector(iris[1])')~.jl('vector(iris[2])'))
 ## Troubles
 
 1. This package has been tested mostly in MacOSX system with R64 (not R, only working for i386) version 2.15.2 and R version 3.0.1 (default is 64bit).
-1. For linux user, there is currently a slight difference from jl4rb gem since dlopen(NULL,RTLD_LAZY|RTLD_GLOBAL) does not behave the same way. For that, I need to preload the shared objects and then call R as follows: 
+1. Update (05/08/2013): No more need of the following LD_PRELOAD thanks to julia-api4rcqls update. OBSOLETE: For linux user, there is currently a slight difference from jl4rb gem since dlopen(NULL,RTLD_LAZY|RTLD_GLOBAL) does not behave the same way. For that, I need to preload the shared objects and then call R as follows: 
 
 	LD_PRELOAD=${JLAPI_HOME}/lib/julia/libjulia-api.so R
