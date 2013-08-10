@@ -2,7 +2,7 @@
 #include <string.h>
 
 //#include <julia.h>
-#include "julia.h"
+//#include "julia.h"
 #include "julia-api.h"
 #include <Rdefines.h>
 #include <R_ext/PrtUtil.h>
