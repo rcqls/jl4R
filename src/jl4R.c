@@ -7,9 +7,10 @@
 #include <Rdefines.h>
 #include <R_ext/PrtUtil.h>
 
-#ifndef Win32
-#include <R_ext/eventloop.h>
-#endif
+// It seems that this fails on win32 "fd_set" missing!
+// #ifndef Win32
+// #include <R_ext/eventloop.h>
+// #endif
 
 
 
