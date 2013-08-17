@@ -159,6 +159,17 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
       return resR;
     }
     else
+    if(strcmp(jl_typeof_str(res),"Tuple")==0 )
+    //if(jl_is_array(res))
+    {
+      d=jl_tuple_len(res);
+      PROTECT(resR=allocVector(VECSXP,d));
+      for(i=0;i<d;i++) {
+        SET_ELEMENT(resR,i,jl_value_to_SEXP(jl_tupleref(res,i)));
+      }
+      UNPROTECT(1);
+      return resR;
+    }
     if(strcmp(resTy,"Array")==0)
     //if(jl_is_array(res))
     {

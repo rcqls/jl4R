@@ -4,6 +4,10 @@
 *.o
 *.so
 *.dylib
+*.png
+*.jpeg
+*.jpg
+*.pdf
 *~
 *#
 .Rhistory
