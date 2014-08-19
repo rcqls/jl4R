@@ -2,7 +2,7 @@ useDynLib(jl4R, .registration = TRUE)
 
 exportPattern("^\\.jl")
 export(
-   
+ .julia
   #jlObj
 
 )

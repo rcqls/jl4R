@@ -253,48 +253,57 @@ SEXP jl4R_eval(SEXP args)
    
   cmdString=(char*)CHAR(STRING_ELT(CADR(args),0));
   res=jl_eval_string(cmdString);
-  //jl_set_global(jl_base_module, jl_symbol("ans"),res);
+  jl_set_global(jl_current_module, jl_symbol("jl4R_ANSWER"),res);
   //jlapi_print_stdout();
   return jl_value_to_SEXP(res);
 }
 
-/************ the converse **************
-jl_array_t* Vector_SEXP_to_jl_array(SEXP ans) {
-  int n,i;
-  Rcomplex cpl;
+SEXP jl4R_get_ans(void) {
+  jl_value_t *res;
+
+  res=jl_get_global(jl_current_module, jl_symbol("jl4R_ANSWER"));
+  return jl_value_to_SEXP(res);
+}
+
+/************ the converse **************/
+jl_value_t* Vector_SEXP_to_jl_array(SEXP ans) {
+  int n;
+  //Rcomplex cpl;
   jl_datatype_t* datatype;
   jl_value_t* array_type;
   jl_array_t* x;
+  void* xData;
   
   n=length(ans);
 
   switch(TYPEOF(ans)) {
   case REALSXP:
     datatype = jl_float64_type;
-    array_type = jl_apply_array_type( datatype, 1 );
-    x          = jl_alloc_array_1d(array_type , n);
-    JL_GC_PUSH1(&x);
-    double* xData = jl_array_data(x);
-    for(size_t i=0; i<jl_array_len(x); i++) xData[i] = REAL(ans)[i];
-    JL_GC_POP();
     break;
   case INTSXP:
     datatype = jl_int64_type;
-    array_type = jl_apply_array_type( datatype, 1 );
-    x          = jl_alloc_array_1d(array_type , n);
-    JL_GC_PUSH1(&x);
-    int* xData = jl_array_data(x);
-    for(size_t i=0; i<jl_array_len(x); i++) xData[i] = INTEGER(ans)[i];
-    JL_GC_POP();
     break;
   case LGLSXP:
     datatype = jl_bool_type;
-    array_type = jl_apply_array_type( datatype, 1 );
-    x          = jl_alloc_array_1d(array_type , n);
-    JL_GC_PUSH1(&x);
-    bool* xData = jl_array_data(x);
-    for(size_t i=0; i<jl_array_len(x); i++) xData[i] = (INTEGER(ans)[i] ? true : false);
-    JL_GC_POP();
+    break;
+  }
+
+  array_type = jl_apply_array_type( datatype, 1 );
+  x          = jl_alloc_array_1d(array_type , n);
+  JL_GC_PUSH1(&x);
+
+  switch(TYPEOF(ans)) {
+  case REALSXP: 
+    xData = (double*)jl_array_data(x);
+    for(size_t i=0; i<jl_array_len(x); i++) ((double*)xData)[i] = REAL(ans)[i];
+    break;
+  case INTSXP:
+    xData = (int*)jl_array_data(x);
+    for(size_t i=0; i<jl_array_len(x); i++) ((int*)xData)[i] = INTEGER(ans)[i];
+    break;
+  case LGLSXP:
+    xData = (int8_t*)jl_array_data(x);
+    for(size_t i=0; i<jl_array_len(x); i++) ((int8_t*)xData)[i] = (INTEGER(ans)[i] ? 1 : 0);
     break;
   case STRSXP:
     // for(i=0;i<n;i++) {
@@ -312,12 +321,61 @@ jl_array_t* Vector_SEXP_to_jl_array(SEXP ans) {
     // }
     break;
   }
+  JL_GC_POP();
 
-  return x;
+  return (jl_value_t*)x;
 }
-
 /****************************/
 
+//wrapper !!! une classe R permettant de wrapper un objet Julia !!!
+static SEXP makeJLObject(jl_value_t* jlobj)
+{
+    SEXP obj;
+
+    obj = R_MakeExternalPtr((void *)jlobj, R_NilValue, R_NilValue);
+    
+    return obj;
+}
+/*********/
+
+SEXP newJLObj(jl_value_t* jlobj) {
+  SEXP ans,class;
+
+  ans=(SEXP)makeJLObject(jlobj);
+  //if(rbIsRVector(jlobj)) {
+    PROTECT(class=allocVector(STRSXP,2));
+    SET_STRING_ELT(class,0, mkChar("jlRVector"));
+    SET_STRING_ELT(class,1, mkChar("jlObj"));
+  //} else {
+  //  PROTECT(class=allocVector(STRSXP,1));
+  //  SET_STRING_ELT(class,0, mkChar("jlObj"));
+  //}
+  //classgets(ans,class);
+  SET_CLASS(ans,class);
+  UNPROTECT(1);
+  return ans;
+}
+/********/
+
+SEXP jl4R_as_jlRvector(SEXP args)
+{
+  jl_value_t* val;
+  SEXP ans; 
+  val=(jl_value_t*)Vector_SEXP_to_jl_array(CADR(args));
+  ans=(SEXP)newJLObj(val);
+  return(ans);
+}
+
+SEXP jl4R_set_global_variable(SEXP args) {
+  char *varName;
+  jl_value_t *res;
+   
+  varName=(char*)CHAR(STRING_ELT(CADR(args),0));
+  res=(jl_value_t*)Vector_SEXP_to_jl_array(CADDR(args));
+  jl_set_global(jl_current_module, jl_symbol(varName),res);
+  //jlapi_print_stdout();
+  return R_NilValue;
+}
 
 #include <R_ext/Rdynload.h>
 static const R_CMethodDef cMethods[] = {
@@ -327,11 +385,13 @@ static const R_CMethodDef cMethods[] = {
 static const R_ExternalMethodDef externalMethods[] = {
   {"jl4R_init",(DL_FUNC) &jl4R_init,-1},
   {"jl4R_eval",(DL_FUNC) &jl4R_eval,-1},
+  {"rb4R_as_rbRvector",(DL_FUNC)&jl4R_as_jlRvector,-1},
   {NULL,NULL,0}
 };
 
 static const R_CallMethodDef callMethods[] = {
   {"jl4R_running",(DL_FUNC) &jl4R_running,0},
+  {"jl4R_get_ans",(DL_FUNC) &jl4R_get_ans,0},
   {NULL,NULL,0}
 };
 
