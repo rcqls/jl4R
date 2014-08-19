@@ -3,7 +3,7 @@
 
 //#include <julia.h>
 //#include "julia.h"
-#include "julia-api.h"
+#include "julia.h"
 #include <Rdefines.h>
 #include <R_ext/PrtUtil.h>
 
@@ -18,16 +18,15 @@ static int jl4R_julia_running=0;
 
 SEXP jl4R_init(SEXP args)
 {
-  char *julia_home_dir,*mode;
+  char *julia_home_dir;
 
   if(!jl4R_julia_running) {
     if(!isValidString(CADR(args)))
      error("invalid argument");
     julia_home_dir=(char*)CHAR(STRING_ELT(CADR(args), 0));
-    mode=(char*)CHAR(STRING_ELT(CADDR(args), 0));
     Rprintf("julia_home_dir=%s\n",julia_home_dir);
-    Rprintf("mode=%s\n",julia_home_dir);
-    jlapi_init(julia_home_dir,mode);
+    jl_init(julia_home_dir);
+    JL_SET_STACK_BASE;
     jl4R_julia_running=1;
     //printf("julia initialized!!!\n");
   }
@@ -59,11 +58,10 @@ SEXP jl4R_running(void) {
 //Maybe try to use cpp stuff to get the output inside julia system (ccall,cgen and cgutils)
 //-| TODO: after adding in the jlapi.c jl_is_<C_type> functions replace the strcmp! 
 SEXP jl_value_to_SEXP(jl_value_t *res) {
-  size_t i=0,k,nd,d;
+  size_t i=0,nd,d;
   SEXP resR;
   SEXPTYPE aryTyR;
   jl_value_t *tmp;
-  jl_function_t *call;
   char *resTy,*aryTy;
 
   if(res!=NULL) { //=> get a result
@@ -228,7 +226,7 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
     // rb_str_cat2(resR, jl_typeof_str(res));
     // rb_str_cat2(resR, ")__\n");
     UNPROTECT(1);
-    printf("%s\n",jl_bytestring_ptr(jl_eval_string("\"$(ans)\"")));
+    //printf("%s\n",jl_bytestring_ptr(jl_eval_string("\"$(ans)\"")));
     return resR;
   }
   //=> No result (command incomplete or syntax error)
@@ -255,10 +253,71 @@ SEXP jl4R_eval(SEXP args)
    
   cmdString=(char*)CHAR(STRING_ELT(CADR(args),0));
   res=jl_eval_string(cmdString);
-  jl_set_global(jl_base_module, jl_symbol("ans"),res);
-  jlapi_print_stdout();
+  //jl_set_global(jl_base_module, jl_symbol("ans"),res);
+  //jlapi_print_stdout();
   return jl_value_to_SEXP(res);
 }
+
+/************ the converse **************
+jl_array_t* Vector_SEXP_to_jl_array(SEXP ans) {
+  int n,i;
+  Rcomplex cpl;
+  jl_datatype_t* datatype;
+  jl_value_t* array_type;
+  jl_array_t* x;
+  
+  n=length(ans);
+
+  switch(TYPEOF(ans)) {
+  case REALSXP:
+    datatype = jl_float64_type;
+    array_type = jl_apply_array_type( datatype, 1 );
+    x          = jl_alloc_array_1d(array_type , n);
+    JL_GC_PUSH1(&x);
+    double* xData = jl_array_data(x);
+    for(size_t i=0; i<jl_array_len(x); i++) xData[i] = REAL(ans)[i];
+    JL_GC_POP();
+    break;
+  case INTSXP:
+    datatype = jl_int64_type;
+    array_type = jl_apply_array_type( datatype, 1 );
+    x          = jl_alloc_array_1d(array_type , n);
+    JL_GC_PUSH1(&x);
+    int* xData = jl_array_data(x);
+    for(size_t i=0; i<jl_array_len(x); i++) xData[i] = INTEGER(ans)[i];
+    JL_GC_POP();
+    break;
+  case LGLSXP:
+    datatype = jl_bool_type;
+    array_type = jl_apply_array_type( datatype, 1 );
+    x          = jl_alloc_array_1d(array_type , n);
+    JL_GC_PUSH1(&x);
+    bool* xData = jl_array_data(x);
+    for(size_t i=0; i<jl_array_len(x); i++) xData[i] = (INTEGER(ans)[i] ? true : false);
+    JL_GC_POP();
+    break;
+  case STRSXP:
+    // for(i=0;i<n;i++) {
+    //   rb_ary_store(res,i,rb_str_new2(CHAR(STRING_ELT(ans,i))));
+    // }
+    break;
+  case CPLXSXP:
+    // rb_require("complex");
+    // for(i=0;i<n;i++) {
+    //   cpl=COMPLEX(ans)[i];
+    //   res2 = rb_eval_string("Complex.new(0,0)");
+    //   rb_iv_set(res2,"@real",rb_float_new(cpl.r));
+    //   rb_iv_set(res2,"@image",rb_float_new(cpl.i));
+    //   rb_ary_store(res,i,res2);
+    // }
+    break;
+  }
+
+  return x;
+}
+
+/****************************/
+
 
 #include <R_ext/Rdynload.h>
 static const R_CMethodDef cMethods[] = {
