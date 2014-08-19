@@ -45,3 +45,9 @@ a
 # a plot should work too!
 plot(.jl('array(iris[1])')~.jl('array(iris[2])'))
 ```
+
+## Remark
+
+Maybe, this (or something similar) needs to be added in your .bash_profile for Mac users:
+
+	export DYLD_FALLBACK_LIBRARY_PATH=$JULIA_DIR/lib/julia:/usr/lib
