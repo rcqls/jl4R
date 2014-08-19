@@ -33,8 +33,8 @@ require(jl4R)			# => true
 require(jl4R)
 # no need .jlInit() since automatically called once
 .jl('using RDatasets') # A bit slow, julia and RDatasets initializations
-a<-.jl('iris=dataset("datasets","iris")') # yes, it is a bit weird, but it is for testing!
-.jl(array(iris[2]))
+.jl('iris=dataset("datasets","iris")') # yes, it is a bit weird, but it is for testing!
+a<-.jl('array(iris[2])')
 
 # a is then an R object
 a
