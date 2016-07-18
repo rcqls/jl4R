@@ -15,6 +15,7 @@
 
 
 static int jl4R_julia_running=0;
+static jl_module_t* jl_R_module;
 
 SEXP jl4R_init(SEXP args)
 {
@@ -26,7 +27,6 @@ SEXP jl4R_init(SEXP args)
     julia_home_dir=(char*)CHAR(STRING_ELT(CADR(args), 0));
     Rprintf("julia_home_dir=%s\n",julia_home_dir);
     jl_init(julia_home_dir);
-    JL_SET_STACK_BASE;
     jl4R_julia_running=1;
     //printf("julia initialized!!!\n");
   }
@@ -51,12 +51,22 @@ SEXP jl4R_running(void) {
   return(ans);
 }
 
+SEXP jl_value_type(jl_value_t *res) {
+  char *resTy,*aryTy;
+  SEXP resR;
 
- 
+  if(res!=NULL) { //=> get a result
+    resTy=(char*)jl_typeof_str(res);
+    PROTECT(resR=NEW_CHARACTER(1));
+    CHARACTER_POINTER(resR)[0]=mkChar(resTy);
+    UNPROTECT(1);
+    return resR;
+  } return R_NilValue;
+}
 
 
 //Maybe try to use cpp stuff to get the output inside julia system (ccall,cgen and cgutils)
-//-| TODO: after adding in the jlapi.c jl_is_<C_type> functions replace the strcmp! 
+//-| TODO: after adding in the jlapi.c jl_is_<C_type> functions replace the strcmp!
 SEXP jl_value_to_SEXP(jl_value_t *res) {
   size_t i=0,nd,d;
   SEXP resR;
@@ -67,7 +77,7 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
   if(res!=NULL) { //=> get a result
     resTy=(char*)jl_typeof_str(res);
     //printf("typeof=%s\n",jl_typeof_str(res));
-    if(strcmp(jl_typeof_str(res),"Int64")==0 || strcmp(jl_typeof_str(res),"Int32")==0) 
+    if(strcmp(jl_typeof_str(res),"Int64")==0 || strcmp(jl_typeof_str(res),"Int32")==0)
     //if(jl_is_long(res)) //does not work because of DLLEXPORT
     {
       //printf("elt=%d\n",jl_unbox_long(res));
@@ -78,7 +88,7 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
     }
     else
     if(strcmp(resTy,"Float64")==0)
-    //if(jl_is_float64(res)) 
+    //if(jl_is_float64(res))
     {
       PROTECT(resR=NEW_NUMERIC(1));
       NUMERIC_POINTER(resR)[0]=jl_unbox_float64(res);
@@ -87,43 +97,43 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
     }
     else
     if(strcmp(resTy,"Float32")==0)
-    //if(jl_is_float64(res)) 
+    //if(jl_is_float64(res))
     {
-       
+
       PROTECT(resR=NEW_NUMERIC(1));
       NUMERIC_POINTER(resR)[0]=jl_unbox_float32(res);
       UNPROTECT(1);
       return resR;
     }
-    else 
+    else
     if(strcmp(resTy,"Bool")==0)
-    //if(jl_is_bool(res)) 
+    //if(jl_is_bool(res))
     {
       PROTECT(resR=NEW_LOGICAL(1));
       LOGICAL(resR)[0]=(jl_unbox_bool(res)  ? TRUE : FALSE);
       UNPROTECT(1);
       return resR;
     }
-    else 
+    else
     if(strcmp(resTy,"DataType")==0)
-    //if(jl_is_bool(res)) 
+    //if(jl_is_bool(res))
     {
       PROTECT(resR=NEW_CHARACTER(1));
       CHARACTER_POINTER(resR)[0]=mkChar(jl_typename_str(res));
       UNPROTECT(1);
       return resR;
     }
-    else 
+    else
     if(strcmp(resTy,"Nothing")==0)
-    //if(jl_is_bool(res)) 
+    //if(jl_is_bool(res))
     {
       return R_NilValue;
     }
     else
     if(strcmp(resTy,"Complex")==0)
-    //if(jl_is_bool(res)) 
+    //if(jl_is_bool(res))
     {
-      
+
       tmp=(jl_value_t*)jl_get_field(res, "re");
       PROTECT(resR=NEW_COMPLEX(1));
       if(strcmp(jl_typeof_str(tmp),"Float64")==0) {
@@ -138,7 +148,7 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
     }
     else
     if(strcmp(resTy,"Regex")==0)
-    //if(jl_is_bool(res)) 
+    //if(jl_is_bool(res))
     {
       // call=(jl_function_t*)jl_get_global(jl_base_module, jl_symbol("show"));
       // printf("ici\n");
@@ -160,10 +170,12 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
     if(strcmp(jl_typeof_str(res),"Tuple")==0 )
     //if(jl_is_array(res))
     {
-      d=jl_tuple_len(res);
+      d=jl_nfields(res); //BEFORE 0.3: d=jl_tuple_len(res);
       PROTECT(resR=allocVector(VECSXP,d));
       for(i=0;i<d;i++) {
-        SET_ELEMENT(resR,i,jl_value_to_SEXP(jl_tupleref(res,i)));
+        //BEFORE 0.3: SET_ELEMENT(resR,i,jl_value_to_SEXP(jl_tupleref(res,i)));
+        SET_ELEMENT(resR,i,jl_value_to_SEXP(jl_fieldref(res,i)));
+        jl_nfields(res)
       }
       UNPROTECT(1);
       return resR;
@@ -185,20 +197,20 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
         d = jl_array_size(res, 0);
         //Rprintf("array_dim[1]=%d\n",(int)d);
         PROTECT(resR=allocVector(aryTyR,d));
-  
+
         for(i=0;i<d;i++) {
           switch(aryTyR) {
             case STRSXP:
               SET_STRING_ELT(resR,i,mkChar(jl_bytestring_ptr(jl_arrayref((jl_array_t *)res,i))));
               break;
             case INTSXP:
-              INTEGER(resR)[i]=jl_unbox_long(jl_arrayref((jl_array_t *)res,i)); 
+              INTEGER(resR)[i]=jl_unbox_long(jl_arrayref((jl_array_t *)res,i));
               break;
             case LGLSXP:
-              LOGICAL(resR)[i]=(jl_unbox_bool(jl_arrayref((jl_array_t *)res,i)) ? TRUE : FALSE); 
+              LOGICAL(resR)[i]=(jl_unbox_bool(jl_arrayref((jl_array_t *)res,i)) ? TRUE : FALSE);
               break;
             case REALSXP:
-              REAL(resR)[i]=jl_unbox_float64(jl_arrayref((jl_array_t *)res,i)); 
+              REAL(resR)[i]=jl_unbox_float64(jl_arrayref((jl_array_t *)res,i));
               break;
             case CPLXSXP:
               tmp=(jl_value_t*)jl_get_field(jl_arrayref((jl_array_t *)res,i), "re");
@@ -217,17 +229,18 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
         UNPROTECT(1);
         return resR;
       }
-      //TODO: multidim array ruby equivalent???? Is it necessary 
-      
+      //TODO: multidim array ruby equivalent???? Is it necessary
+
     }
-    PROTECT(resR=NEW_CHARACTER(1));
+    return R_NilValue;
+    /*PROTECT(resR=NEW_CHARACTER(1));
     CHARACTER_POINTER(resR)[0]=mkChar(jl_typeof_str(res));
     // resR=rb_str_new2("__unconverted(");
     // rb_str_cat2(resR, jl_typeof_str(res));
     // rb_str_cat2(resR, ")__\n");
     UNPROTECT(1);
     //printf("%s\n",jl_bytestring_ptr(jl_eval_string("\"$(ans)\"")));
-    return resR;
+    return resR;*/
   }
   //=> No result (command incomplete or syntax error)
   // jlapi_print_stderr(); //If this happens but this is really not sure!
@@ -246,24 +259,82 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
 
 /***************** EVAL **********************/
 
+//wrapper !!! une classe R permettant de wrapper un objet Julia !!!
+static SEXP makeJLObject(jl_value_t* jlobj)
+{
+    SEXP obj;
+
+    obj = R_MakeExternalPtr((void *)jlobj, R_NilValue, R_NilValue);
+
+    return obj;
+}
+/*********/
+
+SEXP newJLObj(jl_value_t* jlobj) {
+  SEXP ans,class;
+
+  ans=(SEXP)makeJLObject(jlobj);
+  //if(rbIsRVector(jlobj)) {
+    PROTECT(class=allocVector(STRSXP,1));
+    //SET_STRING_ELT(class,0, mkChar("jlRVector"));
+    SET_STRING_ELT(class,1, mkChar("jlObj"));
+  //} else {
+  //  PROTECT(class=allocVector(STRSXP,1));
+  //  SET_STRING_ELT(class,0, mkChar("jlObj"));
+  //}
+  //classgets(ans,class);
+  SET_CLASS(ans,class);
+  UNPROTECT(1);
+  return ans;
+}
+
+SEXP newJLRVector(jl_value_t* jlobj) {
+  SEXP ans,class;
+
+  ans=(SEXP)makeJLObject(jlobj);
+  //if(rbIsRVector(jlobj)) {
+    PROTECT(class=allocVector(STRSXP,2));
+    SET_STRING_ELT(class,0, mkChar("jlRVector"));
+    SET_STRING_ELT(class,1, mkChar("jlObj"));
+  //} else {
+  //  PROTECT(class=allocVector(STRSXP,1));
+  //  SET_STRING_ELT(class,0, mkChar("jlObj"));
+  //}
+  //classgets(ans,class);
+  SET_CLASS(ans,class);
+  UNPROTECT(1);
+  return ans;
+}
+
 SEXP jl4R_eval(SEXP args)
 {
   char *cmdString;
   jl_value_t *res;
-   
+  SEXP resR;
+
   cmdString=(char*)CHAR(STRING_ELT(CADR(args),0));
   res=jl_eval_string(cmdString);
   jl_set_global(jl_current_module, jl_symbol("jl4R_ANSWER"),res);
-  //jlapi_print_stdout();
-  return jl_value_to_SEXP(res);
+  resR=jl_value_to_SEXP(res);
+  if(res==NULL) {
+    if(resR != R_NilValue) resR=R_NilValue;
+    else  resR=R_NilValue;//newJLObj(res);
+  }
+  return resR;
 }
 
-SEXP jl4R_get_ans(void) {
-  jl_value_t *res;
+SEXP jl4R_as_Rvector(SEXP args)
+{
+  SEXP ans;
+  jl_value_t* jlobj;
 
-  res=jl_get_global(jl_current_module, jl_symbol("jl4R_ANSWER"));
-  return jl_value_to_SEXP(res);
+  if (inherits(CADR(args), "jlRvector")) {
+    jlobj=(jl_value_t*) R_ExternalPtrAddr(CADR(args));
+    ans=(SEXP)jl_value_to_SEXP(jlobj);
+    return ans;
+  } else return R_NilValue;
 }
+
 
 /************ the converse **************/
 jl_value_t* Vector_SEXP_to_jl_array(SEXP ans) {
@@ -273,7 +344,7 @@ jl_value_t* Vector_SEXP_to_jl_array(SEXP ans) {
   jl_value_t* array_type;
   jl_array_t* x;
   void* xData;
-  
+
   n=length(ans);
 
   switch(TYPEOF(ans)) {
@@ -293,7 +364,7 @@ jl_value_t* Vector_SEXP_to_jl_array(SEXP ans) {
   JL_GC_PUSH1(&x);
 
   switch(TYPEOF(ans)) {
-  case REALSXP: 
+  case REALSXP:
     xData = (double*)jl_array_data(x);
     for(size_t i=0; i<jl_array_len(x); i++) ((double*)xData)[i] = REAL(ans)[i];
     break;
@@ -327,49 +398,37 @@ jl_value_t* Vector_SEXP_to_jl_array(SEXP ans) {
 }
 /****************************/
 
-//wrapper !!! une classe R permettant de wrapper un objet Julia !!!
-static SEXP makeJLObject(jl_value_t* jlobj)
-{
-    SEXP obj;
-
-    obj = R_MakeExternalPtr((void *)jlobj, R_NilValue, R_NilValue);
-    
-    return obj;
-}
-/*********/
-
-SEXP newJLObj(jl_value_t* jlobj) {
-  SEXP ans,class;
-
-  ans=(SEXP)makeJLObject(jlobj);
-  //if(rbIsRVector(jlobj)) {
-    PROTECT(class=allocVector(STRSXP,2));
-    SET_STRING_ELT(class,0, mkChar("jlRVector"));
-    SET_STRING_ELT(class,1, mkChar("jlObj"));
-  //} else {
-  //  PROTECT(class=allocVector(STRSXP,1));
-  //  SET_STRING_ELT(class,0, mkChar("jlObj"));
-  //}
-  //classgets(ans,class);
-  SET_CLASS(ans,class);
-  UNPROTECT(1);
-  return ans;
-}
 /********/
 
 SEXP jl4R_as_jlRvector(SEXP args)
 {
   jl_value_t* val;
-  SEXP ans; 
+  SEXP ans;
   val=(jl_value_t*)Vector_SEXP_to_jl_array(CADR(args));
   ans=(SEXP)newJLObj(val);
   return(ans);
 }
 
+SEXP jl4R_get_ans(void) {
+  jl_value_t *res;
+
+  res=jl_get_global(jl_current_module, jl_symbol("jl4R_ANSWER"));
+  return jl_value_to_SEXP(res);
+}
+
+SEXP jl4R_get_global_variable(SEXP args) {
+  char *varName;
+  jl_value_t *res;
+
+  varName=(char*)CHAR(STRING_ELT(CADR(args),0));
+  res=jl_get_global(jl_current_module, jl_symbol(varName));
+  return jl_value_to_SEXP(res);
+}
+
 SEXP jl4R_set_global_variable(SEXP args) {
   char *varName;
   jl_value_t *res;
-   
+
   varName=(char*)CHAR(STRING_ELT(CADR(args),0));
   res=(jl_value_t*)Vector_SEXP_to_jl_array(CADDR(args));
   jl_set_global(jl_current_module, jl_symbol(varName),res);
@@ -385,7 +444,10 @@ static const R_CMethodDef cMethods[] = {
 static const R_ExternalMethodDef externalMethods[] = {
   {"jl4R_init",(DL_FUNC) &jl4R_init,-1},
   {"jl4R_eval",(DL_FUNC) &jl4R_eval,-1},
-  {"rb4R_as_rbRvector",(DL_FUNC)&jl4R_as_jlRvector,-1},
+  {"jl4R_as_Rvector",(DL_FUNC)&jl4R_as_Rvector,-1},
+  {"jl4R_set_global_variable",(DL_FUNC)&jl4R_set_global_variable,-1},
+  {"jl4R_get_global_variable",(DL_FUNC)&jl4R_get_global_variable,-1},
+  {"jl4R_as_rbRvector",(DL_FUNC)&jl4R_as_jlRvector,-1},
   {NULL,NULL,0}
 };
 
@@ -398,4 +460,3 @@ static const R_CallMethodDef callMethods[] = {
 void R_init_jl4R(DllInfo *info) {
   R_registerRoutines(info,cMethods,callMethods,NULL,externalMethods);
 }
-

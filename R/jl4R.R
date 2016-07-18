@@ -14,6 +14,7 @@
 
 .jlInit<-function(imgdir=file.path(Sys.getenv("JULIA_DIR"),"lib")) {
   .External("jl4R_init",imgdir ,PACKAGE="jl4R")
+  .jl("JL4R=Dict{Any,Any}()")
   return(invisible())
 }
 
@@ -31,6 +32,11 @@ as.jlRVector <- function(obj) .External("jl4R_as_jlRvector",obj,PACKAGE = "jl4R"
 
 .jlGetAns <- function() {
   .Call("jl4R_get_ans", PACKAGE = "jl4R")
+}
+
+.jlGet <- function(var) {
+	.External("jl4R_get_global_variable",var,PACKAGE="jl4R")
+	return(invisible())
 }
 
 .jlSet <- function(var,value) {

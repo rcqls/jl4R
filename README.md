@@ -8,12 +8,12 @@ This is an attempt to embed the julia language in R. Actually, very basic julia 
 In the parent directory,
 
 	R CMD INSTALL jl4R
-	
+
 If you're using MacOSX with R version < 3.0.0 (default arch=i386),
 
 	R64 CMD INSTALL --no-multiarch jl4R
 
-since julia is (by default) based on x86_64 architecture. 
+since julia is (by default) based on x86_64 architecture.
 
 ## Test
 
@@ -34,7 +34,7 @@ require(jl4R)
 # no need .jlInit() since automatically called once
 .jl('using RDatasets') # A bit slow, julia and RDatasets initializations
 .jl('iris=dataset("datasets","iris")') # yes, it is a bit weird, but it is for testing!
-a<-.jl('array(iris[2])')
+a<-.jl('convert(Array,iris[2])')
 
 # a is then an R object
 a
