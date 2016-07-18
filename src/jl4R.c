@@ -175,7 +175,6 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
       for(i=0;i<d;i++) {
         //BEFORE 0.3: SET_ELEMENT(resR,i,jl_value_to_SEXP(jl_tupleref(res,i)));
         SET_ELEMENT(resR,i,jl_value_to_SEXP(jl_fieldref(res,i)));
-        jl_nfields(res)
       }
       UNPROTECT(1);
       return resR;
