@@ -72,11 +72,11 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
   SEXP resR;
   SEXPTYPE aryTyR;
   jl_value_t *tmp;
-  char *resTy,*aryTy;
+  char *resTy, *aryTy, *aryTy2;
 
   if(res!=NULL) { //=> get a result
     resTy=(char*)jl_typeof_str(res);
-    //printf("typeof=%s\n",jl_typeof_str(res));
+    //DANGEROUS?? printf("typeof=%s\n",jl_typeof_str(res));
     if(strcmp(jl_typeof_str(res),"Int64")==0 || strcmp(jl_typeof_str(res),"Int32")==0)
     //if(jl_is_long(res)) //does not work because of DLLEXPORT
     {
@@ -185,7 +185,9 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
       nd = jl_array_rank(res);
       //Rprintf("array_ndims=%d\n",(int)nd);
       aryTy=(char*)jl_typename_str(jl_array_eltype(res));
-      //Rprintf("type elt=%s\n",aryTy);
+      aryTy2=(char*)jl_typeof_str(jl_array_eltype(res));
+      //Rprintf("type elt=%s,%s\n",aryTy,(char*)jl_typeof_str(jl_array_eltype(res)));
+      if(strcmp(aryTy2,"DataType")!=0) return R_NilValue;
       if(strcmp(aryTy,"ASCIIString")==0 || strcmp(aryTy,"UTF8String")==0) aryTyR=STRSXP;
       else if(strcmp(aryTy,"Int64")==0 || strcmp(aryTy,"Int32")==0) aryTyR=INTSXP;
       else if(strcmp(aryTy,"Bool")==0) aryTyR=LGLSXP;
