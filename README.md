@@ -50,6 +50,15 @@ a
 # a plot should work too! (even if the example is really stupid)
 plot(.jl('convert(Array,iris[1])')~.jl('convert(Array,iris[2])'))
 ```
+As a comment the example above can be executed in a multiline mode:
+```{.R execute="false"}
+.jl('
++ using RDatasets
++ iris=dataset("datasets","iris")
++ convert(Array,iris[2])
++ ') -> a
+a
+```
 
 ## Remark
 
