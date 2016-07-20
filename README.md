@@ -53,10 +53,10 @@ plot(.jl('convert(Array,iris[1])')~.jl('convert(Array,iris[2])'))
 As a comment the example above can be executed in a multiline mode:
 ```{.R execute="false"}
 .jl('
-+ using RDatasets
-+ iris=dataset("datasets","iris")
-+ convert(Array,iris[2])
-+ ') -> a
+	using RDatasets
+	iris=dataset("datasets","iris")
+	convert(Array,iris[2])
+') -> a
 a
 ```
 
