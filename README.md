@@ -42,12 +42,14 @@ a
 # another call
 .jl('map(string,names(iris))')
 
-# a plot should work too!
-plot(.jl('array(iris[1])')~.jl('array(iris[2])'))
+# a plot should work too! (even if the example is really stupid)
+plot(.jl('convert(Array,iris[1])')~.jl('convert(Array,iris[2])'))
 ```
 
 ## Remark
 
-Maybe, this (or something similar) needs to be added in your .bash_profile for Mac users:
+1. Not checked, but the Makevars maybe need to be adapted for linux (at least for Ubuntu where include and lib are not at the same root).
+
+1. NOT SURE THIS REMARK IS STILL USEFUL! Maybe, this (or something similar) needs to be added in your .bash_profile for Mac users:
 
 	export DYLD_FALLBACK_LIBRARY_PATH=$JULIA_DIR/lib/julia:/usr/lib
