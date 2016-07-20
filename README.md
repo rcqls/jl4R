@@ -25,7 +25,12 @@ Then, the R console:
 
 ```{.R execute="false"}
 require(jl4R)			# => true
-.jl('LOAD_PATH')	# => [<your julia home>/local/share/julia/site/v0.3", "<your julia home>/share/julia/site/v0.3"]
+.jl('LOAD_PATH')	# => NULL (since output is not a DataType but a Union)
+.jl('convert(Array{UTF8String},LOAD_PATH)')
+# => (for MacOSX)
+# julia_home_dir=/Applications/Julia-0.4.6.app/Contents/Resources/julia/lib
+# [1] "/Applications/Julia-0.4.6.app/Contents/Resources/julia/local/share/julia/site/v0.4"
+# [2] "/Applications/Julia-0.4.6.app/Contents/Resources/julia/share/julia/site/v0.4"   
 ```
 
 ## Example
