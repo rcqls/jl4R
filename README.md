@@ -5,7 +5,7 @@ This is an attempt to embed the julia language in R. Actually, very basic julia 
 
 ## Install
 
-Choose one of the two installations below:
+Choose one of the two installations below (tested on macOS M1 with julia-1.8.2):
 
 1) In a terminal in the parent directory of ,
 
