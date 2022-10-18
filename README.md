@@ -13,7 +13,7 @@ Choose one of the two installations below:
 JULIA_DIR=$(julia -e "print(joinpath(splitpath(Sys.BINDIR)[1:end-1]))") R CMD INSTALL jl4R
 ```
 
-2) Inside an R terminal:
+2) Inside the R console:
 
 ```{.R execute="false"}
 Sys.setenv("JULIA_DIR"=system("julia -e 'print(joinpath(splitpath(Sys.BINDIR)[1:end-1]))'",intern=TRUE))
@@ -22,16 +22,13 @@ remotes::install_github("rcqls/jl4R",force=TRUE,build=FALSE)
 
 ## Test
 
-First, in a terminal or in your .bashrc (or equivalent):
-
-	export JULIA_DIR=<your julia directory>
-
-Then, the R console:
-
+Inside the R console:
 ## Example
 ```{.R execute="false"}
 require(jl4R)
 # no need .jlInit() since automatically called once
+.jl("a=1")
+.jl("2a")
 .jl('using RDatasets') # A bit slow, julia and RDatasets initializations
 .jl('iris=dataset("datasets","iris")') # yes, it is a bit weird, but it is for testing!
 a<-.jl('iris[!,2]')
@@ -40,7 +37,7 @@ a<-.jl('iris[!,2]')
 a
 
 # another call
-.jl('map(string,names(iris))')
+.jl('names(iris)')
 
 # a plot should work too! (even if the example is really stupid)
 plot(.jl('iris[!,1]')~.jl('iris[!,2]'))
