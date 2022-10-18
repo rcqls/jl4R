@@ -1,13 +1,20 @@
 # Julia for R
 
-This is an attempt to embed the julia language in R. Actually, very basic julia types are converted to R objects.
+This is an attempt to embed the julia language in R. Actually, very basic julia types are converted to R objects. This package is also very experimental
 
 
 ## Install
 
-In the parent directory,
+Choose one of the two installations below:
+
+1) In a terminal in the parent directory of ,
 
 	JULIA_DIR=$(julia -e "print(joinpath(splitpath(Sys.BINDIR)[1:end-1]))") R CMD INSTALL jl4R
+
+2) Inside an R terminal:
+
+	Sys.setenv("JULIA_DIR"=system("julia -e 'print(joinpath(splitpath(Sys.BINDIR)[1:end-1]))'",intern=TRUE))
+	remotes::install_github("rcqls/jl4R",force=TRUE,build=FALSE)
 
 ## Test
 
