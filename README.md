@@ -16,8 +16,8 @@ JULIA_DIR=$(julia -e "print(joinpath(splitpath(Sys.BINDIR)[1:end-1]))") R CMD IN
 2) Inside an R terminal:
 
 ```{.R execute="false"}
-	Sys.setenv("JULIA_DIR"=system("julia -e 'print(joinpath(splitpath(Sys.BINDIR)[1:end-1]))'",intern=TRUE))
-	remotes::install_github("rcqls/jl4R",force=TRUE,build=FALSE)
+Sys.setenv("JULIA_DIR"=system("julia -e 'print(joinpath(splitpath(Sys.BINDIR)[1:end-1]))'",intern=TRUE))
+remotes::install_github("rcqls/jl4R",force=TRUE,build=FALSE)
 ```
 
 ## Test
