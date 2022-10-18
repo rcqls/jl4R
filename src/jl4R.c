@@ -22,11 +22,12 @@ SEXP jl4R_init(SEXP args)
   char *julia_home_dir;
 
   if(!jl4R_julia_running) {
-    if(!isValidString(CADR(args)))
-     error("invalid argument");
-    julia_home_dir=(char*)CHAR(STRING_ELT(CADR(args), 0));
-    Rprintf("julia_home_dir=%s\n",julia_home_dir);
-    jl_init(julia_home_dir);
+    // if(!isValidString(CADR(args)))
+    //  error("invalid argument");
+    // julia_home_dir=(char*)CHAR(STRING_ELT(CADR(args), 0));
+    // Rprintf("julia_home_dir=%s\n",julia_home_dir);
+    // jl_init(julia_home_dir);
+    jl_init();
     jl4R_julia_running=1;
     //printf("julia initialized!!!\n");
   }
@@ -159,10 +160,10 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
       // return resR;
     }
     else
-    if(strcmp(resTy,"ASCIIString")==0 || strcmp(resTy,"UTF8String")==0)
+    if(strcmp(resTy,"String")==0)
     {
       PROTECT(resR=NEW_CHARACTER(1));
-      CHARACTER_POINTER(resR)[0]=mkChar(jl_bytestring_ptr(res));
+      CHARACTER_POINTER(resR)[0]=mkChar(jl_string_ptr(res));
       UNPROTECT(1);
       return resR;
     }
@@ -188,7 +189,7 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
       aryTy2=(char*)jl_typeof_str(jl_array_eltype(res));
       //Rprintf("type elt=%s,%s\n",aryTy,(char*)jl_typeof_str(jl_array_eltype(res)));
       if(strcmp(aryTy2,"DataType")!=0) return R_NilValue;
-      if(strcmp(aryTy,"ASCIIString")==0 || strcmp(aryTy,"UTF8String")==0) aryTyR=STRSXP;
+      if(strcmp(aryTy,"String")==0) aryTyR=STRSXP;
       else if(strcmp(aryTy,"Int64")==0 || strcmp(aryTy,"Int32")==0) aryTyR=INTSXP;
       else if(strcmp(aryTy,"Bool")==0) aryTyR=LGLSXP;
       else if(strcmp(aryTy,"Complex")==0) aryTyR=CPLXSXP;
@@ -202,7 +203,7 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
         for(i=0;i<d;i++) {
           switch(aryTyR) {
             case STRSXP:
-              SET_STRING_ELT(resR,i,mkChar(jl_bytestring_ptr(jl_arrayref((jl_array_t *)res,i))));
+              SET_STRING_ELT(resR,i,mkChar(jl_string_ptr(jl_arrayref((jl_array_t *)res,i))));
               break;
             case INTSXP:
               INTEGER(resR)[i]=jl_unbox_long(jl_arrayref((jl_array_t *)res,i));
@@ -240,7 +241,7 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
     // rb_str_cat2(resR, jl_typeof_str(res));
     // rb_str_cat2(resR, ")__\n");
     UNPROTECT(1);
-    //printf("%s\n",jl_bytestring_ptr(jl_eval_string("\"$(ans)\"")));
+    //printf("%s\n",jl_string_ptr(jl_eval_string("\"$(ans)\"")));
     return resR;*/
   }
   //=> No result (command incomplete or syntax error)
@@ -250,7 +251,7 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
   //   rb_str_cat2(resR, "(");
   //     rb_str_cat2(resR,jl_typeof_str(jl_exception_occurred()));
   //   jl_value_t* err=jl_get_field(jl_exception_occurred(),"msg");
-  //   if(err!=NULL) printf("%s: %s\n",jl_typeof_str(jl_exception_occurred()),jl_bytestring_ptr(err));
+  //   if(err!=NULL) printf("%s: %s\n",jl_typeof_str(jl_exception_occurred()),jl_string_ptr(err));
   //   jl_exception_clear();
   //   rb_str_cat2(resR, ")");
   // }
@@ -315,7 +316,7 @@ SEXP jl4R_eval(SEXP args)
 
   cmdString=(char*)CHAR(STRING_ELT(CADR(args),0));
   res=jl_eval_string(cmdString);
-  jl_set_global(jl_current_module, jl_symbol("jl4R_ANSWER"),res);
+  jl_set_global(jl_main_module, jl_symbol("jl4R_ANSWER"),res);
   resR=jl_value_to_SEXP(res);
   if(res==NULL) {
     if(resR != R_NilValue) resR=R_NilValue;
@@ -413,7 +414,7 @@ SEXP jl4R_as_jlRvector(SEXP args)
 SEXP jl4R_get_ans(void) {
   jl_value_t *res;
 
-  res=jl_get_global(jl_current_module, jl_symbol("jl4R_ANSWER"));
+  res=jl_get_global(jl_main_module, jl_symbol("jl4R_ANSWER"));
   return jl_value_to_SEXP(res);
 }
 
@@ -422,7 +423,7 @@ SEXP jl4R_get_global_variable(SEXP args) {
   jl_value_t *res;
 
   varName=(char*)CHAR(STRING_ELT(CADR(args),0));
-  res=jl_get_global(jl_current_module, jl_symbol(varName));
+  res=jl_get_global(jl_main_module, jl_symbol(varName));
   return jl_value_to_SEXP(res);
 }
 
@@ -432,7 +433,7 @@ SEXP jl4R_set_global_variable(SEXP args) {
 
   varName=(char*)CHAR(STRING_ELT(CADR(args),0));
   res=(jl_value_t*)Vector_SEXP_to_jl_array(CADDR(args));
-  jl_set_global(jl_current_module, jl_symbol(varName),res);
+  jl_set_global(jl_main_module, jl_symbol(varName),res);
   //jlapi_print_stdout();
   return R_NilValue;
 }

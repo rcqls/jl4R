@@ -12,8 +12,9 @@
 }
 
 
-.jlInit<-function(imgdir=file.path(Sys.getenv("JULIA_DIR"),"lib")) {
-  .External("jl4R_init",imgdir ,PACKAGE="jl4R")
+.jlInit<-function() {
+  # .External("jl4R_init",imgdir ,PACKAGE="jl4R")
+  .External("jl4R_init",PACKAGE="jl4R")
   .jl("JL4R=Dict{Any,Any}()")
   return(invisible())
 }

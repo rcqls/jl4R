@@ -1,19 +1,13 @@
 # Julia for R
 
-This is an attempt to embed the julia language in R. Actually, very basic julia types are converted to R objects (DataFrame coming soon!).
+This is an attempt to embed the julia language in R. Actually, very basic julia types are converted to R objects.
 
 
 ## Install
 
 In the parent directory,
 
-	R CMD INSTALL jl4R
-
-If you're using MacOSX with R version < 3.0.0 (default arch=i386),
-
-	R64 CMD INSTALL --no-multiarch jl4R
-
-since julia is (by default) based on x86_64 architecture.
+	JULIA_DIR=$(julia -e "print(joinpath(splitpath(Sys.BINDIR)[1:end-1]))") R CMD INSTALL jl4R
 
 ## Test
 
@@ -23,23 +17,13 @@ First, in a terminal or in your .bashrc (or equivalent):
 
 Then, the R console:
 
-```{.R execute="false"}
-require(jl4R)			# => true
-.jl('LOAD_PATH')	# => NULL (since output is not a DataType but a Union)
-.jl('convert(Array{UTF8String},LOAD_PATH)')
-# => (for MacOSX)
-# julia_home_dir=/Applications/Julia-0.4.6.app/Contents/Resources/julia/lib
-# [1] "/Applications/Julia-0.4.6.app/Contents/Resources/julia/local/share/julia/site/v0.4"
-# [2] "/Applications/Julia-0.4.6.app/Contents/Resources/julia/share/julia/site/v0.4"   
-```
-
 ## Example
 ```{.R execute="false"}
 require(jl4R)
 # no need .jlInit() since automatically called once
 .jl('using RDatasets') # A bit slow, julia and RDatasets initializations
 .jl('iris=dataset("datasets","iris")') # yes, it is a bit weird, but it is for testing!
-a<-.jl('convert(Array,iris[2])')
+a<-.jl('iris[!,2]')
 
 # a is then an R object
 a
@@ -48,14 +32,14 @@ a
 .jl('map(string,names(iris))')
 
 # a plot should work too! (even if the example is really stupid)
-plot(.jl('convert(Array,iris[1])')~.jl('convert(Array,iris[2])'))
+plot(.jl('iris[!,1]')~.jl('iris[!,2]'))
 ```
 As a comment the example above can be executed in a multiline mode:
 ```{.R execute="false"}
 .jl('
 	using RDatasets
 	iris=dataset("datasets","iris")
-	convert(Array,iris[2])
+	iris[!,2]
 ') -> a
 a
 ```
