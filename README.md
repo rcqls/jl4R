@@ -5,19 +5,12 @@ This is an attempt to embed the julia language in R. Actually, very basic julia 
 
 ## Install
 
-Choose one of the two installations below (tested on macOS M1 with julia-1.8.2):
+Tested on macOS M1 with julia-1.9.2:
 
-1) In a terminal in the parent directory of ,
+In a terminal,
 
 ```{bash}
-JULIA_DIR=$(julia -e "print(joinpath(splitpath(Sys.BINDIR)[1:end-1]))") R CMD INSTALL jl4R
-```
-
-2) Inside the R console:
-
-```{.R execute="false"}
-Sys.setenv("JULIA_DIR"=system("julia -e 'print(joinpath(splitpath(Sys.BINDIR)[1:end-1]))'",intern=TRUE))
-remotes::install_github("rcqls/jl4R",force=TRUE,build=FALSE)
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/rcqls/jl4R/HEAD/inst/install.sh)"
 ```
 
 ## Test
@@ -51,11 +44,3 @@ As a comment the example above can be executed in a multiline mode:
 ') -> a
 a
 ```
-
-## Remark
-
-1. Not checked, but the Makevars maybe need to be adapted for linux (at least for Ubuntu where include and lib are not at the same root).
-
-1. NOT SURE THIS REMARK IS STILL USEFUL! Maybe, this (or something similar) needs to be added in your .bash_profile for Mac users:
-
-	export DYLD_FALLBACK_LIBRARY_PATH=$JULIA_DIR/lib/julia:/usr/lib
