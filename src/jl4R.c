@@ -449,7 +449,7 @@ static const R_ExternalMethodDef externalMethods[] = {
   {"jl4R_as_Rvector",(DL_FUNC)&jl4R_as_Rvector,-1},
   {"jl4R_set_global_variable",(DL_FUNC)&jl4R_set_global_variable,-1},
   {"jl4R_get_global_variable",(DL_FUNC)&jl4R_get_global_variable,-1},
-  {"jl4R_as_rbRvector",(DL_FUNC)&jl4R_as_jlRvector,-1},
+  {"jl4R_as_jlRvector",(DL_FUNC)&jl4R_as_jlRvector,-1},
   {NULL,NULL,0}
 };
 

@@ -5,7 +5,7 @@ This is an attempt to embed the julia language in R. Actually, very basic julia 
 
 ## Install
 
-In a terminal (tested on macOS M1 with julia-1.9.2:) with `julia` and `Rscript` binaries supposed to be in the $PATH$ environment variable,
+In a terminal (tested on macOS M1 with julia-1.9.2:) with `julia` and `Rscript` binaries supposed to be in the `PATH` environment variable,
 
 ```{bash}
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/rcqls/jl4R/HEAD/inst/install.sh)"
