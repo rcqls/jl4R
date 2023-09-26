@@ -260,53 +260,7 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
 }
 
 /***************** EVAL **********************/
-
-//wrapper !!! une classe R permettant de wrapper un objet Julia !!!
-static SEXP makeJLObject(jl_value_t* jlobj)
-{
-    SEXP obj;
-
-    obj = R_MakeExternalPtr((void *)jlobj, R_NilValue, R_NilValue);
-
-    return obj;
-}
 /*********/
-
-SEXP newJLObj(jl_value_t* jlobj) {
-  SEXP ans,class;
-
-  ans=(SEXP)makeJLObject(jlobj);
-  //if(rbIsRVector(jlobj)) {
-    PROTECT(class=allocVector(STRSXP,1));
-    //SET_STRING_ELT(class,0, mkChar("jlRVector"));
-    SET_STRING_ELT(class,1, mkChar("jlObj"));
-  //} else {
-  //  PROTECT(class=allocVector(STRSXP,1));
-  //  SET_STRING_ELT(class,0, mkChar("jlObj"));
-  //}
-  //classgets(ans,class);
-  SET_CLASS(ans,class);
-  UNPROTECT(1);
-  return ans;
-}
-
-SEXP newJLRVector(jl_value_t* jlobj) {
-  SEXP ans,class;
-
-  ans=(SEXP)makeJLObject(jlobj);
-  //if(rbIsRVector(jlobj)) {
-    PROTECT(class=allocVector(STRSXP,2));
-    SET_STRING_ELT(class,0, mkChar("jlRVector"));
-    SET_STRING_ELT(class,1, mkChar("jlObj"));
-  //} else {
-  //  PROTECT(class=allocVector(STRSXP,1));
-  //  SET_STRING_ELT(class,0, mkChar("jlObj"));
-  //}
-  //classgets(ans,class);
-  SET_CLASS(ans,class);
-  UNPROTECT(1);
-  return ans;
-}
 
 SEXP jl4R_eval(SEXP args)
 {
@@ -323,18 +277,6 @@ SEXP jl4R_eval(SEXP args)
     else  resR=R_NilValue;//newJLObj(res);
   }
   return resR;
-}
-
-SEXP jl4R_as_Rvector(SEXP args)
-{
-  SEXP ans;
-  jl_value_t* jlobj;
-
-  if (inherits(CADR(args), "jlRvector")) {
-    jlobj=(jl_value_t*) R_ExternalPtrAddr(CADR(args));
-    ans=(SEXP)jl_value_to_SEXP(jlobj);
-    return ans;
-  } else return R_NilValue;
 }
 
 
@@ -402,28 +344,10 @@ jl_value_t* Vector_SEXP_to_jl_array(SEXP ans) {
 
 /********/
 
-SEXP jl4R_as_jlRvector(SEXP args)
-{
-  jl_value_t* val;
-  SEXP ans;
-  val=(jl_value_t*)Vector_SEXP_to_jl_array(CADR(args));
-  ans=(SEXP)newJLObj(val);
-  return(ans);
-}
-
 SEXP jl4R_get_ans(void) {
   jl_value_t *res;
 
   res=jl_get_global(jl_main_module, jl_symbol("jl4R_ANSWER"));
-  return jl_value_to_SEXP(res);
-}
-
-SEXP jl4R_get_global_variable(SEXP args) {
-  char *varName;
-  jl_value_t *res;
-
-  varName=(char*)CHAR(STRING_ELT(CADR(args),0));
-  res=jl_get_global(jl_main_module, jl_symbol(varName));
   return jl_value_to_SEXP(res);
 }
 
@@ -446,10 +370,9 @@ static const R_CMethodDef cMethods[] = {
 static const R_ExternalMethodDef externalMethods[] = {
   {"jl4R_init",(DL_FUNC) &jl4R_init,-1},
   {"jl4R_eval",(DL_FUNC) &jl4R_eval,-1},
-  {"jl4R_as_Rvector",(DL_FUNC)&jl4R_as_Rvector,-1},
   {"jl4R_set_global_variable",(DL_FUNC)&jl4R_set_global_variable,-1},
-  {"jl4R_get_global_variable",(DL_FUNC)&jl4R_get_global_variable,-1},
-  {"jl4R_as_jlRvector",(DL_FUNC)&jl4R_as_jlRvector,-1},
+   // {"jl4R_as_Rvector",(DL_FUNC)&jl4R_as_Rvector,-1},
+  // {"jl4R_as_jlRvector",(DL_FUNC)&jl4R_as_jlRvector,-1},
   {NULL,NULL,0}
 };
 
@@ -462,3 +385,72 @@ static const R_CallMethodDef callMethods[] = {
 void R_init_jl4R(DllInfo *info) {
   R_registerRoutines(info,cMethods,callMethods,NULL,externalMethods);
 }
+
+// OLD USELESS STUFF
+
+// SEXP jl4R_as_Rvector(SEXP args)
+// {
+//   SEXP ans;
+//   jl_value_t* jlobj;
+
+//   if (inherits(CADR(args), "jlRvector")) {
+//     jlobj=(jl_value_t*) R_ExternalPtrAddr(CADR(args));
+//     ans=(SEXP)jl_value_to_SEXP(jlobj);
+//     return ans;
+//   } else return R_NilValue;
+// }
+
+// SEXP jl4R_as_jlRvector(SEXP args)
+// {
+//   jl_value_t* val;
+//   SEXP ans;
+//   val=(jl_value_t*)Vector_SEXP_to_jl_array(CADR(args));
+//   ans=(SEXP)newJLObj(val);
+//   return(ans);
+// }
+
+// SEXP newJLRVector(jl_value_t* jlobj) {
+//   SEXP ans,class;
+
+//   ans=(SEXP)makeJLObject(jlobj);
+//   //if(rbIsRVector(jlobj)) {
+//     PROTECT(class=allocVector(STRSXP,2));
+//     SET_STRING_ELT(class,0, mkChar("jlRVector"));
+//     SET_STRING_ELT(class,1, mkChar("jlObj"));
+//   //} else {
+//   //  PROTECT(class=allocVector(STRSXP,1));
+//   //  SET_STRING_ELT(class,0, mkChar("jlObj"));
+//   //}
+//   //classgets(ans,class);
+//   SET_CLASS(ans,class);
+//   UNPROTECT(1);
+//   return ans;
+// }
+
+// SEXP newJLObj(jl_value_t* jlobj) {
+//   SEXP ans,class;
+
+//   ans=(SEXP)makeJLObject(jlobj);
+//   //if(rbIsRVector(jlobj)) {
+//     PROTECT(class=allocVector(STRSXP,1));
+//     //SET_STRING_ELT(class,0, mkChar("jlRVector"));
+//     SET_STRING_ELT(class,1, mkChar("jlObj"));
+//   //} else {
+//   //  PROTECT(class=allocVector(STRSXP,1));
+//   //  SET_STRING_ELT(class,0, mkChar("jlObj"));
+//   //}
+//   //classgets(ans,class);
+//   SET_CLASS(ans,class);
+//   UNPROTECT(1);
+//   return ans;
+// }
+
+// //wrapper !!! une classe R permettant de wrapper un objet Julia !!!
+// static SEXP makeJLObject(jl_value_t* jlobj)
+// {
+//     SEXP obj;
+
+//     obj = R_MakeExternalPtr((void *)jlobj, R_NilValue, R_NilValue);
+
+//     return obj;
+// }

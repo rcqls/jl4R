@@ -25,31 +25,54 @@ In a terminal (tested on macOS M1 with julia-1.9.2:) with `julia` and `Rscript` 
 ## Test
 
 Inside the R console:
-## Example
+## Examples
+
+### getting started
+
 ```{.R execute="false"}
 require(jl4R)
 # no need .jlInit() since automatically called once
-.jl("a=1")
-.jl("2a")
-.jl('using RDatasets') # A bit slow, julia and RDatasets initializations
-.jl('iris=dataset("datasets","iris")') # yes, it is a bit weird, but it is for testing!
-a<-.jl('iris[!,2]')
+jl("a=1")
+jl("2a")
+jl('using RDatasets') # A bit slow, julia and RDatasets initializations
+jl('iris=dataset("datasets","iris")') # yes, it is a bit weird, but it is for testing!
+a<-jl('iris[!,2]')
 
 # a is then an R object
 a
 
 # another call
-.jl('names(iris)')
+jl('names(iris)')
 
 # a plot should work too! (even if the example is really stupid)
-plot(.jl('iris[!,1]')~.jl('iris[!,2]'))
+plot(jl('iris[!,1]')~jl('iris[!,2]'))
 ```
 As a comment the example above can be executed in a multiline mode:
 ```{.R execute="false"}
-.jl('
+jl('
 	using RDatasets
 	iris=dataset("datasets","iris")
 	iris[!,2]
 ') -> a
 a
+```
+
+### `jlvector`
+
+Our belief is to exchange result cooked in Julia for performance and retrieve the result inside `R` session with the help of vectors that can be easily shared between `R` and `julia`.
+
+```{.R execute="false"}
+require(jl4R)
+jla <- jlvector("a")
+jla   # julia output
+jla[] # R output
+jlb <- jlvector("b", c(1,3,2))
+jlb 
+jlb[]
+# set jla
+jla[] <- c(1,4,2)
+jla
+jla[]
+jla[2] <- 10
+jla
 ```
