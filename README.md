@@ -76,3 +76,6 @@ jla[]
 jla[2] <- 10
 jla
 ```
+
+
+TODO: Improving the interface with expression julia instead of variable (if useful)
