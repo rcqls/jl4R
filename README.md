@@ -5,16 +5,16 @@ This is an attempt to embed the julia language in R. Actually, very basic julia 
 
 ## Install
 
-### Install Julia (all Operating System)
+1. Install Julia (all Operating System)
 
 Install [Julia](https://julialang.org/downloads/). For Windows users don't forget to select `PATH` in the installer.
 
-### Windows user setup
+1. Windows user setup
 
 * Install [RTools](https://cran.r-project.org/bin/windows/Rtools/) and a terminal with bash (for instance, [Git Bash](https://gitforwindows.org/))
 * Ajout de Rscript dans le `PATH` (see for example [this page](https://www.hanss.info/sebastian/post/rtools-path/) for adding R path in the `PATH` environment variable)
 
-### Bash installation (all Operating Systems)
+1. Bash installation (all Operating Systems)
 
 In a terminal (tested on macOS M1 with julia-1.9.2:) with `julia` and `Rscript` binaries supposed to be in the `PATH` environment variable,
 
