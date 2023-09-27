@@ -16,6 +16,7 @@
 
 static int jl4R_julia_running=0;
 static jl_module_t* jl_R_module;
+SEXP newJlValue(jl_value_t* jlvalue);
 
 SEXP jl4R_init(SEXP args)
 {
@@ -77,6 +78,7 @@ SEXP jl_value_type(jl_value_t *res) {
 SEXP jl_value_to_SEXP(jl_value_t *res) {
   size_t i=0,nd,d;
   SEXP resR;
+  SEXP nmsR;
   SEXPTYPE aryTyR;
   jl_value_t *tmp;
   jl_function_t *func;
@@ -84,7 +86,7 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
 
   if(res!=NULL) { //=> get a result
     resTy=(char*)jl_typeof_str(res);
-    //DANGEROUS?? printf("typeof=%s\n",jl_typeof_str(res));
+    //printf("typeof=%s\n",resTy);
     if(strcmp(jl_typeof_str(res),"Int64")==0 || strcmp(jl_typeof_str(res),"Int32")==0)
     //if(jl_is_long(res)) //does not work because of DLLEXPORT
     {
@@ -202,7 +204,7 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
       d=jl_nfields(res); //BEFORE 0.3: d=jl_tuple_len(res);
       func = jl_get_function(jl_base_module, "keys");
       jl_value_t *keys = jl_call1(func, res);
-      SEXP nmsR = PROTECT(allocVector(STRSXP, d));
+      PROTECT(nmsR = allocVector(STRSXP, d));
       PROTECT(resR=allocVector(VECSXP,d));
       for(i=0;i<d;i++) {
         //BEFORE 0.3: SET_ELEMENT(resR,i,jl_value_to_SEXP(jl_tupleref(res,i)));
@@ -211,7 +213,7 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
       }
       setAttrib(resR, R_NamesSymbol, nmsR);
       UNPROTECT(1);
-     UNPROTECT(1);
+      UNPROTECT(1);
       
       return resR;
     }
@@ -267,18 +269,18 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
         UNPROTECT(1);
         return resR;
       }
-      //TODO: multidim array ruby equivalent???? Is it necessary
-
+    } else {
+      resR = (SEXP)newJlValue(res);
+      // PROTECT(resR=allocVector(STRSXP,1));
+      // PROTECT(nmsR = allocVector(STRSXP, 2));
+      // SET_STRING_ELT(resR,0,mkChar(resTy));
+      // SET_STRING_ELT(nmsR,0,mkChar(resTy));
+      // SET_STRING_ELT(nmsR,1, mkChar("jl_value"));
+      // setAttrib(resR, R_ClassSymbol, nmsR);
+      // UNPROTECT(1);
+      // UNPROTECT(1);
+      return resR;
     }
-    return R_NilValue;
-    /*PROTECT(resR=NEW_CHARACTER(1));
-    CHARACTER_POINTER(resR)[0]=mkChar(jl_typeof_str(res));
-    // resR=rb_str_new2("__unconverted(");
-    // rb_str_cat2(resR, jl_typeof_str(res));
-    // rb_str_cat2(resR, ")__\n");
-    UNPROTECT(1);
-    //printf("%s\n",jl_string_ptr(jl_eval_string("\"$(ans)\"")));
-    return resR;*/
   }
   //=> No result (command incomplete or syntax error)
   // jlapi_print_stderr(); //If this happens but this is really not sure!
@@ -407,6 +409,100 @@ SEXP jl4R_set_global_variable(SEXP args) {
   return R_NilValue;
 }
 
+
+//// R class: jlvalue
+//// External Pointer class called jlvalue (and not jl_value which is the name used by Julia)
+
+SEXP newJlValue(jl_value_t* jlvalue) {
+  SEXP ans,class;
+  char *jltype;
+  ans=(SEXP)R_MakeExternalPtr((void *)jlvalue, R_NilValue, R_NilValue);
+  //if(rbIsRVector(jlobj)) {
+    PROTECT(class=allocVector(STRSXP,2));
+    jltype=(char*)jl_typeof_str(jlvalue);
+    SET_STRING_ELT(class,0, mkChar(jltype));
+    SET_STRING_ELT(class,1, mkChar("jlvalue"));
+  //} else {
+  //  PROTECT(class=allocVector(STRSXP,1));
+  //  SET_STRING_ELT(class,0, mkChar("jlObj"));
+  //}
+  //classgets(ans,class);
+  SET_CLASS(ans,class);
+  UNPROTECT(1);
+  return ans;
+}
+
+
+SEXP jl4R_jlvalue(SEXP args) {
+  char *cmdString;
+  jl_value_t *jlv;
+  SEXP jlvR;
+
+  cmdString=(char*)CHAR(STRING_ELT(CADR(args),0));
+  jlv=jl_eval_string(cmdString);
+  jlvR=(SEXP)newJlValue(jlv);
+  return jlvR;
+}
+
+SEXP jl4R_jlvalue_to_SEXP(SEXP args) {
+  jl_value_t *jlv, *res;
+  SEXP resR;
+
+  jlv=(jl_value_t*)R_ExternalPtrAddr(CADR(args));
+  resR = jl_value_to_SEXP(jlv);
+  return resR;
+}
+
+SEXP jl4R_jlcall1(SEXP args) {
+  char *meth;
+  jl_value_t *jlv, *res;
+  jl_function_t *func;
+  SEXP resR;
+
+  jlv=(jl_value_t*)R_ExternalPtrAddr(CADR(args));
+  meth = (char*)CHAR(STRING_ELT(CADDR(args),0));
+
+  func = jl_get_function(jl_base_module, meth);
+  res = jl_call1(func, jlv);
+  resR=(SEXP)newJlValue(res);
+  return resR;
+}
+
+SEXP jl4R_jlcall2(SEXP args) {
+  char *meth;
+  jl_value_t *jlv, *res, *jlarg;
+  jl_function_t *func;
+  SEXP resR;
+
+  jlv=(jl_value_t*)R_ExternalPtrAddr(CADR(args));
+  meth = (char*)CHAR(STRING_ELT(CADDR(args),0));
+  // printf("meth=%s\n",meth);
+  jlarg=(jl_value_t*)R_ExternalPtrAddr(CADDDR(args));
+  func = jl_get_function(jl_base_module, meth);
+  res = jl_call2(func, jlv,jlarg);
+  resR=(SEXP)newJlValue(res);
+  return resR;
+}
+
+SEXP jl4R_jlcall3(SEXP args) {
+  char *meth;
+  jl_value_t *jlv, *res, *jlarg, *jlarg2;
+  jl_function_t *func;
+  SEXP resR;
+
+  jlv=(jl_value_t*)R_ExternalPtrAddr(CADR(args));
+  meth = (char*)CHAR(STRING_ELT(CADDR(args),0));
+  jlarg=(jl_value_t*)R_ExternalPtrAddr(CADDDR(args));
+  jlarg2=(jl_value_t*)R_ExternalPtrAddr(CAD4R(args));
+  func = jl_get_function(jl_base_module, meth);
+  res = jl_call3(func, jlv, jlarg,jlarg2);
+  resR=(SEXP)newJlValue(res);
+  return resR;
+}
+
+
+
+
 #include <R_ext/Rdynload.h>
 static const R_CMethodDef cMethods[] = {
   {NULL,NULL,0}
@@ -419,6 +515,11 @@ static const R_ExternalMethodDef externalMethods[] = {
   {"jl4R_set_global_variable",(DL_FUNC)&jl4R_set_global_variable,-1},
    // {"jl4R_as_Rvector",(DL_FUNC)&jl4R_as_Rvector,-1},
   // {"jl4R_as_jlRvector",(DL_FUNC)&jl4R_as_jlRvector,-1},
+  {"jl4R_jlvalue",(DL_FUNC) &jl4R_jlvalue,-1},
+  {"jl4R_jlvalue_to_SEXP",(DL_FUNC) &jl4R_jlvalue_to_SEXP,-1},
+  {"jl4R_jlcall1",(DL_FUNC) &jl4R_jlcall1,-1},
+  {"jl4R_jlcall2",(DL_FUNC) &jl4R_jlcall2,-1},
+  {"jl4R_jlcall3",(DL_FUNC) &jl4R_jlcall3,-1},
   {NULL,NULL,0}
 };
 
@@ -471,32 +572,4 @@ void R_init_jl4R(DllInfo *info) {
 //   SET_CLASS(ans,class);
 //   UNPROTECT(1);
 //   return ans;
-// }
-
-// SEXP newJLObj(jl_value_t* jlobj) {
-//   SEXP ans,class;
-
-//   ans=(SEXP)makeJLObject(jlobj);
-//   //if(rbIsRVector(jlobj)) {
-//     PROTECT(class=allocVector(STRSXP,1));
-//     //SET_STRING_ELT(class,0, mkChar("jlRVector"));
-//     SET_STRING_ELT(class,1, mkChar("jlObj"));
-//   //} else {
-//   //  PROTECT(class=allocVector(STRSXP,1));
-//   //  SET_STRING_ELT(class,0, mkChar("jlObj"));
-//   //}
-//   //classgets(ans,class);
-//   SET_CLASS(ans,class);
-//   UNPROTECT(1);
-//   return ans;
-// }
-
-// //wrapper !!! une classe R permettant de wrapper un objet Julia !!!
-// static SEXP makeJLObject(jl_value_t* jlobj)
-// {
-//     SEXP obj;
-
-//     obj = R_MakeExternalPtr((void *)jlobj, R_NilValue, R_NilValue);
-
-//     return obj;
 // }

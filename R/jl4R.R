@@ -1,27 +1,16 @@
-.jlsafe <- function(...) {
-  paste0("try\n",..., "\ncatch e\n println(e.msg)\n end")
-}
 ## the main julia parsing expression !!!
 .jleval <- function(...) {
   if(!.jlrunning()) .jlinit()
   res <- .External("jl4R_eval", ..., PACKAGE = "jl4R")
+  if(inherits(res,"jl_value")) {
+    res[[1]] <- c(...)[1]
+    res <- jlvalue(res)
+  }
   return(res)
 }
 
 jl <- function(...) {
   res <- .jleval(...)
-  # if(is.null(res)) {
-  #   var <- paste0("jl4R_RESULT", sample(1:1000000,1))
-  #   .jleval(paste0(var," = jl4R_ANSWER"))
-  #   if(.jltypeof(var) == "NamedTuple") {
-  #     print(var)
-  #     res <- jl(.jlmethod("values",var))
-  #     print(.jltypeof(.jlmethod("values",var)))
-  #     names(res) <- .jleval(.jlmethod("keys",var))
-  #   } else {
-  #     return(NULL)
-  #   }
-  # }
   return(res)
 }
 
@@ -33,10 +22,6 @@ jlrun <- function(...) {
   if(!.jlrunning()) .jlinit()
   invisible(.External("jl4R_run", ..., PACKAGE = "jl4R"))
 }
-
-.jlmethod <- function(meth, value) paste0(meth,"(",value,")")
-
-.jltypeof <- function(value) .jleval(.jlmethod("typeof",value))
 
 jlget <- function(var) {
   if(!.jlrunning()) .jlinit()
