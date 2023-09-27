@@ -2,8 +2,7 @@ useDynLib(jl4R, .registration = TRUE)
 
 exportPattern("^\\.jl")
 export(
-  jl, jlGet, jlSet, 
-  .julia,
+  jl, jlsafe, jlrun, jlget, jlset,
   jlvector,
   "[.jlvector","[<-.jlvector","[[.jlvector","[[<-.jlvector", as.vector.jlvector
 )

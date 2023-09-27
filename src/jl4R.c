@@ -65,6 +65,12 @@ SEXP jl_value_type(jl_value_t *res) {
   } return R_NilValue;
 }
 
+// char* method(char* meth, char* expr) {
+//   char res[255];
+//   sprintf(res, "%c(%c)",meth ,expr);
+//   return res;
+// }
+
 
 //Maybe try to use cpp stuff to get the output inside julia system (ccall,cgen and cgutils)
 //-| TODO: after adding in the jlapi.c jl_is_<C_type> functions replace the strcmp!
@@ -73,6 +79,7 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
   SEXP resR;
   SEXPTYPE aryTyR;
   jl_value_t *tmp;
+  jl_function_t *func;
   char *resTy, *aryTy, *aryTy2;
 
   if(res!=NULL) { //=> get a result
@@ -168,7 +175,15 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
       return resR;
     }
     else
-    if(strcmp(jl_typeof_str(res),"Tuple")==0 )
+    if(strcmp(resTy,"Symbol")==0 )
+    {
+       PROTECT(resR=NEW_CHARACTER(1));
+      CHARACTER_POINTER(resR)[0]=mkChar(jl_symbol_name(res));
+      UNPROTECT(1);
+      return resR;
+    }
+    else
+    if(strcmp(jl_typeof_str(res),"Tuple")==0)
     //if(jl_is_array(res))
     {
       d=jl_nfields(res); //BEFORE 0.3: d=jl_tuple_len(res);
@@ -180,6 +195,27 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
       UNPROTECT(1);
       return resR;
     }
+    else
+    if(strcmp(jl_typeof_str(res),"NamedTuple")==0)
+    //if(jl_is_array(res))
+    {
+      d=jl_nfields(res); //BEFORE 0.3: d=jl_tuple_len(res);
+      func = jl_get_function(jl_base_module, "keys");
+      jl_value_t *keys = jl_call1(func, res);
+      SEXP nmsR = PROTECT(allocVector(STRSXP, d));
+      PROTECT(resR=allocVector(VECSXP,d));
+      for(i=0;i<d;i++) {
+        //BEFORE 0.3: SET_ELEMENT(resR,i,jl_value_to_SEXP(jl_tupleref(res,i)));
+        SET_ELEMENT(resR,i,jl_value_to_SEXP(jl_fieldref(res,i)));
+        SET_STRING_ELT(nmsR,i,mkChar(jl_symbol_name(jl_fieldref(keys,i))));
+      }
+      setAttrib(resR, R_NamesSymbol, nmsR);
+      UNPROTECT(1);
+     UNPROTECT(1);
+      
+      return resR;
+    }
+    else
     if(strcmp(resTy,"Array")==0)
     //if(jl_is_array(res))
     {
@@ -279,6 +315,15 @@ SEXP jl4R_eval(SEXP args)
   return resR;
 }
 
+SEXP jl4R_run(SEXP args)
+{
+  char *cmdString;
+
+  cmdString=(char*)CHAR(STRING_ELT(CADR(args),0));
+  jl_eval_string(cmdString);
+  return R_NilValue;
+}
+
 
 /************ the converse **************/
 jl_value_t* Vector_SEXP_to_jl_array(SEXP ans) {
@@ -370,6 +415,7 @@ static const R_CMethodDef cMethods[] = {
 static const R_ExternalMethodDef externalMethods[] = {
   {"jl4R_init",(DL_FUNC) &jl4R_init,-1},
   {"jl4R_eval",(DL_FUNC) &jl4R_eval,-1},
+  {"jl4R_run",(DL_FUNC) &jl4R_run,-1},
   {"jl4R_set_global_variable",(DL_FUNC)&jl4R_set_global_variable,-1},
    // {"jl4R_as_Rvector",(DL_FUNC)&jl4R_as_Rvector,-1},
   // {"jl4R_as_jlRvector",(DL_FUNC)&jl4R_as_jlRvector,-1},

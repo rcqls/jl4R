@@ -1,40 +1,75 @@
+.jlsafe <- function(...) {
+  paste0("try\n",..., "\ncatch e\n println(e.msg)\n end")
+}
 ## the main julia parsing expression !!!
+.jleval <- function(...) {
+  if(!.jlrunning()) .jlinit()
+  res <- .External("jl4R_eval", ..., PACKAGE = "jl4R")
+  return(res)
+}
+
 jl <- function(...) {
-  if(!.jlRunning()) .jlInit()
-  .External("jl4R_eval", ..., PACKAGE = "jl4R")
+  res <- .jleval(...)
+  # if(is.null(res)) {
+  #   var <- paste0("jl4R_RESULT", sample(1:1000000,1))
+  #   .jleval(paste0(var," = jl4R_ANSWER"))
+  #   if(.jltypeof(var) == "NamedTuple") {
+  #     print(var)
+  #     res <- jl(.jlmethod("values",var))
+  #     print(.jltypeof(.jlmethod("values",var)))
+  #     names(res) <- .jleval(.jlmethod("keys",var))
+  #   } else {
+  #     return(NULL)
+  #   }
+  # }
+  return(res)
 }
 
-
-jlGet <- function(var) {
-  if(!.jlRunning()) .jlInit()
-	return(jl(var))
+jlsafe <- function(...) {
+  jl(.jlsafe(...))
 }
 
-jlSet <- function(var,value) {
-  if(!.jlRunning()) .jlInit()
+jlrun <- function(...) {
+  if(!.jlrunning()) .jlinit()
+  invisible(.External("jl4R_run", ..., PACKAGE = "jl4R"))
+}
+
+.jlmethod <- function(meth, value) paste0(meth,"(",value,")")
+
+.jltypeof <- function(value) .jleval(.jlmethod("typeof",value))
+
+jlget <- function(var) {
+  if(!.jlrunning()) .jlinit()
+  res <- jl(var)
+  
+	return(res)
+}
+
+jlset <- function(var,value) {
+  if(!.jlrunning()) .jlinit()
 	.External("jl4R_set_global_variable",var,value ,PACKAGE="jl4R")
 	return(invisible())
 }
 
-.julia <- function(...) {
-  if(!.jlRunning()) .jlInit()
-  .External("jl4R_eval", paste(c("display(",...,")"),collapse=""), PACKAGE = "jl4R")
+.jl <- function(...) {
+  if(!.jlrunning()) .jlinit()
+  .External("jl4R_eval", paste(c("display(",.jlsafe(...),")"),collapse=""), PACKAGE = "jl4R")
   cat("\n")
   return(invisible())
 }
 
 
-.jlInit<-function() {
+.jlinit<-function() {
   # .External("jl4R_init",imgdir ,PACKAGE="jl4R")
   .External("jl4R_init",PACKAGE="jl4R")
   return(invisible())
 }
 
-.jlRunning <- function() {
+.jlrunning <- function() {
   .Call("jl4R_running", PACKAGE = "jl4R")
 }
 
-.jlGetAns <- function() {
-  if(!.jlRunning()) .jlInit()
+.jlans <- function() {
+  if(!.jlrunning()) .jlinit()
   .Call("jl4R_get_ans", PACKAGE = "jl4R")
 }
