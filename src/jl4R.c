@@ -16,7 +16,7 @@
 
 static int jl4R_julia_running=0;
 static jl_module_t* jl_R_module;
-SEXP newJlValue(jl_value_t* jlvalue);
+SEXP jlPtr(jl_value_t* jlvalue);
 
 SEXP jl4R_init(SEXP args)
 {
@@ -35,14 +35,14 @@ SEXP jl4R_init(SEXP args)
   return R_NilValue;
 }
 
-// void jl4R_finalize(void)
-// {
-//   if(jl4R_julia_running) {
-//     julia_finalize();
-//     jl4R_julia_running=0;
-//     printf("julia finalize!!!\n");
-//   }
-// }
+void jl4R_exit()
+{
+  if(jl4R_julia_running) {
+    jl_atexit_hook(0);
+    jl4R_julia_running=0;
+    printf("julia finalize!!!\n");
+  }
+}
 
 SEXP jl4R_running(void) {
   SEXP ans;
@@ -65,13 +65,6 @@ SEXP jl_value_type(jl_value_t *res) {
     return resR;
   } return R_NilValue;
 }
-
-// char* method(char* meth, char* expr) {
-//   char res[255];
-//   sprintf(res, "%c(%c)",meth ,expr);
-//   return res;
-// }
-
 
 //Maybe try to use cpp stuff to get the output inside julia system (ccall,cgen and cgutils)
 //-| TODO: after adding in the jlapi.c jl_is_<C_type> functions replace the strcmp!
@@ -270,7 +263,7 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
         return resR;
       }
     } else {
-      resR = (SEXP)newJlValue(res);
+      resR = (SEXP)jlPtr(res);
       // PROTECT(resR=allocVector(STRSXP,1));
       // PROTECT(nmsR = allocVector(STRSXP, 2));
       // SET_STRING_ELT(resR,0,mkChar(resTy));
@@ -282,26 +275,13 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
       return resR;
     }
   }
-  //=> No result (command incomplete or syntax error)
-  // jlapi_print_stderr(); //If this happens but this is really not sure!
-  // resR=rb_str_new2("__incomplete");
-  // if(jl_exception_occurred()!=NULL) {
-  //   rb_str_cat2(resR, "(");
-  //     rb_str_cat2(resR,jl_typeof_str(jl_exception_occurred()));
-  //   jl_value_t* err=jl_get_field(jl_exception_occurred(),"msg");
-  //   if(err!=NULL) printf("%s: %s\n",jl_typeof_str(jl_exception_occurred()),jl_string_ptr(err));
-  //   jl_exception_clear();
-  //   rb_str_cat2(resR, ")");
-  // }
-  // rb_str_cat2(resR, "__");
-  return R_NilValue;//resR;
+  return R_NilValue;
 }
 
 /***************** EVAL **********************/
 /*********/
 
-SEXP jl4R_eval(SEXP args)
-{
+jl_value_t* jl_eval2jl(SEXP args) {
   char *cmdString;
   jl_value_t *res;
   SEXP resR;
@@ -309,6 +289,14 @@ SEXP jl4R_eval(SEXP args)
   cmdString=(char*)CHAR(STRING_ELT(CADR(args),0));
   res=jl_eval_string(cmdString);
   jl_set_global(jl_main_module, jl_symbol("jl4R_ANSWER"),res);
+  return res;
+}
+
+SEXP jl4R_eval2R(SEXP args)
+{
+  jl_value_t *res;
+  SEXP resR;
+  res = jl_eval2jl(args); 
   resR=jl_value_to_SEXP(res);
   if(res==NULL) {
     if(resR != R_NilValue) resR=R_NilValue;
@@ -410,10 +398,11 @@ SEXP jl4R_set_global_variable(SEXP args) {
 }
 
 
-//// R class: jlvalue
-//// External Pointer class called jlvalue (and not jl_value which is the name used by Julia)
+/************************************************/
 
-SEXP newJlValue(jl_value_t* jlvalue) {
+//// R class jlPtr standi g for jl_value_t External Pointer
+
+SEXP jlPtr(jl_value_t* jlvalue) {
   SEXP ans,class;
   char *jltype;
   ans=(SEXP)R_MakeExternalPtr((void *)jlvalue, R_NilValue, R_NilValue);
@@ -421,7 +410,7 @@ SEXP newJlValue(jl_value_t* jlvalue) {
     PROTECT(class=allocVector(STRSXP,2));
     jltype=(char*)jl_typeof_str(jlvalue);
     SET_STRING_ELT(class,0, mkChar(jltype));
-    SET_STRING_ELT(class,1, mkChar("jlvalue"));
+    SET_STRING_ELT(class,1, mkChar("jlPtr"));
   //} else {
   //  PROTECT(class=allocVector(STRSXP,1));
   //  SET_STRING_ELT(class,0, mkChar("jlObj"));
@@ -432,28 +421,14 @@ SEXP newJlValue(jl_value_t* jlvalue) {
   return ans;
 }
 
-
-SEXP jl4R_jlvalue(SEXP args) {
-  char *cmdString;
-  jl_value_t *jlv;
-  SEXP jlvR;
-
-  cmdString=(char*)CHAR(STRING_ELT(CADR(args),0));
-  jlv=jl_eval_string(cmdString);
-  jlvR=(SEXP)newJlValue(jlv);
-  return jlvR;
+SEXP jl4R_eval2jlPtr(SEXP args)
+{
+  jl_value_t *res;
+  res = jl_eval2jl(args);
+  return jlPtr(res);
 }
 
-SEXP jl4R_jlvalue_to_SEXP(SEXP args) {
-  jl_value_t *jlv, *res;
-  SEXP resR;
-
-  jlv=(jl_value_t*)R_ExternalPtrAddr(CADR(args));
-  resR = jl_value_to_SEXP(jlv);
-  return resR;
-}
-
-SEXP jl4R_jlcall1(SEXP args) {
+SEXP jl4R_jlPtr_call1(SEXP args) {
   char *meth;
   jl_value_t *jlv, *res;
   jl_function_t *func;
@@ -462,13 +437,13 @@ SEXP jl4R_jlcall1(SEXP args) {
   jlv=(jl_value_t*)R_ExternalPtrAddr(CADR(args));
   meth = (char*)CHAR(STRING_ELT(CADDR(args),0));
 
-  func = jl_get_function(jl_base_module, meth);
+  func = jl_get_function(jl_main_module, meth);
   res = jl_call1(func, jlv);
-  resR=(SEXP)newJlValue(res);
+  resR=(SEXP)jlPtr(res);
   return resR;
 }
 
-SEXP jl4R_jlcall2(SEXP args) {
+SEXP jl4R_jlPtr_call2(SEXP args) {
   char *meth;
   jl_value_t *jlv, *res, *jlarg;
   jl_function_t *func;
@@ -478,13 +453,13 @@ SEXP jl4R_jlcall2(SEXP args) {
   meth = (char*)CHAR(STRING_ELT(CADDR(args),0));
   // printf("meth=%s\n",meth);
   jlarg=(jl_value_t*)R_ExternalPtrAddr(CADDDR(args));
-  func = jl_get_function(jl_base_module, meth);
+  func = jl_get_function(jl_main_module, meth);
   res = jl_call2(func, jlv,jlarg);
-  resR=(SEXP)newJlValue(res);
+  resR=(SEXP)jlPtr(res);
   return resR;
 }
 
-SEXP jl4R_jlcall3(SEXP args) {
+SEXP jl4R_jlPtr_call3(SEXP args) {
   char *meth;
   jl_value_t *jlv, *res, *jlarg, *jlarg2;
   jl_function_t *func;
@@ -494,9 +469,18 @@ SEXP jl4R_jlcall3(SEXP args) {
   meth = (char*)CHAR(STRING_ELT(CADDR(args),0));
   jlarg=(jl_value_t*)R_ExternalPtrAddr(CADDDR(args));
   jlarg2=(jl_value_t*)R_ExternalPtrAddr(CAD4R(args));
-  func = jl_get_function(jl_base_module, meth);
-  res = jl_call3(func, jlv, jlarg,jlarg2);
-  resR=(SEXP)newJlValue(res);
+  func = jl_get_function(jl_main_module, meth);
+  res = jl_call3(func, jlv, jlarg, jlarg2);
+  resR=(SEXP)jlPtr(res);
+  return resR;
+}
+
+SEXP jl4R_jlPtr2R(SEXP args) {
+  jl_value_t *jlv, *res;
+  SEXP resR;
+
+  jlv=(jl_value_t*)R_ExternalPtrAddr(CADR(args));
+  resR = jl_value_to_SEXP(jlv);
   return resR;
 }
 
@@ -510,16 +494,17 @@ static const R_CMethodDef cMethods[] = {
 
 static const R_ExternalMethodDef externalMethods[] = {
   {"jl4R_init",(DL_FUNC) &jl4R_init,-1},
-  {"jl4R_eval",(DL_FUNC) &jl4R_eval,-1},
+  {"jl4R_exit",(DL_FUNC) &jl4R_exit,-1},
+  {"jl4R_eval2R",(DL_FUNC) &jl4R_eval2R,-1},
   {"jl4R_run",(DL_FUNC) &jl4R_run,-1},
   {"jl4R_set_global_variable",(DL_FUNC)&jl4R_set_global_variable,-1},
    // {"jl4R_as_Rvector",(DL_FUNC)&jl4R_as_Rvector,-1},
   // {"jl4R_as_jlRvector",(DL_FUNC)&jl4R_as_jlRvector,-1},
-  {"jl4R_jlvalue",(DL_FUNC) &jl4R_jlvalue,-1},
-  {"jl4R_jlvalue_to_SEXP",(DL_FUNC) &jl4R_jlvalue_to_SEXP,-1},
-  {"jl4R_jlcall1",(DL_FUNC) &jl4R_jlcall1,-1},
-  {"jl4R_jlcall2",(DL_FUNC) &jl4R_jlcall2,-1},
-  {"jl4R_jlcall3",(DL_FUNC) &jl4R_jlcall3,-1},
+  {"jl4R_eval2jlPtr",(DL_FUNC) &jl4R_eval2jlPtr,-1},
+  {"jl4R_jlPtr_call1",(DL_FUNC) &jl4R_jlPtr_call1,-1},
+  {"jl4R_jlPtr_call2",(DL_FUNC) &jl4R_jlPtr_call2,-1},
+  {"jl4R_jlPtr_call3",(DL_FUNC) &jl4R_jlPtr_call3,-1},
+  {"jl4R_jlPtr2RR",(DL_FUNC) &jl4R_jlPtr2R,-1},
   {NULL,NULL,0}
 };
 

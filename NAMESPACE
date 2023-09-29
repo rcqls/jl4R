@@ -2,10 +2,11 @@ useDynLib(jl4R, .registration = TRUE)
 
 exportPattern("^\\.jl")
 export(
-  jl, jlsafe, jlrun, jlget, jlset,
+  jlptr, jlptr_unsafe,
+  jl, jl_unsafe, jlrun, jlget, jlset, jlshow,
   jlvector,
   "[.jlvector","[<-.jlvector","[[.jlvector","[[<-.jlvector", as.vector.jlvector,
-  jlvalue
+  jl2R, jl2R.default
 )
 
 #S3methods are not viewable inside the R system. If you want this functionality available put it in the previous export
@@ -17,4 +18,6 @@ S3method("[[",jlvector)
 S3method("[[<-",jlvector)
 S3method(as.vector,jlvector)
 
-S3method(jlvalue,DataFrame)
+S3method(jl2R,default)
+S3method(jl2R,jlPtr)
+S3method(jl2R,DataFrame)

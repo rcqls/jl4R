@@ -7,7 +7,7 @@ jlvector <- function(x,value) {
     obj
 }
 
- print.jlvector <- function(obj, ...) {invisible(.jl(obj$var))}
+ print.jlvector <- function(obj, ...) {invisible(jlshow(obj$var))}
 
 
 "[<-.jlvector" <- "[[<-.jlvector" <- function(obj, i, value) {

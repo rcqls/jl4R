@@ -1,48 +1,37 @@
-## the main julia parsing expression !!!
-.jleval <- function(...) {
-  if(!.jlrunning()) .jlinit()
-  res <- .External("jl4R_eval", ..., PACKAGE = "jl4R")
-  if(inherits(res,"jl_value")) {
-    res[[1]] <- c(...)[1]
-    res <- jlvalue(res)
-  }
+jl_unsafe <- function(expr) {
+  res <- .jleval2R(expr)
   return(res)
 }
 
-jl <- function(...) {
-  res <- .jleval(...)
-  return(res)
+jl <- function(expr) {
+  .jleval2R(.jlsafe(expr))
 }
 
-jlsafe <- function(...) {
-  jl(.jlsafe(...))
-}
-
-jlrun <- function(...) {
+jlrun <- function(expr) {
   if(!.jlrunning()) .jlinit()
-  invisible(.External("jl4R_run", ..., PACKAGE = "jl4R"))
+  invisible(.External("jl4R_run", .jlsafe(expr), PACKAGE = "jl4R"))
+}
+
+jlshow <- function(expr) {
+  jl(paste(c("display(",expr,")"),collapse="")) 
+  cat("\n")
+  return(invisible())
 }
 
 jlget <- function(var) {
   if(!.jlrunning()) .jlinit()
   res <- jl(var)
-  
 	return(res)
 }
 
 jlset <- function(var,value) {
   if(!.jlrunning()) .jlinit()
-	.External("jl4R_set_global_variable",var,value ,PACKAGE="jl4R")
+	.External("jl4R_set_global_variable", var, .jlsafe(value) ,PACKAGE="jl4R")
 	return(invisible())
 }
 
-.jl <- function(...) {
-  if(!.jlrunning()) .jlinit()
-  .External("jl4R_eval", paste(c("display(",.jlsafe(...),")"),collapse=""), PACKAGE = "jl4R")
-  cat("\n")
-  return(invisible())
-}
 
+## More internal stuff
 
 .jlinit<-function() {
   # .External("jl4R_init",imgdir ,PACKAGE="jl4R")
@@ -50,8 +39,26 @@ jlset <- function(var,value) {
   return(invisible())
 }
 
+.jlexit<-function() {
+  # .External("jl4R_init",imgdir ,PACKAGE="jl4R")
+  .External("jl4R_exit",PACKAGE="jl4R")
+  return(invisible())
+}
+
 .jlrunning <- function() {
   .Call("jl4R_running", PACKAGE = "jl4R")
+}
+
+## the main julia parsing expression !!!
+
+.jleval2R <- function(expr) {
+  if(!.jlrunning()) .jlinit()
+  res <- .External("jl4R_eval2R", expr, PACKAGE = "jl4R")
+  if(inherits(res,"jl_value")) {
+    res[[1]] <- expr
+    res <- jlvalue(res)
+  }
+  return(res)
 }
 
 .jlans <- function() {
