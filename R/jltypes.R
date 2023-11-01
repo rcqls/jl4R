@@ -1,35 +1,50 @@
-.jlPtr2R <- function(jlptr) {
+jl_typeof <- function(jlval) {
     if(!.jlrunning()) .jlinit()
-    res <- .External("jl4R_jlPtr2R", jlptr, PACKAGE = "jl4R")
+    res <- .External("jl4R_typeof2R", jlval, PACKAGE = "jl4R")
     res
 }
 
-is.jlPtr <- function(obj) inherits(obj,"jlPtr")
+.jlValue2R <- function(jlval) {
+    if(!.jlrunning()) .jlinit()
+    res <- .External("jl4R_jlValue2R", jlval, PACKAGE = "jl4R")
+    res
+}
 
-jl2R <- function(jlptr, ...) UseMethod("jl2R")
+print.jlValue <- function(obj, ...) print(toR(obj))
 
-jl2R.default <- function(obj, ...) obj
+is.jlValue <- function(obj) inherits(obj,"jlValue")
 
-jl2R.jlPtr <- function(jlptr) {
-    res <- .jlPtr2R(jlptr)
-    if(is.jlPtr(res)) {
-        jl2R(res)
+toR <- function(jlval, ...) UseMethod("toR")
+
+toR.default <- function(obj, ...) obj
+
+toR.jlValue <- function(jlval) {
+    res <- .jlValue2R(jlval)
+    if(is.jlValue(res)) {
+        toR(res)
     } else {
-        if(is.list(res) && any(sapply(res,is.jlPtr))) {
-            lapply(res, jl2R)
+        if(is.list(res) && any(sapply(res,is.jlValue))) {
+            sapply(res, toR)
         } else {
-            res
+            simplify2array(res)
         }
     }
 }
 
-jl2R.DataFrame <- function(jlp) {
-    nms <- .jlPtr2R(.jlPtr_call1(jlp,"names"))
+toR.DataFrame <- function(jlval) {
+    nms <- toR(jl_call("names",jlval))
     res <- list()
     for(nm in nms) {
-        res[[nm]] <- .jlPtr2R(.jlPtr_call3(jlp,"getindex",jlptr_unsafe(":"), jlptr(paste0(":",nm))))
+        res[[nm]] <- toR(jl_call("getindex",jlval, jl_unsafe(":"), jl_symbol(nm)))
     }
     attr(res,"row.names") <- as.character(1:length(res[[1]]))
     class(res) <- "data.frame"
+    res
+}
+
+toR.CategoricalArray <- function(jlval) {
+    res <- integer(0)
+    attr(res,"levels") <- character(0)
+    class(res) <- "factor"
     res
 }

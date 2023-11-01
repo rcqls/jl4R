@@ -1,9 +1,9 @@
-jl_unsafe <- function(expr) {
+jlR_unsafe <- function(expr) {
   res <- .jleval2R(expr)
   return(res)
 }
 
-jl <- function(expr) {
+jlR <- function(expr) {
   .jleval2R(.jlsafe(expr))
 }
 

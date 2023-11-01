@@ -1,3 +1,5 @@
+jl_symbol <- function(field) jl(paste0(":",field))
+
 .jlmethod <- function(meth, value) paste0(meth,"(",value,")")
 
 .jltypeof <- function(value) .jleval(.jlmethod("typeof",value))

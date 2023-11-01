@@ -1,23 +1,30 @@
 useDynLib(jl4R, .registration = TRUE)
 
-exportPattern("^\\.jl")
+exportPattern("^\\jl_")
+exportPattern("^\\jlval_")
 export(
-  jlptr, jlptr_unsafe,
-  jl, jl_unsafe, jlrun, jlget, jlset, jlshow,
-  jlvector,
-  "[.jlvector","[<-.jlvector","[[.jlvector","[[<-.jlvector", as.vector.jlvector,
-  jl2R, jl2R.default
+  jl, jlR, jlR_unsafe, 
+  jlrun, 
+  toR
 )
 
 #S3methods are not viewable inside the R system. If you want this functionality available put it in the previous export
 
-S3method(print,jlvector)
-S3method("[",jlvector)
-S3method("[<-",jlvector)
-S3method("[[",jlvector)
-S3method("[[<-",jlvector)
-S3method(as.vector,jlvector)
+# S3method(print,jlvector)
+S3method("names",NamedTuple)
+S3method("[",NamedTuple)
+S3method("$",NamedTuple)
+# S3method("[<-",jlvector)
+# S3method("[[",jlvector)
+# S3method("[[<-",jlvector)
+# S3method(as.vector,jlvector)
 
-S3method(jl2R,default)
-S3method(jl2R,jlPtr)
-S3method(jl2R,DataFrame)
+S3method("names",jlStruct)
+S3method("[",jlStruct)
+S3method("$",jlStruct)
+
+S3method(print,jlValue)
+S3method(toR,default)
+S3method(toR,jlValue)
+S3method(toR,DataFrame)
+S3method(toR,CategoricalArray)
