@@ -3,15 +3,15 @@ jl_colon <- function() jl_unsafe(":")
 ## Struct facility
 
 jl_isstructtype <- function(jlval) {
-    jl_call("isstructtype", jlval)
+    jlcall("isstructtype", jlval)
 }
 
 jl_fieldnames <- function(jlv) {
-    jl_call("fieldnames",jl_call("typeof",jlv))
+    jlcall("fieldnames",jlcall("typeof",jlv))
 }
 
 jl_getfield <- function(jlval,field) {
-    jl_call("getfield", jlval, jl_symbol(field))
+    jlcall("getfield", jlval, jl_symbol(field))
 }
 
 jlR_isstructtype <- function(jlval) toR(jl_isstructtype(jlval))

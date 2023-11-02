@@ -2,21 +2,16 @@ useDynLib(jl4R, .registration = TRUE)
 
 exportPattern("^\\jl_")
 exportPattern("^\\jlR_")
-exportPattern("^\\jlval_")
 export(
-  jl, jl2R, jl2R_unsafe, 
-  jlrun, jlshow,
-  toR,
-  is.jlValue, is.jlStruct
+  jl, 
+  jlrun, jlcall, jlcallR, 
+  jlshow, jldisplay,
+  R, toR,
+  is.jlValue, is.jlStruct,
+  jl2R, jl2R_unsafe
 )
 
 #S3methods are not viewable inside the R system. If you want this functionality available put it in the previous export
-
-# S3method(print,jlvector)
-# S3method("[<-",jlvector)
-# S3method("[[",jlvector)
-# S3method("[[<-",jlvector)
-# S3method(as.vector,jlvector)
 
 S3method("names",jlStruct)
 S3method("[",jlStruct)
@@ -35,3 +30,10 @@ S3method(toR,default)
 S3method(toR,jlValue)
 S3method(toR,DataFrame)
 S3method(toR,CategoricalArray)
+
+
+# S3method(print,jlvector)
+# S3method("[<-",jlvector)
+# S3method("[[",jlvector)
+# S3method("[[<-",jlvector)
+# S3method(as.vector,jlvector)

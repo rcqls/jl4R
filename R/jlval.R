@@ -34,7 +34,7 @@
     .Call("jl4R_jlValue_call", meth, jlargs, jlnargs, PACKAGE = "jl4R")
 }
 
-jl_call_ <- function(meth, ...) {
+jl_call <- function(meth, ...) {
     jlargs <- list(...)
     jlnargs <- length(jlargs)
     .jlValue_call(meth,jlargs,jlnargs)

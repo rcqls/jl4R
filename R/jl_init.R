@@ -22,10 +22,6 @@
 .jleval2R <- function(expr) {
   if(!.jlrunning()) .jlinit()
   res <- .External("jl4R_eval2R", expr, PACKAGE = "jl4R")
-  if(inherits(res,"jl_value")) {
-    res[[1]] <- expr
-    res <- jlvalue(res)
-  }
   return(res)
 }
 

@@ -405,15 +405,23 @@ SEXP jl4R_set_global_variable(SEXP args) {
   return R_NilValue;
 }
 
-
+// static void jlValueFinalizer(SEXP ptr) {
+//     if(!R_ExternalPtrAddr(ptr)) return;
+//     jl_finalize((jl_value_t*)ptr);
+//     printf("Finalized...\n");
+//     R_ClearExternalPtr(ptr); /* not really needed */
+// }
 /************************************************/
 
-//// R class jlValue standi g for jl_value_t External Pointer
+//// R class jlValue standing for jl_value_t External Pointer
 
 SEXP jlValue(jl_value_t* jlvalue) {
   SEXP ans,class;
   char *jltype;
   ans=(SEXP)R_MakeExternalPtr((void *)jlvalue, R_NilValue, R_NilValue);
+  PROTECT(ans);
+  // RMK: jl_finalize is not exported
+  // R_RegisterCFinalizerEx(ans, jlValueFinalizer, TRUE);
   //if(rbIsRVector(jlobj)) {
     PROTECT(class=allocVector(STRSXP,2));
     jltype=(char*)jl_typeof_str(jlvalue);
@@ -425,7 +433,7 @@ SEXP jlValue(jl_value_t* jlvalue) {
   //}
   //classgets(ans,class);
   SET_CLASS(ans,class);
-  UNPROTECT(1);
+  UNPROTECT(2);
   return ans;
 }
 

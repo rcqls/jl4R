@@ -8,13 +8,13 @@ jl_unsafe <- function(expr) {
 }
 
 # apply a method call 
-jl_call <- function(meth , ...) {
+jlcall <- function(meth , ...) {
     args <- list(...)
     if(!is.character(meth)) {
         error("No julia method specified!")
     }
     if(length(args) > 3) {
-      jl_call_(meth, ...)
+      jl_call(meth, ...)
     } else {
       switch(length(args) + 1,
           .jlValue_call0(meth),
@@ -28,7 +28,7 @@ jl_call <- function(meth , ...) {
 
 jlR <- function(expr) toR(jl(expr))
 jlR_unsafe <- function(expr) toR(jl_unsafe(expr))
-jlR_call <- function(meth , ...) toR(jl_call(meth, ...))
+jlcallR <- function(meth , ...) toR(jlcall(meth, ...))
 
 jl2R <- function(expr) .jleval2R(.jlsafe(expr))
 jl2R_unsafe <- function(expr) .jleval2R(expr)
@@ -38,20 +38,19 @@ jlrun <- function(expr) {
   invisible(.External("jl4R_run", .jlsafe(expr), PACKAGE = "jl4R"))
 }
 
-jlshow <- function(expr) {
-  jl(paste(c("display(",expr,")"),collapse="")) 
-  cat("\n")
-  return(invisible())
-}
+jlshow <- function(jlval) invisible(jlcall("show",jlval))
 
-jlget <- function(var) {
-  if(!.jlrunning()) .jlinit()
-  res <- jl(var)
-	return(res)
-}
+jldisplay <- function(jlval) invisible(jlcall("display",jlval))
 
-jlset <- function(var,value) {
-  if(!.jlrunning()) .jlinit()
-	.External("jl4R_set_global_variable", var, .jlsafe(value) ,PACKAGE="jl4R")
-	return(invisible())
-}
+
+# jlget <- function(var) {
+#   if(!.jlrunning()) .jlinit()
+#   res <- jl(var)
+# 	return(res)
+# }
+
+# jlset <- function(var,value) {
+#   if(!.jlrunning()) .jlinit()
+# 	.External("jl4R_set_global_variable", var, .jlsafe(value) ,PACKAGE="jl4R")
+# 	return(invisible())
+# }
