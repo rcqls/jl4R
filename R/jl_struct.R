@@ -5,7 +5,9 @@ is.jlStruct <- function(jlval) {
 names.jlStruct <- function(jlval) jl_fieldnames(jlval)
 
 "[.jlStruct" <- function(jlval, field) {
-    jl_call("getfield",jlval,jl_symbol(field))
+    if(field %in% names(jlval)) {
+        jl_call("getfield",jlval,jl_symbol(field))
+    } else NULL
 }
 
 "$.jlStruct" <- function(jlval, field) jlval[field]
