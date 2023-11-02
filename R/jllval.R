@@ -30,7 +30,7 @@ jl_call <- function(meth , ...) {
 .jleval2jlValue <- function(expr) {
   if(!.jlrunning()) .jlinit()
   jlval <- .External("jl4R_eval2jlValue", expr, PACKAGE = "jl4R")
-  if(toR(jl_isstructtype(jl_call("typeof", jlval)))) {
+  if(is.jlStruct(jlval)) {
     class(jlval) <- c(class(jlval)[1:(length(class(jlval))-1)],"jlStruct","jlValue")
   }
   return(jlval)
@@ -53,12 +53,12 @@ jl_call <- function(meth , ...) {
 
 ## Struct facility
 
-jl_isstructtype <- function(jlv) {
-    jl_call("isstructtype", jlv)
+jl_isstructtype <- function(jlval) {
+    jl_call("isstructtype", jlval)
 }
 
 jl_fieldnames <- function(jlv) {
-    jl_call("fieldnames",jlv)
+    jl_call("fieldnames",jl_call("typeof",jlv))
 }
 
 jl_getfield <- function(jlv,field) {
