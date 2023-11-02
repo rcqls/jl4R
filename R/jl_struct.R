@@ -2,7 +2,7 @@ is.jlStruct <- function(jlval) {
     toR(jl_isstructtype(jl_call("typeof",jlval)))
 }
 
-names.jlStruct <- function(jlval) jl_fieldnames(jlval)
+names.jlStruct <- function(jlval) toR(jl_fieldnames(jlval))
 
 "[.jlStruct" <- function(jlval, field) {
     if(field %in% names(jlval)) {
