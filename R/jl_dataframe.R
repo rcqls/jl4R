@@ -1,4 +1,4 @@
-names.DataFrame <- function(jlval) jl_call("names",jlval)
+names.DataFrame <- function(jlval) jlR_call("names",jlval)
 
 "[.DataFrame" <- function(jlval, field) {
      if(field %in% names(jlval)) {

@@ -1,4 +1,4 @@
-names.NamedTuple <- function(jlval) jl_call("keys",jlval)
+names.NamedTuple <- function(jlval) toR(jl_call("keys",jlval))
 
 "[.NamedTuple" <- function(jlval, field) {
      if(field %in% names(jlval)) {

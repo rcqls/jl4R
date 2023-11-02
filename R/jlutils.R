@@ -1,5 +1,20 @@
 jl_symbol <- function(field) jl(paste0(":",field))
 
+## Struct facility
+
+jl_isstructtype <- function(jlval) {
+    jl_call("isstructtype", jlval)
+}
+
+jl_fieldnames <- function(jlv) {
+    jl_call("fieldnames",jl_call("typeof",jlv))
+}
+
+jl_getfield <- function(jlv,field) {
+    jl_call("getfield", jlv, jlptr(paste0(":",field)))
+}
+
+
 .jlmethod <- function(meth, value) paste0(meth,"(",value,")")
 
 .jltypeof <- function(value) .jleval(.jlmethod("typeof",value))
