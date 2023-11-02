@@ -1,5 +1,5 @@
 jl_symbol <- function(field) jl(paste0(":",field))
-
+jl_colon <- function() jl_unsafe(":")
 ## Struct facility
 
 jl_isstructtype <- function(jlval) {
@@ -10,9 +10,15 @@ jl_fieldnames <- function(jlv) {
     jl_call("fieldnames",jl_call("typeof",jlv))
 }
 
-jl_getfield <- function(jlv,field) {
-    jl_call("getfield", jlv, jlptr(paste0(":",field)))
+jl_getfield <- function(jlval,field) {
+    jl_call("getfield", jlval, jl_symbol(field))
 }
+
+jlR_isstructtype <- function(jlval) toR(jl_isstructtype(jlval))
+jlR_fieldnames <- function(jlval) toR(jl_fieldnames(jlval))
+jlR_getfield <- function(jlval,field) toR(jl_getfield(jlval,field))
+
+
 
 
 .jlmethod <- function(meth, value) paste0(meth,"(",value,")")

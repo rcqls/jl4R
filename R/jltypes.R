@@ -10,23 +10,31 @@ jl_typeof <- function(jlval) {
     res
 }
 
-print.jlValue <- function(obj, ...) print(toR(obj))
-
 is.jlValue <- function(obj) inherits(obj,"jlValue")
 
-toR <- function(jlval, ...) UseMethod("toR")
+print.jlValue <- function(obj, ...) {
+    print(toR(obj))
+}
 
-toR.default <- function(obj, ...) obj
+print.jlUnprintable <- function(obj, ...) print.default(obj)
+
+toR <- function(jlval) UseMethod("toR")
+
+toR.default <- function(obj) obj
 
 toR.jlValue <- function(jlval) {
     res <- .jlValue2R(jlval)
-    if(is.jlValue(res)) {
-        toR(res)
+    if(typeof(res) == "externalptr") {
+        ## To avoid infinite recursion for print method
+        class(res) <- c("jlUnprintable",class(res))
+        res
     } else {
         if(is.list(res) && any(sapply(res,is.jlValue))) {
+            # print(2)
             sapply(res, toR)
         } else {
-            simplify2array(res)
+            # print(3)
+            if(is.list(res)) simplify2array(res) else res
         }
     }
 }
@@ -35,7 +43,7 @@ toR.DataFrame <- function(jlval) {
     nms <- toR(jl_call("names",jlval))
     res <- list()
     for(nm in nms) {
-        res[[nm]] <- toR(jl_call("getindex",jlval, jl_unsafe(":"), jl_symbol(nm)))
+        res[[nm]] <- jlR_call("getindex",jlval, jl_colon(), jl_symbol(nm))
     }
     attr(res,"row.names") <- as.character(1:length(res[[1]]))
     class(res) <- "data.frame"
@@ -43,8 +51,9 @@ toR.DataFrame <- function(jlval) {
 }
 
 toR.CategoricalArray <- function(jlval) {
-    res <- integer(0)
-    attr(res,"levels") <- character(0)
+    pool <- jl_getfield(jlval,"pool")
+    res <- jlR_getfield(jlval,"refs")
+    attr(res,"levels") <- jlR_call("levels",pool)
     class(res) <- "factor"
     res
 }

@@ -66,6 +66,13 @@ SEXP jl_value_type(jl_value_t *res) {
   } return R_NilValue;
 }
 
+int jl4R_isa(jl_value_t *jlv, char* typ) {
+  jl_value_t *jl_typ;
+
+  jl_typ = jl_eval_string(typ);
+  return jl_isa(jlv,jl_typ);
+}
+
 //Maybe try to use cpp stuff to get the output inside julia system (ccall,cgen and cgutils)
 //-| TODO: after adding in the jlapi.c jl_is_<C_type> functions replace the strcmp!
 SEXP jl_value_to_SEXP(jl_value_t *res) {
@@ -74,13 +81,14 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
   SEXP nmsR;
   SEXPTYPE aryTyR;
   jl_value_t *tmp;
-  jl_function_t *func;
+  jl_function_t *func, *isa;
   char *resTy, *aryTy, *aryTy2;
 
   if(res!=NULL) { //=> get a result
     resTy=(char*)jl_typeof_str(res);
     //printf("typeof=%s\n",resTy);
-    if(strcmp(jl_typeof_str(res),"Int64")==0 || strcmp(jl_typeof_str(res),"Int32")==0)
+    if(jl4R_isa(res,"Integer")) 
+    // if(strcmp(jl_typeof_str(res),"Int64")==0 || strcmp(jl_typeof_str(res),"Int32")==0 || strcmp(jl_typeof_str(res),"UInt64")==0 || strcmp(jl_typeof_str(res),"UInt32")==0)
     //if(jl_is_long(res)) //does not work because of DLLEXPORT
     {
       //printf("elt=%d\n",jl_unbox_long(res));
@@ -428,6 +436,19 @@ SEXP jl4R_eval2jlValue(SEXP args)
   return jlValue(res);
 }
 
+SEXP jl4R_jlValue_call0(SEXP args) {
+  char *meth;
+  jl_value_t *res;
+  jl_function_t *func;
+  SEXP resR;
+
+  meth = (char*)CHAR(STRING_ELT(CADR(args),0));
+  func = jl_get_function(jl_main_module, meth);
+  res = jl_call0(func);
+  resR=(SEXP)jlValue(res);
+  return resR;
+}
+
 SEXP jl4R_jlValue_call1(SEXP args) {
   char *meth;
   jl_value_t *jlv, *res;
@@ -474,6 +495,32 @@ SEXP jl4R_jlValue_call3(SEXP args) {
   return resR;
 }
 
+SEXP jl4R_jlValue_call(SEXP jl_meth, SEXP jl_args, SEXP jl_nargs) {
+  char *meth;
+  int nargs;
+  jl_value_t **args;
+  jl_value_t *res;
+  jl_function_t *func;
+  SEXP resR;
+
+  // printf("type %d\n", TYPEOF(jl_args));
+  if(TYPEOF(jl_args) != VECSXP) {
+    return R_NilValue;
+  }
+  meth = (char*)CHAR(STRING_ELT(jl_meth,0));
+  // printf("meth=%s\n",meth);
+  nargs=INTEGER(jl_nargs)[0];
+  args = malloc(nargs * sizeof(jl_value_t*));
+  for(int i=0;i < nargs;i++) {
+    args[i] = (jl_value_t*)(R_ExternalPtrAddr(VECTOR_ELT(jl_args,i)));
+  }
+  func = jl_get_function(jl_main_module, meth);
+  res = jl_call(func, args, nargs);
+  resR=(SEXP)jlValue(res);
+  free(args);
+  return resR;
+}
+
 SEXP jl4R_jlValue2R(SEXP args) {
   jl_value_t *jlv, *res;
   SEXP resR;
@@ -510,6 +557,7 @@ static const R_ExternalMethodDef externalMethods[] = {
    // {"jl4R_as_Rvector",(DL_FUNC)&jl4R_as_Rvector,-1},
   // {"jl4R_as_jlRvector",(DL_FUNC)&jl4R_as_jlRvector,-1},
   {"jl4R_eval2jlValue",(DL_FUNC) &jl4R_eval2jlValue,-1},
+  {"jl4R_jlValue_call0",(DL_FUNC) &jl4R_jlValue_call0,-1},
   {"jl4R_jlValue_call1",(DL_FUNC) &jl4R_jlValue_call1,-1},
   {"jl4R_jlValue_call2",(DL_FUNC) &jl4R_jlValue_call2,-1},
   {"jl4R_jlValue_call3",(DL_FUNC) &jl4R_jlValue_call3,-1},
@@ -521,6 +569,7 @@ static const R_ExternalMethodDef externalMethods[] = {
 static const R_CallMethodDef callMethods[] = {
   {"jl4R_running",(DL_FUNC) &jl4R_running,0},
   {"jl4R_get_ans",(DL_FUNC) &jl4R_get_ans,0},
+  {"jl4R_jlValue_call",(DL_FUNC) &jl4R_jlValue_call,3},
   {NULL,NULL,0}
 };
 

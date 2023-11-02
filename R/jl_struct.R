@@ -1,5 +1,5 @@
 is.jlStruct <- function(jlval) {
-    toR(jl_isstructtype(jl_call("typeof",jlval)))
+    jlR_isstructtype(jl_call("typeof",jlval))
 }
 
 names.jlStruct <- function(jlval) toR(jl_fieldnames(jlval))

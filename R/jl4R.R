@@ -7,18 +7,23 @@ jl_unsafe <- function(expr) {
     .jleval2jlValue(expr)
 }
 
-# apply a call to jlptr
+# apply a method call 
 jl_call <- function(meth , ...) {
     args <- list(...)
     if(!is.character(meth)) {
         error("No julia method specified!")
     }
-    switch(length(args),
-        .jlValue_call1(meth, ...),
-        .jlValue_call2(meth, ...),
-        .jlValue_call3(meth, ...),
-        "Too much argument"
-    )
+    if(length(args) > 3) {
+      jl_call_(meth, ...)
+    } else {
+      switch(length(args) + 1,
+          .jlValue_call0(meth),
+          .jlValue_call1(meth, ...),
+          .jlValue_call2(meth, ...),
+          .jlValue_call3(meth, ...),
+          "Supposed to be done..."
+      )
+    }
 }
 
 jlR <- function(expr) toR(jl(expr))
