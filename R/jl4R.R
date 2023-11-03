@@ -1,6 +1,12 @@
+jl <- function(obj, ...) UseMethod("jl")
+
 # return External Pointer of julia object 
-jl <- function(expr) {
+jl.default <- function(expr) {
+  if(class(substitute(expr)) == "character") {
     .jleval2jlValue(.jlsafe(expr))
+  } else {
+    .jleval2jlValue(.jlsafe(deparse(substitute(expr))))
+  }
 }
 
 jl_unsafe <- function(expr) {
@@ -38,6 +44,10 @@ jlrun <- function(expr) {
   invisible(.External("jl4R_run", .jlsafe(expr), PACKAGE = "jl4R"))
 }
 
+jlusing <- function(pkgs) {
+  jlrun(paste0("using ",paste(pkgs,collapse=", ")))
+}
+
 jlshow <- function(jlval) invisible(jlcall("show",jlval))
 
 jldisplay <- function(jlval) invisible(jlcall("display",jlval))
@@ -49,8 +59,8 @@ jldisplay <- function(jlval) invisible(jlcall("display",jlval))
 # 	return(res)
 # }
 
-# jlset <- function(var,value) {
-#   if(!.jlrunning()) .jlinit()
-# 	.External("jl4R_set_global_variable", var, .jlsafe(value) ,PACKAGE="jl4R")
-# 	return(invisible())
-# }
+jlset <- function(var,value) {
+  if(!.jlrunning()) .jlinit()
+	.External("jl4R_set_global_variable", var, value ,PACKAGE="jl4R")
+	return(invisible())
+}

@@ -12,3 +12,14 @@ names.DataFrame <- function(jlval) jlcallR("names",jlval)
     } else NULL
 }
 "$.DataFrame" <- function(jlval, field) jlval[field]
+
+jl.data.frame <- function(df) {
+    jlusing("DataFrames")
+    DF <- jlcall("splat",jl("DataFrame"))
+    jl_args <- jl("[]")
+    for( nm in names(df)) {
+        jlcall("=>",jl_symbol("a"),jl(c(1,2,3)))
+        df[[nm]]
+    }
+    # jlcall("vcat",jlcall("=>",jl_symbol("a"),jl(c(1,2,3))),jlcall("=>",jl_symbol("b"),jl(c(3,4,1)))) -> jl_args
+}

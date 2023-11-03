@@ -13,7 +13,7 @@
 // #endif
 
 
-
+JULIA_DEFINE_FAST_TLS
 static int jl4R_julia_running=0;
 static jl_module_t* jl_R_module;
 SEXP jlValue(jl_value_t* jlvalue);
@@ -181,7 +181,7 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
     if(strcmp(resTy,"Symbol")==0 )
     {
        PROTECT(resR=NEW_CHARACTER(1));
-      CHARACTER_POINTER(resR)[0]=mkChar(jl_symbol_name(res));
+      CHARACTER_POINTER(resR)[0]=mkChar(jl_symbol_name((jl_sym_t *)res));
       UNPROTECT(1);
       return resR;
     }
@@ -210,7 +210,7 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
       for(i=0;i<d;i++) {
         //BEFORE 0.3: SET_ELEMENT(resR,i,jl_value_to_SEXP(jl_tupleref(res,i)));
         SET_ELEMENT(resR,i,jl_value_to_SEXP(jl_fieldref(res,i)));
-        SET_STRING_ELT(nmsR,i,mkChar(jl_symbol_name(jl_fieldref(keys,i))));
+        SET_STRING_ELT(nmsR,i,mkChar(jl_symbol_name((jl_sym_t *)jl_fieldref(keys,i))));
       }
       setAttrib(resR, R_NamesSymbol, nmsR);
       UNPROTECT(1);
@@ -296,7 +296,9 @@ jl_value_t* jl_eval2jl(SEXP args) {
 
   cmdString=(char*)CHAR(STRING_ELT(CADR(args),0));
   res=jl_eval_string(cmdString);
+  JL_GC_PUSH1(&res);
   jl_set_global(jl_main_module, jl_symbol("jl4R_ANSWER"),res);
+  JL_GC_POP();
   return res;
 }
 
@@ -304,12 +306,14 @@ SEXP jl4R_eval2R(SEXP args)
 {
   jl_value_t *res;
   SEXP resR;
-  res = jl_eval2jl(args); 
+  res = jl_eval2jl(args);
+  JL_GC_PUSH1(&res);
   resR=jl_value_to_SEXP(res);
   if(res==NULL) {
     if(resR != R_NilValue) resR=R_NilValue;
     else  resR=R_NilValue;//newJLObj(res);
   }
+  JL_GC_POP();
   return resR;
 }
 
@@ -327,13 +331,13 @@ SEXP jl4R_run(SEXP args)
 jl_value_t* Vector_SEXP_to_jl_array(SEXP ans) {
   int n;
   //Rcomplex cpl;
-  jl_datatype_t* datatype;
-  jl_value_t* array_type;
-  jl_array_t* x;
-  void* xData;
+  jl_datatype_t *datatype;
+  jl_value_t *array_type, *elt;
+  jl_array_t *x=NULL;
+  int i;
 
   n=length(ans);
-
+  // printf("typeof %d\n",TYPEOF(ans));
   switch(TYPEOF(ans)) {
   case REALSXP:
     datatype = jl_float64_type;
@@ -344,44 +348,62 @@ jl_value_t* Vector_SEXP_to_jl_array(SEXP ans) {
   case LGLSXP:
     datatype = jl_bool_type;
     break;
+  case STRSXP:
+    datatype = jl_string_type;
+    break;
   }
 
-  array_type = jl_apply_array_type( datatype, 1 );
+ JL_GC_PUSH1(&x);
+  array_type = jl_apply_array_type( (jl_value_t*)datatype, 1 );
   x          = jl_alloc_array_1d(array_type , n);
-  JL_GC_PUSH1(&x);
+
 
   switch(TYPEOF(ans)) {
   case REALSXP:
-    xData = (double*)jl_array_data(x);
-    for(size_t i=0; i<jl_array_len(x); i++) ((double*)xData)[i] = REAL(ans)[i];
+    // xData = (double*)jl_array_data(x);
+    // for(size_t i=0; i<jl_array_len(x); i++) ((double*)xData)[i] = jl_box_float64(REAL(ans)[i]);
+    for(i=0;i<n;i++) {
+      elt=jl_box_float64(REAL(ans)[i]);
+      jl_arrayset((jl_array_t*)x,elt,i);
+      jl_gc_wb(x, elt);
+    }
     break;
   case INTSXP:
-    xData = (int*)jl_array_data(x);
-    for(size_t i=0; i<jl_array_len(x); i++) ((int*)xData)[i] = INTEGER(ans)[i];
+    // xData = (int*)jl_array_data(x);
+    // for(size_t i=0; i<jl_array_len(x); i++) ((int*)xData)[i] = jl_box_long(INTEGER(ans)[i]);
+    for(i=0;i<n;i++) {
+      elt=jl_box_long(INTEGER(ans)[i]);
+      jl_arrayset((jl_array_t*)x,elt,i);
+      jl_gc_wb(x, elt);
+    }
     break;
   case LGLSXP:
-    xData = (int8_t*)jl_array_data(x);
-    for(size_t i=0; i<jl_array_len(x); i++) ((int8_t*)xData)[i] = (INTEGER(ans)[i] ? 1 : 0);
+    for(i=0;i<n;i++) {
+      elt=jl_box_bool((INTEGER(ans)[i] ? 1 : 0));
+      jl_arrayset((jl_array_t*)x,elt,i);
+      jl_gc_wb(x, elt);
+    }
     break;
   case STRSXP:
-    // for(i=0;i<n;i++) {
-    //   rb_ary_store(res,i,rb_str_new2(CHAR(STRING_ELT(ans,i))));
-    // }
-    break;
-  case CPLXSXP:
-    // rb_require("complex");
-    // for(i=0;i<n;i++) {
-    //   cpl=COMPLEX(ans)[i];
-    //   res2 = rb_eval_string("Complex.new(0,0)");
-    //   rb_iv_set(res2,"@real",rb_float_new(cpl.r));
-    //   rb_iv_set(res2,"@image",rb_float_new(cpl.i));
-    //   rb_ary_store(res,i,res2);
-    // }
+    for(i=0;i<n;i++) {
+      elt=jl_cstr_to_string((char*)CHAR(STRING_ELT(ans,i)));
+      jl_arrayset((jl_array_t*)x,elt,i);
+      jl_gc_wb(x, elt);
+    }
     break;
   }
   JL_GC_POP();
 
-  return (jl_value_t*)x;
+  return x;
+}
+
+SEXP jl4R_VECSXP_to_jl_array_EXTPTRSXP(SEXP ans) {
+  jl_value_t *res=NULL;
+  JL_GC_PUSH1(&res);
+  res = Vector_SEXP_to_jl_array(ans);
+  JL_GC_POP();
+  return jlValue(res);
+
 }
 /****************************/
 
@@ -418,6 +440,7 @@ SEXP jl4R_set_global_variable(SEXP args) {
 SEXP jlValue(jl_value_t* jlvalue) {
   SEXP ans,class;
   char *jltype;
+  JL_GC_PUSH1(&jlvalue);
   ans=(SEXP)R_MakeExternalPtr((void *)jlvalue, R_NilValue, R_NilValue);
   PROTECT(ans);
   // RMK: jl_finalize is not exported
@@ -434,6 +457,7 @@ SEXP jlValue(jl_value_t* jlvalue) {
   //classgets(ans,class);
   SET_CLASS(ans,class);
   UNPROTECT(2);
+  JL_GC_POP();
   return ans;
 }
 
@@ -459,15 +483,32 @@ SEXP jl4R_jlValue_call0(SEXP args) {
 
 SEXP jl4R_jlValue_call1(SEXP args) {
   char *meth;
-  jl_value_t *jlv, *res;
-  jl_function_t *func;
+  jl_value_t *jlv=NULL, *res=NULL;
+  jl_function_t *func=NULL;
   SEXP resR;
 
   meth = (char*)CHAR(STRING_ELT(CADR(args),0));
+  JL_GC_PUSH3(&jlv,&func,&res);
   jlv=(jl_value_t*)R_ExternalPtrAddr(CADDR(args));
   func = jl_get_function(jl_main_module, meth);
   res = jl_call1(func, jlv);
   resR=(SEXP)jlValue(res);
+  JL_GC_POP();
+  return resR;
+}
+
+SEXP jl4R_jlValue_func_call1(SEXP args) {
+  char *meth;
+  jl_value_t *jlv=NULL, *res=NULL;
+  jl_function_t *func=NULL;
+  SEXP resR;
+
+  JL_GC_PUSH3(&jlv,&func,&res);
+  func = (jl_function_t*)R_ExternalPtrAddr(CADR(args));
+  jlv=(jl_value_t*)R_ExternalPtrAddr(CADDR(args));
+  res = jl_call1(func, jlv);
+  resR=(SEXP)jlValue(res);
+  JL_GC_POP();
   return resR;
 }
 
@@ -518,14 +559,39 @@ SEXP jl4R_jlValue_call(SEXP jl_meth, SEXP jl_args, SEXP jl_nargs) {
   meth = (char*)CHAR(STRING_ELT(jl_meth,0));
   // printf("meth=%s\n",meth);
   nargs=INTEGER(jl_nargs)[0];
-  args = malloc(nargs * sizeof(jl_value_t*));
+  // printf("nargs=%d\n",nargs);
+  JL_GC_PUSHARGS(args, nargs);
   for(int i=0;i < nargs;i++) {
     args[i] = (jl_value_t*)(R_ExternalPtrAddr(VECTOR_ELT(jl_args,i)));
   }
   func = jl_get_function(jl_main_module, meth);
   res = jl_call(func, args, nargs);
   resR=(SEXP)jlValue(res);
-  free(args);
+  JL_GC_POP();
+  return resR;
+}
+
+SEXP jl4R_jlValue_func_call(SEXP jl_func, SEXP jl_args, SEXP jl_nargs) {
+  int nargs;
+  jl_value_t **args;
+  jl_value_t *res;
+  jl_function_t *func;
+  SEXP resR;
+
+  // printf("type %d\n", TYPEOF(jl_args));
+  if(TYPEOF(jl_args) != VECSXP) {
+    return R_NilValue;
+  }
+  // printf("meth=%s\n",meth);
+  nargs=INTEGER(jl_nargs)[0];
+  JL_GC_PUSHARGS(args, nargs);
+  for(int i=0;i < nargs;i++) {
+    args[i] = (jl_value_t*)(R_ExternalPtrAddr(VECTOR_ELT(jl_args,i)));
+  }
+  func = (jl_function_t*)(R_ExternalPtrAddr(jl_func));
+  res = jl_call(func, args, nargs);
+  resR=(SEXP)jlValue(res);
+  JL_GC_POP();
   return resR;
 }
 
@@ -569,6 +635,7 @@ static const R_ExternalMethodDef externalMethods[] = {
   {"jl4R_jlValue_call1",(DL_FUNC) &jl4R_jlValue_call1,-1},
   {"jl4R_jlValue_call2",(DL_FUNC) &jl4R_jlValue_call2,-1},
   {"jl4R_jlValue_call3",(DL_FUNC) &jl4R_jlValue_call3,-1},
+  {"jl4R_jlValue_func_call1",(DL_FUNC) &jl4R_jlValue_func_call1,-1},
   {"jl4R_jlValue2R",(DL_FUNC) &jl4R_jlValue2R,-1},
   {"jl4R_typeof2R",(DL_FUNC) &jl4R_typeof2R,-1},
   {NULL,NULL,0}
@@ -578,6 +645,8 @@ static const R_CallMethodDef callMethods[] = {
   {"jl4R_running",(DL_FUNC) &jl4R_running,0},
   {"jl4R_get_ans",(DL_FUNC) &jl4R_get_ans,0},
   {"jl4R_jlValue_call",(DL_FUNC) &jl4R_jlValue_call,3},
+  {"jl4R_jlValue_func_call",(DL_FUNC) &jl4R_jlValue_func_call,3},
+  {"jl4R_VECSXP_to_jl_array_EXTPTRSXP", (DL_FUNC)&jl4R_VECSXP_to_jl_array_EXTPTRSXP,-1},
   {NULL,NULL,0}
 };
 

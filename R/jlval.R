@@ -19,6 +19,13 @@
     .External("jl4R_jlValue_call1", meth, jlv, PACKAGE = "jl4R")
 }
 
+.jlValue_func_call1 <- function(jl_meth, jlv) {
+    if(!.jlrunning()) .jlinit()
+    .External("jl4R_jlValue_func_call1", jl_meth, jlv, PACKAGE = "jl4R")
+}
+
+jl_func1 <- function(jl_meth, jlv) .jlValue_func_call1(jl_meth, jlv)
+
 .jlValue_call2 <- function(meth, jlv, jlarg) {
     if(!.jlrunning()) .jlinit()
     .External("jl4R_jlValue_call2", meth, jlv, jlarg, PACKAGE = "jl4R")
@@ -38,6 +45,17 @@ jl_call <- function(meth, ...) {
     jlargs <- list(...)
     jlnargs <- length(jlargs)
     .jlValue_call(meth,jlargs,jlnargs)
+}
+
+.jlValue_func_call <- function(jlfunc, jlargs, jlnargs) {
+    if(!.jlrunning()) .jlinit()
+    .Call("jl4R_jlValue_func_call", jlfunc, jlargs, jlnargs, PACKAGE = "jl4R")
+}
+
+jl_func <- function(jlfunc, ...) {
+    jlargs <- list(...)
+    jlnargs <- length(jlargs)
+    .jlValue_func_call(jlfunc,jlargs,jlnargs)
 }
 
 
