@@ -14,7 +14,7 @@
 
 #define preserved
 
-JULIA_DEFINE_FAST_TLS
+// JULIA_DEFINE_FAST_TLS
 static int jl4R_julia_running=0;
 static jl_module_t* jl_R_module;
 SEXP jlValue(jl_value_t* jlvalue);
