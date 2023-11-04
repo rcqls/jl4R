@@ -44,7 +44,8 @@ jlrun <- function(expr) {
   invisible(.External("jl4R_run", .jlsafe(expr), PACKAGE = "jl4R"))
 }
 
-jlusing <- function(pkgs) {
+jlusing <- function(...) {
+  pkgs <- sapply(substitute(c(...))[-1], function(e) ifelse(is.character(e), e, as.character(e)))
   jlrun(paste0("using ",paste(pkgs,collapse=", ")))
 }
 
