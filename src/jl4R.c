@@ -492,7 +492,7 @@ SEXP jl4R_set_global_variable(SEXP args) {
   jl_value_t *res;
 
   varName=(char*)CHAR(STRING_ELT(CADR(args),0));
-  res=(jl_value_t*)Vector_SEXP_to_jl_array(CADDR(args));
+  res=(jl_value_t*)get_preserved_jlvalue_from_R_ExternalPtrAddr(CADDR(args));
   jl_set_global(jl_main_module, jl_symbol(varName),res);
   //jlapi_print_stdout();
   return R_NilValue;

@@ -6,7 +6,7 @@ export(
   jl, 
   jlrun, jlcall, jlcallR,
   jlusing,
-  jlset,
+  jlset, jlget,
   jlshow, jldisplay,
   R, toR,
   is.jlValue, is.jlStruct,

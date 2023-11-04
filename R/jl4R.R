@@ -53,14 +53,20 @@ jlshow <- function(jlval) invisible(jlcall("show",jlval))
 jldisplay <- function(jlval) invisible(jlcall("display",jlval))
 
 
-# jlget <- function(var) {
-#   if(!.jlrunning()) .jlinit()
-#   res <- jl(var)
-# 	return(res)
-# }
-
-jlset <- function(var,value) {
+jlget <- function(var) {
   if(!.jlrunning()) .jlinit()
-	.External("jl4R_set_global_variable", var, value ,PACKAGE="jl4R")
+  if(class(substitute(var)) != "character") {
+    var <- deparse(substitute(var))
+  }
+  res <- jl(var)
+	return(res)
+}
+
+jlset <- function(var,value,vector=FALSE) {
+  if(!.jlrunning()) .jlinit()
+  if(class(substitute(var)) != "character") {
+    var <- deparse(substitute(var))
+  }
+	.External("jl4R_set_global_variable", var, jl(value,vector=vector) ,PACKAGE="jl4R")
 	return(invisible())
 }
