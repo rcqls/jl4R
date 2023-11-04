@@ -1,4 +1,10 @@
-jl_symbol <- function(field) jl(paste0(":",field))
+# jl_symbol <- function(field) jl(paste0(":",field))
+jl_symbol <- function(field) {
+    if(!.jlrunning()) .jlinit()
+    res <- .External("jl4R_jl_symbol", field, PACKAGE = "jl4R")
+    res
+}
+
 jl_colon <- function() jl_unsafe(":")
 ## Struct facility
 

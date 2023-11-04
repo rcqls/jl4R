@@ -12,10 +12,14 @@ jl_typeof <- function(jlval) {
 
 is.jlValue <- function(obj) inherits(obj,"jlValue")
 
-print.jlValue <- function(obj, ...) {
-    # cat(paste(class(obj),collapse=","),":\n",sep="")
-    # print(toR(obj))
-    invisible(jlcallR("display",obj))
+# print.jlValue <- function(obj, ...) {
+#     # cat(paste(class(obj),collapse=","),":\n",sep="")
+#     # print(toR(obj))
+#     invisible(jlcallR("display",obj))
+# }
+
+print.jlValue <- function(jlval, ...) {
+    invisible(.Call("jl4R_show_preserved_ref", jlval, PACKAGE = "jl4R"))
 }
 
 print.jlUnprintable <- function(obj, ...) print.default(obj)
@@ -40,23 +44,4 @@ toR.jlValue <- function(jlval) {
             if(is.list(res)) simplify2array(res) else res
         }
     }
-}
-
-toR.DataFrame <- function(jlval) {
-    nms <- toR(jlcall("names",jlval))
-    res <- list()
-    for(nm in nms) {
-        res[[nm]] <- jlcallR("getindex",jlval, jl_colon(), jl_symbol(nm))
-    }
-    attr(res,"row.names") <- as.character(1:length(res[[1]]))
-    class(res) <- "data.frame"
-    res
-}
-
-toR.CategoricalArray <- function(jlval) {
-    pool <- jl_getfield(jlval,"pool")
-    res <- jlR_getfield(jlval,"refs")
-    attr(res,"levels") <- jlcallR("levels",pool)
-    class(res) <- "factor"
-    res
 }

@@ -20,6 +20,7 @@ S3method("jl",integer)
 S3method("jl",double)
 S3method("jl",logical)
 S3method("jl",character)
+S3method("jl",factor)
 
 S3method("names",jlStruct)
 S3method("[",jlStruct)

@@ -12,11 +12,59 @@
 // #include <R_ext/eventloop.h>
 // #endif
 
+#define preserved
 
 JULIA_DEFINE_FAST_TLS
 static int jl4R_julia_running=0;
 static jl_module_t* jl_R_module;
 SEXP jlValue(jl_value_t* jlvalue);
+
+#ifdef preserved
+static jl_value_t* preserved_refs;
+static jl_datatype_t* reft;
+// static jl_function_t* setindex;
+// static jl_function_t* delete;
+// static jl_function_t* getfield;
+
+void jl_init_preserved_refs() {
+  preserved_refs = jl_eval_string("preserved_refs = IdDict()");
+  reft = (jl_datatype_t*)jl_eval_string("Base.RefValue{Any}");
+  // setindex = jl_get_function(jl_base_module, "setindex!");
+  // delete = jl_get_function(jl_base_module, "delete!");
+  // getfield = jl_get_function(jl_base_module, "getfield");
+}
+
+void jl_add_preserved_ref(jl_value_t *ref) {
+  jl_function_t* setindex = jl_get_function(jl_base_module, "setindex!");
+  jl_call3(setindex, preserved_refs, ref, ref);
+}
+
+void jl_rm_preserved_ref(jl_value_t *ref) {
+  jl_function_t* delete = jl_get_function(jl_base_module, "delete!");
+  jl_call2(delete, preserved_refs, ref);
+}
+
+jl_value_t* get_preserved_jlvalue_from_R_ExternalPtrAddr(SEXP ans) {
+  jl_value_t *res=NULL, *ref=NULL;
+  jl_function_t* getfield = jl_get_function(jl_base_module, "getfield");
+  JL_GC_PUSH2(&res,&ref);
+  ref = (jl_value_t*)R_ExternalPtrAddr(ans);
+  res = (jl_value_t*)jl_call2(getfield, ref,(jl_value_t*)jl_symbol("x"));
+  JL_GC_POP();
+  return res;
+}
+
+#else
+
+jl_value_t* get_preserved_jlvalue_from_R_ExternalPtrAddr(SEXP ans) {
+  jl_value_t *res=NULL;
+  JL_GC_PUSH1(&res);
+  res = (jl_value_t*)R_ExternalPtrAddr(ans);
+  JL_GC_POP();
+  return res;
+}
+
+#endif 
 
 SEXP jl4R_init(SEXP args)
 {
@@ -31,6 +79,9 @@ SEXP jl4R_init(SEXP args)
     jl_init();
     jl4R_julia_running=1;
     //printf("julia initialized!!!\n");
+#ifdef preserved
+    jl_init_preserved_refs();
+#endif
   }
   return R_NilValue;
 }
@@ -67,10 +118,14 @@ SEXP jl_value_type(jl_value_t *res) {
 }
 
 int jl4R_isa(jl_value_t *jlv, char* typ) {
-  jl_value_t *jl_typ;
+  jl_value_t *jl_typ=NULL;
+  int res;
 
+  JL_GC_PUSH1(&jl_typ);
   jl_typ = jl_eval_string(typ);
-  return jl_isa(jlv,jl_typ);
+  res = jl_isa(jlv,jl_typ);
+  JL_GC_POP();
+  return res;
 }
 
 //Maybe try to use cpp stuff to get the output inside julia system (ccall,cgen and cgutils)
@@ -304,10 +359,11 @@ jl_value_t* jl_eval2jl(SEXP args) {
 
 SEXP jl4R_eval2R(SEXP args)
 {
-  jl_value_t *res;
+  jl_value_t *res=NULL;
   SEXP resR;
-  res = jl_eval2jl(args);
   JL_GC_PUSH1(&res);
+  res = jl_eval2jl(args);
+  
   resR=jl_value_to_SEXP(res);
   if(res==NULL) {
     if(resR != R_NilValue) resR=R_NilValue;
@@ -394,18 +450,33 @@ jl_value_t* Vector_SEXP_to_jl_array(SEXP ans) {
   }
   JL_GC_POP();
 
-  return x;
+  return (jl_value_t*)x;
 }
 
 SEXP jl4R_VECSXP_to_jl_array_EXTPTRSXP(SEXP ans) {
   jl_value_t *res=NULL;
+  SEXP resR;
+
   JL_GC_PUSH1(&res);
   res = Vector_SEXP_to_jl_array(ans);
+  resR = jlValue(res);
   JL_GC_POP();
-  return jlValue(res);
-
+  return resR;
 }
 /****************************/
+
+SEXP jl4R_jl_symbol(SEXP ans) {
+  jl_value_t* symb=NULL;
+  char* symbol_name;
+  SEXP resR;
+
+  JL_GC_PUSH1(&symb);
+  symbol_name=(char*)CHAR(STRING_ELT(CADR(ans),0));
+  symb = (jl_value_t*)jl_symbol(symbol_name);
+  resR = jlValue(symb);
+  JL_GC_POP();
+  return resR;
+}
 
 /********/
 
@@ -427,22 +498,34 @@ SEXP jl4R_set_global_variable(SEXP args) {
   return R_NilValue;
 }
 
-// static void jlValueFinalizer(SEXP ptr) {
-//     if(!R_ExternalPtrAddr(ptr)) return;
-//     jl_finalize((jl_value_t*)ptr);
-//     printf("Finalized...\n");
-//     R_ClearExternalPtr(ptr); /* not really needed */
-// }
+static void jlValueFinalizer(SEXP ptr) {
+    if(!R_ExternalPtrAddr(ptr)) return;
+#ifdef preserved
+    jl_rm_preserved_ref((jl_value_t*)ptr);
+#endif
+    // printf("Finalized...\n");
+    R_ClearExternalPtr(ptr); /* not really needed */
+}
 /************************************************/
 
 //// R class jlValue standing for jl_value_t External Pointer
 
 SEXP jlValue(jl_value_t* jlvalue) {
-  SEXP ans,class;
+  SEXP ans, class;
   char *jltype;
-  JL_GC_PUSH1(&jlvalue);
-  ans=(SEXP)R_MakeExternalPtr((void *)jlvalue, R_NilValue, R_NilValue);
-  PROTECT(ans);
+
+#ifdef preserved
+  jl_value_t *ref=NULL;
+
+  JL_GC_PUSH2(&ref,&jlvalue);
+  // Wrap `jlvalue` in `RefValue{Any}` and push to `preserved_refs` to protect it.
+  ref = jl_new_struct(reft, jlvalue);
+  jl_add_preserved_ref(ref);
+  PROTECT(ans=(SEXP)R_MakeExternalPtr((void *)ref, R_NilValue, R_NilValue));
+  JL_GC_POP();
+ #else
+  PROTECT(ans=(SEXP)R_MakeExternalPtr((void *)jlvalue, R_NilValue, R_NilValue));
+ #endif
   // RMK: jl_finalize is not exported
   // R_RegisterCFinalizerEx(ans, jlValueFinalizer, TRUE);
   //if(rbIsRVector(jlobj)) {
@@ -457,27 +540,34 @@ SEXP jlValue(jl_value_t* jlvalue) {
   //classgets(ans,class);
   SET_CLASS(ans,class);
   UNPROTECT(2);
-  JL_GC_POP();
+
   return ans;
 }
 
 SEXP jl4R_eval2jlValue(SEXP args)
 {
-  jl_value_t *res;
+  SEXP resR;
+  jl_value_t *res=NULL;
+
+  JL_GC_PUSH1(&res);
   res = jl_eval2jl(args);
-  return jlValue(res);
+  resR = jlValue(res);
+  JL_GC_POP();
+  return resR;
 }
 
 SEXP jl4R_jlValue_call0(SEXP args) {
   char *meth;
-  jl_value_t *res;
+  jl_value_t *res=NULL;
   jl_function_t *func;
   SEXP resR;
 
+  JL_GC_PUSH2(&res,&func);
   meth = (char*)CHAR(STRING_ELT(CADR(args),0));
   func = jl_get_function(jl_main_module, meth);
   res = jl_call0(func);
   resR=(SEXP)jlValue(res);
+  JL_GC_POP();
   return resR;
 }
 
@@ -489,7 +579,7 @@ SEXP jl4R_jlValue_call1(SEXP args) {
 
   meth = (char*)CHAR(STRING_ELT(CADR(args),0));
   JL_GC_PUSH3(&jlv,&func,&res);
-  jlv=(jl_value_t*)R_ExternalPtrAddr(CADDR(args));
+  jlv=(jl_value_t*)get_preserved_jlvalue_from_R_ExternalPtrAddr(CADDR(args));
   func = jl_get_function(jl_main_module, meth);
   res = jl_call1(func, jlv);
   resR=(SEXP)jlValue(res);
@@ -504,8 +594,8 @@ SEXP jl4R_jlValue_func_call1(SEXP args) {
   SEXP resR;
 
   JL_GC_PUSH3(&jlv,&func,&res);
-  func = (jl_function_t*)R_ExternalPtrAddr(CADR(args));
-  jlv=(jl_value_t*)R_ExternalPtrAddr(CADDR(args));
+  func = (jl_function_t*)get_preserved_jlvalue_from_R_ExternalPtrAddr(CADR(args));
+  jlv=(jl_value_t*)get_preserved_jlvalue_from_R_ExternalPtrAddr(CADDR(args));
   res = jl_call1(func, jlv);
   resR=(SEXP)jlValue(res);
   JL_GC_POP();
@@ -514,33 +604,37 @@ SEXP jl4R_jlValue_func_call1(SEXP args) {
 
 SEXP jl4R_jlValue_call2(SEXP args) {
   char *meth;
-  jl_value_t *jlv, *res, *jlarg;
-  jl_function_t *func;
+  jl_value_t *jlv = NULL, *res = NULL, *jlarg = NULL;
+  jl_function_t *func=NULL;
   SEXP resR;
 
   meth = (char*)CHAR(STRING_ELT(CADR(args),0));
-  jlv=(jl_value_t*)R_ExternalPtrAddr(CADDR(args));
+  JL_GC_PUSH4(&jlv,&res,&jlarg,&func);
+  jlv=(jl_value_t*)get_preserved_jlvalue_from_R_ExternalPtrAddr(CADDR(args));
   // printf("meth=%s\n",meth);
-  jlarg=(jl_value_t*)R_ExternalPtrAddr(CADDDR(args));
+  jlarg=(jl_value_t*)get_preserved_jlvalue_from_R_ExternalPtrAddr(CADDDR(args));
   func = jl_get_function(jl_main_module, meth);
   res = jl_call2(func, jlv,jlarg);
   resR=(SEXP)jlValue(res);
+  JL_GC_POP();
   return resR;
 }
 
 SEXP jl4R_jlValue_call3(SEXP args) {
   char *meth;
-  jl_value_t *jlv, *res, *jlarg, *jlarg2;
-  jl_function_t *func;
+  jl_value_t *jlv=NULL, *res=NULL, *jlarg=NULL, *jlarg2=NULL;
+  jl_function_t *func=NULL;
   SEXP resR;
 
   meth = (char*)CHAR(STRING_ELT(CADR(args),0));
-  jlv=(jl_value_t*)R_ExternalPtrAddr(CADDR(args));
-  jlarg=(jl_value_t*)R_ExternalPtrAddr(CADDDR(args));
-  jlarg2=(jl_value_t*)R_ExternalPtrAddr(CAD4R(args));
+  JL_GC_PUSH5(&jlv,&func,&res,&jlarg,&jlarg2);
+  jlv=(jl_value_t*)get_preserved_jlvalue_from_R_ExternalPtrAddr(CADDR(args));
+  jlarg=(jl_value_t*)get_preserved_jlvalue_from_R_ExternalPtrAddr(CADDDR(args));
+  jlarg2=(jl_value_t*)get_preserved_jlvalue_from_R_ExternalPtrAddr(CAD4R(args));
   func = jl_get_function(jl_main_module, meth);
   res = jl_call3(func, jlv, jlarg, jlarg2);
   resR=(SEXP)jlValue(res);
+  JL_GC_POP();
   return resR;
 }
 
@@ -562,7 +656,7 @@ SEXP jl4R_jlValue_call(SEXP jl_meth, SEXP jl_args, SEXP jl_nargs) {
   // printf("nargs=%d\n",nargs);
   JL_GC_PUSHARGS(args, nargs);
   for(int i=0;i < nargs;i++) {
-    args[i] = (jl_value_t*)(R_ExternalPtrAddr(VECTOR_ELT(jl_args,i)));
+    args[i] = (jl_value_t*)(get_preserved_jlvalue_from_R_ExternalPtrAddr(VECTOR_ELT(jl_args,i)));
   }
   func = jl_get_function(jl_main_module, meth);
   res = jl_call(func, args, nargs);
@@ -586,9 +680,9 @@ SEXP jl4R_jlValue_func_call(SEXP jl_func, SEXP jl_args, SEXP jl_nargs) {
   nargs=INTEGER(jl_nargs)[0];
   JL_GC_PUSHARGS(args, nargs);
   for(int i=0;i < nargs;i++) {
-    args[i] = (jl_value_t*)(R_ExternalPtrAddr(VECTOR_ELT(jl_args,i)));
+    args[i] = (jl_value_t*)(get_preserved_jlvalue_from_R_ExternalPtrAddr(VECTOR_ELT(jl_args,i)));
   }
-  func = (jl_function_t*)(R_ExternalPtrAddr(jl_func));
+  func = (jl_function_t*)(get_preserved_jlvalue_from_R_ExternalPtrAddr(jl_func));
   res = jl_call(func, args, nargs);
   resR=(SEXP)jlValue(res);
   JL_GC_POP();
@@ -596,25 +690,38 @@ SEXP jl4R_jlValue_func_call(SEXP jl_func, SEXP jl_args, SEXP jl_nargs) {
 }
 
 SEXP jl4R_jlValue2R(SEXP args) {
-  jl_value_t *jlv, *res;
+  jl_value_t *jlv=NULL;
   SEXP resR;
 
-  jlv=(jl_value_t*)R_ExternalPtrAddr(CADR(args));
+  JL_GC_PUSH1(&jlv);
+  jlv=(jl_value_t*)get_preserved_jlvalue_from_R_ExternalPtrAddr(CADR(args));
   resR = jl_value_to_SEXP(jlv);
+  JL_GC_POP();
   return resR;
 }
 
 SEXP jl4R_typeof2R(SEXP args)
 {
-  jl_value_t *jlv, *res;
+  jl_value_t *jlv=NULL;
   SEXP resR;
 
-  jlv=(jl_value_t*)R_ExternalPtrAddr(CADR(args));
+  JL_GC_PUSH1(&jlv);
+  jlv=(jl_value_t*)get_preserved_jlvalue_from_R_ExternalPtrAddr(CADR(args));
   resR = jl_value_type(jlv);
+  JL_GC_POP();
   return resR;
 }
 
+SEXP jl4R_show_preserved_ref(SEXP ans) {
+  jl_value_t *res=NULL;
+  jl_function_t* display = jl_get_function(jl_main_module, "display");
 
+  JL_GC_PUSH1(&res);
+  res = get_preserved_jlvalue_from_R_ExternalPtrAddr(ans);
+  jl_call1(display, res);
+  JL_GC_POP();
+  return R_NilValue;
+}
 
 
 #include <R_ext/Rdynload.h>
@@ -638,6 +745,7 @@ static const R_ExternalMethodDef externalMethods[] = {
   {"jl4R_jlValue_func_call1",(DL_FUNC) &jl4R_jlValue_func_call1,-1},
   {"jl4R_jlValue2R",(DL_FUNC) &jl4R_jlValue2R,-1},
   {"jl4R_typeof2R",(DL_FUNC) &jl4R_typeof2R,-1},
+  {"jl4R_jl_symbol",(DL_FUNC) &jl4R_jl_symbol,-1},
   {NULL,NULL,0}
 };
 
@@ -646,7 +754,8 @@ static const R_CallMethodDef callMethods[] = {
   {"jl4R_get_ans",(DL_FUNC) &jl4R_get_ans,0},
   {"jl4R_jlValue_call",(DL_FUNC) &jl4R_jlValue_call,3},
   {"jl4R_jlValue_func_call",(DL_FUNC) &jl4R_jlValue_func_call,3},
-  {"jl4R_VECSXP_to_jl_array_EXTPTRSXP", (DL_FUNC)&jl4R_VECSXP_to_jl_array_EXTPTRSXP,-1},
+  {"jl4R_VECSXP_to_jl_array_EXTPTRSXP", (DL_FUNC)&jl4R_VECSXP_to_jl_array_EXTPTRSXP,1},
+  {"jl4R_show_preserved_ref", (DL_FUNC)&jl4R_show_preserved_ref,1},
   {NULL,NULL,0}
 };
 

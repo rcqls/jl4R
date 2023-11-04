@@ -11,15 +11,32 @@ names.DataFrame <- function(jlval) jlcallR("names",jlval)
         jlcall("getindex",jlval, i, jl_symbol(field))
     } else NULL
 }
+
 "$.DataFrame" <- function(jlval, field) jlval[field]
+
+toR.DataFrame <- function(jlval) {
+    nms <- toR(jlcall("names",jlval))
+    res <- list()
+    for(nm in nms) {
+        res[[nm]] <- jlcallR("getindex",jlval, jl_colon(), jl_symbol(nm))
+    }
+    attr(res,"row.names") <- as.character(1:length(res[[1]]))
+    class(res) <- "data.frame"
+    res
+}
 
 jl.data.frame <- function(df) {
     jlusing("DataFrames")
     DF <- jlcall("splat",jl("DataFrame"))
-    jl_args <- jl("[]")
+    args <- jl("[]")
+    vars <- list()
+    pairs <-list()
     for( nm in names(df)) {
-        jlcall("=>",jl_symbol("a"),jl(c(1,2,3)))
-        df[[nm]]
+        vars[[nm]] <- jl(df[[nm]])
+        pairs[[nm]] <- jlcall("=>",jl_symbol(nm), vars[[nm]])
+        jlcall("push!", args, pairs[[nm]])
     }
-    # jlcall("vcat",jlcall("=>",jl_symbol("a"),jl(c(1,2,3))),jlcall("=>",jl_symbol("b"),jl(c(3,4,1)))) -> jl_args
+    jl_func1(DF,args) -> jlval
+    # attr(jlval,"deps") <- list(vars=vars,pairs=pairs)
+    jlval
 }
