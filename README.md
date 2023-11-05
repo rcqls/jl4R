@@ -2,7 +2,7 @@ Julia for R
 ================
 RCqls
 
-<!-- Rscript -e "rmarkdown::render('README.Rmd')" -->
+<!-- Rscript -e "rmarkdown::render('README.Rmd')";rm README.html -->
 
 # Julia for R
 
@@ -41,10 +41,6 @@ Inside the R console: \## Examples
 
 ### getting started
 
-### Goal: conversion of `julia` structures used in statitictic to `R`
-
-- `DataFrame`
-
 ``` r
 require(jl4R)
 ```
@@ -52,19 +48,27 @@ require(jl4R)
     ## Le chargement a nécessité le package : jl4R
 
 ``` r
-jlusing(DataFrames)
 jl(1)
 ```
 
     ## 1.0
 
 ``` r
-interactive()
+jl(c(1,3,2))
 ```
 
-    ## [1] FALSE
+    ## 3-element Vector{Float64}:
+    ##  1.0
+    ##  3.0
+    ##  2.0
+
+### Goal: conversion of `julia` structures used in statitictic to `R`
+
+- `DataFrame`
 
 ``` r
+require(jl4R)
+jlusing(DataFrames)
 jl("(a=1,b=DataFrame(a=1:3,b=2:4))") -> nt_jl
 nt_jl
 ```
@@ -118,6 +122,7 @@ typeof(nt_jl)
 - `CategoricalArray`
 
 ``` r
+require(jl4R)
 jlusing(CategoricalArrays)
 ca_jl <- jl('categorical(["titi","toto","titi"])')
 ca_jl

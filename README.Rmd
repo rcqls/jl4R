@@ -3,7 +3,7 @@ title: "Julia for R"
 author: "RCqls"
 output: github_document
 ---
-<!-- Rscript -e "rmarkdown::render('README.Rmd')" -->
+<!-- Rscript -e "rmarkdown::render('README.Rmd')";rm README.html -->
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -39,6 +39,12 @@ Inside the R console:
 
 ### getting started
 
+```{r}
+require(jl4R)
+jl(1)
+jl(c(1,3,2))
+```
+
 ### Goal: conversion of `julia` structures used in statitictic to `R`
 
 * `DataFrame`
@@ -46,8 +52,6 @@ Inside the R console:
 ```{r}
 require(jl4R)
 jlusing(DataFrames)
-jl(1)
-interactive()
 jl("(a=1,b=DataFrame(a=1:3,b=2:4))") -> nt_jl
 nt_jl
 toR(nt_jl)
@@ -59,6 +63,7 @@ typeof(nt_jl)
 * `CategoricalArray`
 
 ```{r}
+require(jl4R)
 jlusing(CategoricalArrays)
 ca_jl <- jl('categorical(["titi","toto","titi"])')
 ca_jl
