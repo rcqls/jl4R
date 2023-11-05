@@ -54,13 +54,20 @@ jl(1)
     ## 1.0
 
 ``` r
-jl(c(1,3,2))
+v_jl <- jl(c(1,3,2))
+v_jl
 ```
 
     ## 3-element Vector{Float64}:
     ##  1.0
     ##  3.0
     ##  2.0
+
+``` r
+R(v_jl)
+```
+
+    ## [1] 1 3 2
 
 ### Goal: conversion of `julia` structures used in statitictic to `R`
 
