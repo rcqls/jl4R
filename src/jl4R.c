@@ -712,21 +712,30 @@ SEXP jl4R_typeof2R(SEXP args)
   return resR;
 }
 
-SEXP jl4R_show_preserved_ref(SEXP ans, SEXP buffer) {
+SEXP jl4R_show_preserved_ref(SEXP ans) {
   jl_value_t *res=NULL;
   jl_function_t* display=NULL;
-  int capture = INTEGER(buffer)[0];
-
+  
   JL_GC_PUSH2(&res,&display);
-  if(capture) {
-    display = jl_get_function(jl_main_module, "display_buffer");
-  } else {
     display = jl_get_function(jl_main_module, "display");
-  }
   res = get_preserved_jlvalue_from_R_ExternalPtrAddr(ans);
   jl_call1(display, res);
   JL_GC_POP();
   return R_NilValue;
+}
+
+SEXP jl4R_capture_preserved_ref(SEXP ans) {
+  jl_value_t *res=NULL, *out=NULL;
+  jl_function_t* display=NULL;
+  SEXP outR;
+
+  JL_GC_PUSH3(&res,&display,&out);
+    display = jl_get_function(jl_main_module, "display_buffer");
+  res = get_preserved_jlvalue_from_R_ExternalPtrAddr(ans);
+  out=jl_call1(display, res);
+  outR=(SEXP)jl_value_to_SEXP(out);
+  JL_GC_POP();
+  return outR;
 }
 
 
@@ -761,7 +770,8 @@ static const R_CallMethodDef callMethods[] = {
   {"jl4R_jlValue_call",(DL_FUNC) &jl4R_jlValue_call,3},
   {"jl4R_jlValue_func_call",(DL_FUNC) &jl4R_jlValue_func_call,3},
   {"jl4R_VECSXP_to_jl_array_EXTPTRSXP", (DL_FUNC)&jl4R_VECSXP_to_jl_array_EXTPTRSXP,1},
-  {"jl4R_show_preserved_ref", (DL_FUNC)&jl4R_show_preserved_ref,2},
+  {"jl4R_show_preserved_ref", (DL_FUNC)&jl4R_show_preserved_ref,1},
+  {"jl4R_capture_preserved_ref", (DL_FUNC)&jl4R_capture_preserved_ref,1},
   {NULL,NULL,0}
 };
 

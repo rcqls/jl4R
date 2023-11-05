@@ -19,7 +19,15 @@ is.jlValue <- function(obj) inherits(obj,"jlValue")
 # }
 
 print.jlValue <- function(jlval, ...) {
-    invisible(.Call("jl4R_show_preserved_ref", jlval, !interactive(), PACKAGE = "jl4R"))
+    if(interactive()) {
+        invisible(.Call("jl4R_show_preserved_ref", jlval, PACKAGE = "jl4R"))
+    } else {
+        cat(jl_capture_display(jlvalue))
+    }
+}
+
+jl_capture_display <- function(jlval, ...) {
+    .Call("jl4R_capture_preserved_ref", jlval, PACKAGE = "jl4R")
 }
 
 print.jlUnprintable <- function(obj, ...) print.default(obj)
