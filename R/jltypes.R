@@ -22,7 +22,7 @@ print.jlValue <- function(jlval, ...) {
     if(interactive()) {
         invisible(.Call("jl4R_show_preserved_ref", jlval, PACKAGE = "jl4R"))
     } else {
-        cat(jl_capture_display(jlvalue))
+        cat(jl_capture_display(jlval))
     }
 }
 
