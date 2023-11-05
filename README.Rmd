@@ -3,7 +3,7 @@ title: "Julia for R"
 author: "RCqls"
 output: github_document
 ---
-
+<!-- Rscript -e "rmarkdown::render('README.Rmd')" -->
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
