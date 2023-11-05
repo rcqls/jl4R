@@ -2,8 +2,6 @@ Julia for R
 ================
 RCqls
 
-<!-- Rscript -e "rmarkdown::render('README.Rmd')";rm README.html -->
-
 # Julia for R
 
 This is an attempt to embed the julia language in R. Actually, very
