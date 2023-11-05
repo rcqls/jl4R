@@ -33,28 +33,6 @@ In a terminal (tested on macOS M1 with julia-1.9.2:) with `julia` and
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/rcqls/jl4R/HEAD/inst/install.sh)"
 ```
 
-    ## /bin/bash: line 2: julia: command not found
-    ## Downloading GitHub repo rcqls/jl4R@HEAD
-    ## Installation du package dans ‘/opt/homebrew/lib/R/4.3/site-library’
-    ## (car ‘lib’ n'est pas spécifié)
-    ## * installing *source* package ‘jl4R’ ...
-    ## ** using staged installation
-    ## ** libs
-    ## using C compiler: ‘Apple clang version 14.0.3 (clang-1403.0.22.14.1)’
-    ## using SDK: ‘MacOSX13.3.sdk’
-    ## clang -I"/opt/homebrew/Cellar/r/4.3.1/lib/R/include" -DNDEBUG   -I/opt/homebrew/opt/gettext/include -I/opt/homebrew/opt/readline/include -I/opt/homebrew/opt/xz/include -I/opt/homebrew/include   -I/include/julia -I.  -fPIC  -g -O2  -c jl4R.c -o jl4R.o
-    ## jl4R.c:6:10: fatal error: 'julia.h' file not found
-    ## #include "julia.h"
-    ##          ^~~~~~~~~
-    ## 1 error generated.
-    ## make: *** [jl4R.o] Error 1
-    ## ERROR: compilation failed for package ‘jl4R’
-    ## * removing ‘/opt/homebrew/lib/R/4.3/site-library/jl4R’
-    ## * restoring previous ‘/opt/homebrew/lib/R/4.3/site-library/jl4R’
-    ## Message d'avis :
-    ## Dans i.p(...) :
-    ##   l'installation du package ‘/var/folders/56/9j6x05c56936_gmzgd5mygjr0000gn/T//Rtmp4suNK3/remotesd9cd27a16b04/rcqls-jl4R-e863d8c’ a eu un statut de sortie non nul
-
 ## Test
 
 Inside the R console: \## Examples

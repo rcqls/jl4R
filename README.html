@@ -630,27 +630,6 @@ for adding R path in the <code>PATH</code> environment variable)</li>
 <code>julia</code> and <code>Rscript</code> binaries supposed to be in
 the <code>PATH</code> environment variable,</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="ex">/bin/bash</span> <span class="at">-c</span> <span class="st">&quot;</span><span class="va">$(</span><span class="ex">curl</span> <span class="at">-fsSL</span> https://raw.githubusercontent.com/rcqls/jl4R/HEAD/inst/install.sh<span class="va">)</span><span class="st">&quot;</span></span></code></pre></div>
-<pre><code>## /bin/bash: line 2: julia: command not found
-## Downloading GitHub repo rcqls/jl4R@HEAD
-## Installation du package dans ‘/opt/homebrew/lib/R/4.3/site-library’
-## (car ‘lib’ n&#39;est pas spécifié)
-## * installing *source* package ‘jl4R’ ...
-## ** using staged installation
-## ** libs
-## using C compiler: ‘Apple clang version 14.0.3 (clang-1403.0.22.14.1)’
-## using SDK: ‘MacOSX13.3.sdk’
-## clang -I&quot;/opt/homebrew/Cellar/r/4.3.1/lib/R/include&quot; -DNDEBUG   -I/opt/homebrew/opt/gettext/include -I/opt/homebrew/opt/readline/include -I/opt/homebrew/opt/xz/include -I/opt/homebrew/include   -I/include/julia -I.  -fPIC  -g -O2  -c jl4R.c -o jl4R.o
-## jl4R.c:6:10: fatal error: &#39;julia.h&#39; file not found
-## #include &quot;julia.h&quot;
-##          ^~~~~~~~~
-## 1 error generated.
-## make: *** [jl4R.o] Error 1
-## ERROR: compilation failed for package ‘jl4R’
-## * removing ‘/opt/homebrew/lib/R/4.3/site-library/jl4R’
-## * restoring previous ‘/opt/homebrew/lib/R/4.3/site-library/jl4R’
-## Message d&#39;avis :
-## Dans i.p(...) :
-##   l&#39;installation du package ‘/var/folders/56/9j6x05c56936_gmzgd5mygjr0000gn/T//Rtmp4suNK3/remotesd9cd27a16b04/rcqls-jl4R-e863d8c’ a eu un statut de sortie non nul</code></pre>
 <h2 id="test">Test</h2>
 <p>Inside the R console: ## Examples</p>
 <h3 id="getting-started">getting started</h3>
@@ -660,15 +639,15 @@ conversion of <code>julia</code> structures used in statitictic to
 <ul>
 <li><code>DataFrame</code></li>
 </ul>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">require</span>(jl4R)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">require</span>(jl4R)</span></code></pre></div>
 <pre><code>## Le chargement a nécessité le package : jl4R</code></pre>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">jlusing</span>(DataFrames)</span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="fu">jl</span>(<span class="dv">1</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">jlusing</span>(DataFrames)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="fu">jl</span>(<span class="dv">1</span>)</span></code></pre></div>
 <pre><code>## 1.0</code></pre>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">interactive</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">interactive</span>()</span></code></pre></div>
 <pre><code>## [1] FALSE</code></pre>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">jl</span>(<span class="st">&quot;(a=1,b=DataFrame(a=1:3,b=2:4))&quot;</span>) <span class="ot">-&gt;</span> nt_jl</span>
-<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>nt_jl</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">jl</span>(<span class="st">&quot;(a=1,b=DataFrame(a=1:3,b=2:4))&quot;</span>) <span class="ot">-&gt;</span> nt_jl</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>nt_jl</span></code></pre></div>
 <pre><code>## (a = 1, b = 3×2 DataFrame
 ##  Row │ a      b
 ##      │ Int64  Int64
@@ -676,7 +655,7 @@ conversion of <code>julia</code> structures used in statitictic to
 ##    1 │     1      2
 ##    2 │     2      3
 ##    3 │     3      4)</code></pre>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="fu">toR</span>(nt_jl)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">toR</span>(nt_jl)</span></code></pre></div>
 <pre><code>## $a
 ## [1] 1
 ## 
@@ -685,7 +664,7 @@ conversion of <code>julia</code> structures used in statitictic to
 ## 1 1 2
 ## 2 2 3
 ## 3 3 4</code></pre>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="fu">R</span>(nt_jl)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="fu">R</span>(nt_jl)</span></code></pre></div>
 <pre><code>## $a
 ## [1] 1
 ## 
@@ -694,21 +673,21 @@ conversion of <code>julia</code> structures used in statitictic to
 ## 1 1 2
 ## 2 2 3
 ## 3 3 4</code></pre>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">jl_typeof</span>(nt_jl)</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="fu">jl_typeof</span>(nt_jl)</span></code></pre></div>
 <pre><code>## [1] &quot;NamedTuple&quot;</code></pre>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="fu">typeof</span>(nt_jl)</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="fu">typeof</span>(nt_jl)</span></code></pre></div>
 <pre><code>## [1] &quot;externalptr&quot;</code></pre>
 <ul>
 <li><code>CategoricalArray</code></li>
 </ul>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a><span class="fu">jlusing</span>(CategoricalArrays)</span>
-<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a>ca_jl <span class="ot">&lt;-</span> <span class="fu">jl</span>(<span class="st">&#39;categorical([&quot;titi&quot;,&quot;toto&quot;,&quot;titi&quot;])&#39;</span>)</span>
-<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a>ca_jl</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="fu">jlusing</span>(CategoricalArrays)</span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a>ca_jl <span class="ot">&lt;-</span> <span class="fu">jl</span>(<span class="st">&#39;categorical([&quot;titi&quot;,&quot;toto&quot;,&quot;titi&quot;])&#39;</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a>ca_jl</span></code></pre></div>
 <pre><code>## 3-element CategoricalArray{String,1,UInt32}:
 ##  &quot;titi&quot;
 ##  &quot;toto&quot;
 ##  &quot;titi&quot;</code></pre>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a><span class="fu">R</span>(ca_jl)</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="fu">R</span>(ca_jl)</span></code></pre></div>
 <pre><code>## [1] titi toto titi
 ## Levels: titi toto</code></pre>
 
