@@ -33,9 +33,7 @@ In a terminal (tested on macOS M1 with julia-1.9.2:) with `julia` and
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/rcqls/jl4R/HEAD/inst/install.sh)"
 ```
 
-## Test
-
-Inside the R console: \## Examples
+## How it works
 
 ### getting started
 
@@ -273,3 +271,12 @@ list(jltypeof(nt_jl), typeof(nt_jl), class(nt_jl))
     ## 
     ## [[3]]
     ## [1] "NamedTuple" "jlStruct"   "jlValue"
+
+## R Finalizers
+
+Following the documentation on embedding `julia`, a system of preserved
+references to `julia` values has been created. An `R` finalizer is
+assiocated to each `jlValue` object (in fact, an `R` external pointer
+wrapping some `jl_value_t*` value). Whenever the `jlValue` is gabarged
+collected, the reference on the associated `julia` value is also
+dereferenced which is then cleaned up by the `julia` garbage collector.
