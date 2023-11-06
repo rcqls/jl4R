@@ -64,10 +64,15 @@ jlget <- function(var) {
 }
 
 jlset <- function(var,value,vector=FALSE) {
-  if(!.jlrunning()) .jlinit()
-  if(class(substitute(var)) != "character") {
+  if (!.jlrunning()) .jlinit()
+  if (class(substitute(var)) != "character") {
     var <- deparse(substitute(var))
   }
-	.External("jl4R_set_global_variable", var, jl(value,vector=vector) ,PACKAGE="jl4R")
+	.External("jl4R_set_global_variable", var, jl(value,vector=vector), PACKAGE="jl4R")
 	return(invisible())
+}
+
+jl_finalize_jlValues <- function(...) {
+  extptrs <- unlist(c(...))
+  invisible(.Call("jl4R_finalizeExternalPtr", extptrs, PACKAGE="jl4R"))
 }

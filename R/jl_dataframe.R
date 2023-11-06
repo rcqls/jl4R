@@ -27,16 +27,17 @@ toR.DataFrame <- function(jlval) {
 
 jl.data.frame <- function(df) {
     jlusing("DataFrames")
-    DF <- jlcall("splat",jl("DataFrame"))
+    splatdf <- jlcall("splat", jl("DataFrame"))
     args <- jl("[]")
     vars <- list()
-    pairs <-list()
-    for( nm in names(df)) {
+    pairs <- list()
+    for (nm in names(df)) {
         vars[[nm]] <- jl(df[[nm]])
-        pairs[[nm]] <- jlcall("=>",jl_symbol(nm), vars[[nm]])
+        pairs[[nm]] <- jlcall("=>", jl_symbol(nm), vars[[nm]])
         jlcall("push!", args, pairs[[nm]])
     }
-    jl_func1(DF,args) -> jlval
-    # attr(jlval,"deps") <- list(vars=vars,pairs=pairs)
+    jlval <- jl_func1(splatdf, args)
+    ## Attempt to clean all unused jlValue external pointers
+    ## jl_finalize_jlValues(splatdf, args, pairs, vars)
     jlval
 }

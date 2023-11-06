@@ -499,12 +499,29 @@ SEXP jl4R_set_global_variable(SEXP args) {
 }
 
 static void jlValueFinalizer(SEXP ptr) {
-    if(!R_ExternalPtrAddr(ptr)) return;
+  jl_value_t *ref=NULL;
+  JL_GC_PUSH1(&ref);
+  ref = (jl_value_t*)R_ExternalPtrAddr(ptr);
+  if(!ref) return;
 #ifdef preserved
-    jl_rm_preserved_ref((jl_value_t*)ptr);
+    jl_rm_preserved_ref(ref);
 #endif
-    // printf("Finalized...\n");
-    R_ClearExternalPtr(ptr); /* not really needed */
+  JL_GC_POP();
+  // printf("Finalized...\n");
+  R_ClearExternalPtr(ptr); /* not really needed */
+}
+
+SEXP jl4R_finalizeExternalPtr(SEXP extptrlist) {
+  int i, n;
+  SEXP ptr;
+
+  n = length(extptrlist);
+  for(i = 0; i < n; i++) {
+    ptr = (SEXP)VECTOR_ELT(extptrlist, i);
+    jlValueFinalizer(ptr);
+  }
+  return R_NilValue;
+
 }
 /************************************************/
 
@@ -526,18 +543,11 @@ SEXP jlValue(jl_value_t* jlvalue) {
  #else
   PROTECT(ans=(SEXP)R_MakeExternalPtr((void *)jlvalue, R_NilValue, R_NilValue));
  #endif
-  // RMK: jl_finalize is not exported
-  // R_RegisterCFinalizerEx(ans, jlValueFinalizer, TRUE);
-  //if(rbIsRVector(jlobj)) {
-    PROTECT(class=allocVector(STRSXP,2));
-    jltype=(char*)jl_typeof_str(jlvalue);
-    SET_STRING_ELT(class,0, mkChar(jltype));
-    SET_STRING_ELT(class,1, mkChar("jlValue"));
-  //} else {
-  //  PROTECT(class=allocVector(STRSXP,1));
-  //  SET_STRING_ELT(class,0, mkChar("jlObj"));
-  //}
-  //classgets(ans,class);
+  R_RegisterCFinalizerEx(ans, jlValueFinalizer, TRUE);
+  PROTECT(class=allocVector(STRSXP,2));
+  jltype=(char*)jl_typeof_str(jlvalue);
+  SET_STRING_ELT(class,0, mkChar(jltype));
+  SET_STRING_ELT(class,1, mkChar("jlValue"));
   SET_CLASS(ans,class);
   UNPROTECT(2);
 
@@ -769,6 +779,7 @@ static const R_CallMethodDef callMethods[] = {
   {"jl4R_get_ans",(DL_FUNC) &jl4R_get_ans,0},
   {"jl4R_jlValue_call",(DL_FUNC) &jl4R_jlValue_call,3},
   {"jl4R_jlValue_func_call",(DL_FUNC) &jl4R_jlValue_func_call,3},
+  {"jl4R_finalizeExternalPtr",(DL_FUNC) &jl4R_finalizeExternalPtr,1},
   {"jl4R_VECSXP_to_jl_array_EXTPTRSXP", (DL_FUNC)&jl4R_VECSXP_to_jl_array_EXTPTRSXP,1},
   {"jl4R_show_preserved_ref", (DL_FUNC)&jl4R_show_preserved_ref,1},
   {"jl4R_capture_preserved_ref", (DL_FUNC)&jl4R_capture_preserved_ref,1},
