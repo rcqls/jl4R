@@ -1,9 +1,3 @@
-jl_typeof <- function(jlval) {
-    if(!.jlrunning()) .jlinit()
-    res <- .External("jl4R_typeof2R", jlval, PACKAGE = "jl4R")
-    res
-}
-
 .jlValue2R <- function(jlval) {
     if(!.jlrunning()) .jlinit()
     res <- .External("jl4R_jlValue2R", jlval, PACKAGE = "jl4R")

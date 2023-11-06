@@ -5,7 +5,7 @@ exportPattern("^\\jlR_")
 export(
   jl, 
   jlrun, jlcall, jlcallR,
-  jlusing,
+  jlusing, jltypeof,
   jlset, jlget,
   jlshow, jldisplay,
   R, toR,

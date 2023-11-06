@@ -67,6 +67,134 @@ R(v_jl)
 
     ## [1] 1 3 2
 
+## `jl()` function
+
+### `jl()` as evaluation of `julia` expressions given as an one-length `R` character vector
+
+``` r
+jl("[1,3,2]")
+```
+
+    ## 3-element Vector{Int64}:
+    ##  1
+    ##  3
+    ##  2
+
+``` r
+jl("[1.0,3.0,2.0]")
+```
+
+    ## 3-element Vector{Float64}:
+    ##  1.0
+    ##  3.0
+    ##  2.0
+
+``` r
+jl("(a=1,b=[1,3])")
+```
+
+    ## (a = 1, b = [1, 3])
+
+All these results are `jlValue` objects which are `R` external pointers
+wrapping `jl_value_t*` values.
+
+### `jl()` as `julia` converter of `R` vectors
+
+Above, an example for conversion of a vector of double was given. Below
+one completes with vector of character, logical and integer.
+
+``` r
+require(jl4R)
+jl(c("one","three","two"))
+```
+
+    ## 3-element Vector{String}:
+    ##  "one"
+    ##  "three"
+    ##  "two"
+
+``` r
+jl(c(TRUE,FALSE,TRUE))
+```
+
+    ## 3-element Vector{Bool}:
+    ##  1
+    ##  0
+    ##  1
+
+``` r
+jl(c(1L,3L,2L))
+```
+
+    ## 3-element Vector{Int64}:
+    ##  1
+    ##  3
+    ##  2
+
+Notice that vector of length 1 are converted to atomic `julia` values.
+
+``` r
+require(jl4R)
+jl(TRUE)
+```
+
+    ## true
+
+``` r
+jl(1L)
+```
+
+    ## 1
+
+``` r
+jl(1)
+```
+
+    ## 1.0
+
+Also, remember that `jl()` applied to a one-length character vector is
+devoted to the evaluation of a `julia` expression expressed as a string.
+To get a `julia` atomic String, one has to enclose this string inside
+another `R` single quote:
+
+``` r
+require(jl4R)
+jl('"one"')
+```
+
+    ## "one"
+
+To get a vector of length 1 in `julia` one has
+
+``` r
+require(jl4R)
+jl("one", vector=TRUE) # or simply jl("one", TRUE)
+```
+
+    ## 1-element Vector{String}:
+    ##  "one"
+
+``` r
+jl(TRUE, vector=TRUE) # or simply jl(TRUE, TRUE)
+```
+
+    ## 1-element Vector{Bool}:
+    ##  1
+
+``` r
+jl(1L, TRUE)
+```
+
+    ## 1-element Vector{Int64}:
+    ##  1
+
+``` r
+jl(1, TRUE)
+```
+
+    ## 1-element Vector{Float64}:
+    ##  1.0
+
 ### Goal: conversion of `julia` structures used in statitictic to `R`
 
 - `DataFrame`
@@ -87,7 +215,7 @@ nt_jl
     ##    3 │     3      4)
 
 ``` r
-toR(nt_jl)
+R(nt_jl) # or toR(nt_jl)
 ```
 
     ## $a
@@ -100,29 +228,17 @@ toR(nt_jl)
     ## 3 3 4
 
 ``` r
-R(nt_jl)
+list(jltypeof(nt_jl), typeof(nt_jl), class(nt_jl))
 ```
 
-    ## $a
-    ## [1] 1
-    ## 
-    ## $b
-    ##   a b
-    ## 1 1 2
-    ## 2 2 3
-    ## 3 3 4
-
-``` r
-jl_typeof(nt_jl)
-```
-
+    ## [[1]]
     ## [1] "NamedTuple"
-
-``` r
-typeof(nt_jl)
-```
-
+    ## 
+    ## [[2]]
     ## [1] "externalptr"
+    ## 
+    ## [[3]]
+    ## [1] "NamedTuple" "jlStruct"   "jlValue"
 
 - `CategoricalArray`
 
@@ -144,3 +260,16 @@ R(ca_jl)
 
     ## [1] titi toto titi
     ## Levels: titi toto
+
+``` r
+list(jltypeof(nt_jl), typeof(nt_jl), class(nt_jl))
+```
+
+    ## [[1]]
+    ## [1] "NamedTuple"
+    ## 
+    ## [[2]]
+    ## [1] "externalptr"
+    ## 
+    ## [[3]]
+    ## [1] "NamedTuple" "jlStruct"   "jlValue"

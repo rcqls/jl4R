@@ -53,6 +53,11 @@ jlshow <- function(jlval) invisible(jlcall("show",jlval))
 
 jldisplay <- function(jlval) invisible(jlcall("display",jlval))
 
+jltypeof <- function(jlval) {
+    if(!.jlrunning()) .jlinit()
+    res <- .External("jl4R_typeof2R", jlval, PACKAGE = "jl4R")
+    res
+}
 
 jlget <- function(var) {
   if(!.jlrunning()) .jlinit()
@@ -70,9 +75,4 @@ jlset <- function(var,value,vector=FALSE) {
   }
 	.External("jl4R_set_global_variable", var, jl(value,vector=vector), PACKAGE="jl4R")
 	return(invisible())
-}
-
-jl_finalize_jlValues <- function(...) {
-  extptrs <- unlist(c(...))
-  invisible(.Call("jl4R_finalizeExternalPtr", extptrs, PACKAGE="jl4R"))
 }

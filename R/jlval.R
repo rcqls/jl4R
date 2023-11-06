@@ -58,4 +58,9 @@ jl_func <- function(jlfunc, ...) {
     .jlValue_func_call(jlfunc,jlargs,jlnargs)
 }
 
+jl_finalize_jlValues <- function(...) {
+  extptrs <- unlist(c(...))
+  invisible(.Call("jl4R_finalizeExternalPtr", extptrs, PACKAGE="jl4R"))
+}
+
 
