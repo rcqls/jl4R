@@ -44,11 +44,6 @@ jlrun <- function(expr) {
   invisible(.External("jl4R_run", .jlsafe(expr), PACKAGE = "jl4R"))
 }
 
-jlusing <- function(...) {
-  pkgs <- sapply(substitute(c(...))[-1], function(e) ifelse(is.character(e), e, as.character(e)))
-  jlrun(paste0("using ",paste(pkgs,collapse=", ")))
-}
-
 jlshow <- function(jlval) invisible(jlcall("show",jlval))
 
 jldisplay <- function(jlval) invisible(jlcall("display",jlval))
@@ -75,4 +70,19 @@ jlset <- function(var,value,vector=FALSE) {
   }
 	.External("jl4R_set_global_variable", var, jl(value,vector=vector), PACKAGE="jl4R")
 	return(invisible())
+}
+
+## Facility function
+
+jlpkg <- function(cmd) {
+  if (class(substitute(cmd)) != "character") {
+    cmd <- deparse(substitute(cmd))
+  }
+  print(paste0("import Pkg;Pkg.",cmd))
+  jlrun(paste0("import Pkg;Pkg.",cmd))
+}
+
+jlusing <- function(...) {
+  pkgs <- sapply(substitute(c(...))[-1], function(e) ifelse(is.character(e), e, as.character(e)))
+  jlrun(paste0("using ",paste(pkgs,collapse=", ")))
 }
