@@ -3,7 +3,7 @@ useDynLib(jl4R, .registration = TRUE)
 exportPattern("^\\jl_")
 exportPattern("^\\jlR_")
 export(
-  jl, "jl<-",
+  jl,
   jlrun, jlcall, jlcallR,
   jltypeof,
   jlset, jlget,

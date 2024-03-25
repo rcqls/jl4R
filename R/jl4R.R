@@ -1,10 +1,5 @@
 jl <- function(obj, ...) UseMethod("jl")
 
-"jl<-" <- function(var, value) {
-  var <- deparse(substitute(var))
-  jlset(var, value)
-}
-
 # return External Pointer of julia object 
 jl.default <- function(expr) {
   if(class(substitute(expr)) == "character") {
