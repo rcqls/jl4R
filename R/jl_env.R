@@ -12,27 +12,25 @@
     }
 }
 
-`[.jlenv` <- function(obj, var) {
-    if (class(substitute(var)) != "character") {
-        var <- deparse(substitute(var))
-    }
+`[.jlenv` <- function(obj, field) {
+    field <- as.character(substitute(field))
     jlget(var)
 }
 
-`$.jlenv` <- function(obj, var) {
-    jlget(var)
+`$.jlenv` <- function(obj, field) {
+    field <- as.character(substitute(field))
+    jlget(field)
 }
 
-`[<-.jlenv` <- function(obj, var, value) {
-    if (class(substitute(var)) != "character") {
-        var <- deparse(substitute(var))
-    }
-    jlset(var, value)
+`[<-.jlenv` <- function(obj, field, value) {
+    field <- as.character(substitute(field))
+    jlset(field, value)
     obj
 }
 
-`$<-.jlenv` <- function(obj, var, value) {
-    jlset(var, value)
+`$<-.jlenv` <- function(obj, field, value) {
+    field <- as.character(substitute(field))
+    jlset(field, value)
     obj
 }
 
