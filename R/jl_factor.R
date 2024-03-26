@@ -8,6 +8,10 @@ toR.CategoricalArray <- function(jlval) {
     res
 }
 
+levels.CategoricalArray <- function(jlval) {
+    jlcall("levels", jlval)
+}
+
 jl.factor <- function(fa) {
     jlusing("CategoricalArrays")
     jlcall("categorical",jl(as.character(fa)))
