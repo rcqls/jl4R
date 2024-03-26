@@ -1,5 +1,5 @@
 length.Array <- function(jlval) {
-    jlcallR("sizeof",jlval)
+    jlcallR("length",jlval)
 }
 
 "[.Array" <- function(jlval,i) {
