@@ -6,6 +6,8 @@
     obj
 }
 
+ `@.jlenv` <- function(obj, key) function(...) {jlcall(key, ...)}
+
 `[.jlenv` <- function(obj, field) {
     field <- as.character(substitute(field))
     jlget(field)

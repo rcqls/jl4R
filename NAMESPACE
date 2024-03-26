@@ -29,6 +29,7 @@ S3method("$",jlenv)
 S3method("[<-",jlenv)
 S3method("$<-",jlenv)
 S3method("print",jlenv)
+S3method("@",jlenv)
 
 S3method("names",jlStruct)
 S3method("[",jlStruct)
