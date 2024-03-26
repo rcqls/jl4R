@@ -29,5 +29,5 @@
 }
 
 `names.jlenv` <- function(obj) {
-
+    setdiff(R(jl("names(Main)")), c("Base","Core","Main","display_buffer","jl4R_ANSWER","preserved_refs"))
 }
