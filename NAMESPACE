@@ -45,6 +45,8 @@ S3method("names",DataFrame)
 S3method("[",DataFrame)
 S3method("$",DataFrame)
 
+S3method("levels",CategoricalArray)
+
 S3method(print,jlValue)
 S3method(toR,default)
 S3method(toR,jlValue)
