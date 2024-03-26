@@ -11,7 +11,9 @@ export(
   jlusing, jlpkg,
   R, toR,
   is.jlValue, is.jlStruct,
-  jl2R, jl2R_unsafe
+  jl2R, jl2R_unsafe,
+  '[.jlenv", '[<-.jlenv",
+  '$.jlenv", '$<-.jlenv"
 )
 
 #S3methods are not viewable inside the R system. If you want this functionality available put it in the previous export
