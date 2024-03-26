@@ -6,12 +6,6 @@
     obj
 }
 
-.jl_load_jlenv <- function() {
-    if(!exists("jl", envir = globalenv())) {
-        assign("jl", .jlenv(), envir = globalenv())
-    }
-}
-
 `[.jlenv` <- function(obj, field) {
     field <- as.character(substitute(field))
     jlget(field)
