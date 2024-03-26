@@ -19,10 +19,18 @@
     jlget(var)
 }
 
+`$.jlenv` <- function(obj, var) {
+    jlget(var)
+}
+
 `[<-.jlenv` <- function(obj, var, value) {
     if (class(substitute(var)) != "character") {
         var <- deparse(substitute(var))
     }
+    jlset(var, value)
+}
+
+`$<-.jlenv` <- function(obj, var, value) {
     jlset(var, value)
 }
 

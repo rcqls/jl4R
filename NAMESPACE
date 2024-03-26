@@ -23,6 +23,12 @@ S3method("jl",logical)
 S3method("jl",character)
 S3method("jl",factor)
 
+S3method("names",jlenv)
+S3method("[",jlenv)
+S3method("$",jlenv)
+S3method("[<-",jlenv)
+S3method("$<-",jlenv)
+
 S3method("names",jlStruct)
 S3method("[",jlStruct)
 S3method("$",jlStruct)
