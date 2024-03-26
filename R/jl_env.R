@@ -33,5 +33,5 @@
 }
 
 `print.jlenv` <- function(obj, ...) {
-    cat("julia environment\n")
+    cat("julia environment", paste( names(obj), collapse=", "),"\n")
 }
