@@ -28,10 +28,12 @@
         var <- deparse(substitute(var))
     }
     jlset(var, value)
+    obj
 }
 
 `$<-.jlenv` <- function(obj, var, value) {
     jlset(var, value)
+    obj
 }
 
 `names.jlenv` <- function(obj) {
