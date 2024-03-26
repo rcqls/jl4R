@@ -2,18 +2,12 @@ jl <- function(obj, ...) UseMethod("jl")
 
 jlget <- function(var) {
   if(!.jlrunning()) .jlinit()
-  if(class(substitute(var)) != "character") {
-    var <- deparse(substitute(var))
-  }
   res <- jl(var)
 	return(res)
 }
 
 jlset <- function(var, value, vector = FALSE) {
   if (!.jlrunning()) .jlinit()
-  if (class(substitute(var)) != "character") {
-    var <- deparse(substitute(var))
-  }
   jlval <- if(is.character(value)) jl.character(value, vector = vector) else jl(value)
 	.External("jl4R_set_global_variable", var, jlval, PACKAGE = "jl4R")
 	return(invisible())

@@ -14,7 +14,7 @@
 
 `[.jlenv` <- function(obj, field) {
     field <- as.character(substitute(field))
-    jlget(var)
+    jlget(field)
 }
 
 `$.jlenv` <- function(obj, field) {
