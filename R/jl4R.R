@@ -8,7 +8,9 @@ jlget <- function(var) {
 
 jlset <- function(var, value, vector = FALSE) {
   if (!.jlrunning()) .jlinit()
-  jlval <- if(is.character(value)) jl.character(value, vector = vector) else jl(value)
+  jlval <- if(is.jlValue(value)) value
+           else if(is.character(value)) jl.character(value, vector = vector) 
+           else jl(value)
 	.External("jl4R_set_global_variable", var, jlval, PACKAGE = "jl4R")
 	return(invisible())
 }
