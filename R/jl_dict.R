@@ -1,0 +1,22 @@
+names.Dict <- function(jlval) jlcallR("collect",jlcall("keys",jlval))
+
+"[.Dict" <- function(jlval, field) {
+     if(field %in% names(jlval)) {
+        jlcall("getindex",jlval,jl_symbol(field))
+    } else NULL
+}
+"$.Dict" <- function(jlval, field) jlval[field]
+
+## Convert to Tuple or NamedTuple
+jl.list <-  function(obj) {
+    if(!.jlrunning()) .jlinit()
+    jlval <- jl("Dict{Symbol, Any}()")
+    vars <- list()
+    pairs <- list()
+    for (nm in names(obj)) {
+        vars[[nm]] <- jl(obj[[nm]])
+        pairs[[nm]] <- jlcall("=>", jl_symbol(nm), vars[[nm]])
+        jlcall("push!", jlval, pairs[[nm]])
+    }
+    jlval
+}

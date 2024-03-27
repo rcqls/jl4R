@@ -136,7 +136,7 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
   SEXP nmsR;
   SEXPTYPE aryTyR;
   jl_value_t *tmp;
-  jl_function_t *func, *isa;
+  jl_function_t *func, *len, *func2, *collect;
   char *resTy, *aryTy, *aryTy2;
 
   if(res!=NULL) { //=> get a result
@@ -271,6 +271,38 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
       UNPROTECT(1);
       UNPROTECT(1);
       
+      return resR;
+    }
+    else
+    if(strcmp(jl_typeof_str(res),"Dict")==0)
+    //if(jl_is_array(res))
+    {
+      d=1; //jl_nfields(res); //BEFORE 0.3: d=jl_tuple_len(res);
+      len = jl_get_function(jl_base_module, "length");
+      jl_value_t *l = jl_call1(len, res);
+      d = jl_unbox_long(l);
+      func = jl_get_function(jl_base_module, "keys");
+      func2 = jl_get_function(jl_base_module, "values");
+      collect = jl_get_function(jl_base_module, "collect");
+      jl_value_t *keys = NULL, *tmpkeys = NULL, *vals = NULL, *tmpvals = NULL;
+      JL_GC_PUSH4(&keys,&tmpkeys, &vals, &tmpvals);
+      tmpkeys = jl_call1(func, res);
+      keys = jl_call1(collect, tmpkeys);
+      tmpvals = jl_call1(func2, res);
+      vals = jl_call1(collect, tmpvals);
+      
+      PROTECT(nmsR = allocVector(STRSXP, d));
+      PROTECT(resR=allocVector(VECSXP,d));
+      for(i=0;i<d;i++) {
+        //BEFORE 0.3: SET_ELEMENT(resR,i,jl_value_to_SEXP(jl_tupleref(res,i)));
+        //printf("i=%zu/%zu\n",i,d);
+        SET_STRING_ELT(nmsR,i,mkChar(jl_symbol_name((jl_sym_t *)jl_arrayref((jl_array_t *)keys,i))));
+        SET_ELEMENT(resR,i,jl_value_to_SEXP(jl_arrayref((jl_array_t *)vals,i)));
+      }
+      setAttrib(resR, R_NamesSymbol, nmsR);
+      UNPROTECT(1);
+      UNPROTECT(1);
+      JL_GC_POP();
       return resR;
     }
     else

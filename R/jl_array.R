@@ -29,3 +29,5 @@ jl.character <- function(obj,vector=FALSE) {
         .Call("jl4R_VECSXP_to_jl_array_EXTPTRSXP", obj, PACKAGE = "jl4R")
     }
 }
+
+
