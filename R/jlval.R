@@ -3,8 +3,8 @@
 .jleval2jlValue <- function(expr) {
   if(!.jlrunning()) .jlinit()
   jlval <- .External("jl4R_eval2jlValue", expr, PACKAGE = "jl4R")
-  if(is.jlStruct(jlval)) {
-    class(jlval) <- c(class(jlval)[1:(length(class(jlval))-1)],"jlStruct","jlValue")
+  if(is.Struct(jlval)) {
+    class(jlval) <- c(class(jlval)[1:(length(class(jlval))-1)],"Struct","jlValue")
   }
   return(jlval)
 }

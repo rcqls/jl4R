@@ -47,6 +47,13 @@ jlcall <- function(meth , ...) {
     }
 }
 
+jlnew <- function(datatype, ...) {
+    if(!is.character(datatype)) {
+        error("No julia DataType specified!")
+    }
+      jl_new_struct(datatype, ...)
+}
+
 jlR <- function(expr) toR(jl(expr))
 jlR_unsafe <- function(expr) toR(jl_unsafe(expr))
 jlcallR <- function(meth , ...) toR(jlcall(meth, ...))

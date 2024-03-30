@@ -1,13 +1,25 @@
-is.jlStruct <- function(jlval) {
+is.Struct <- function(jlval) {
     jlR_isstructtype(jlcall("typeof",jlval))
 }
 
-names.jlStruct <- function(jlval) toR(jl_fieldnames(jlval))
+names.Struct <- function(jlval) toR(jl_fieldnames(jlval))
 
-"[.jlStruct" <- function(jlval, field) {
+"[.Struct" <- function(jlval, field) {
     if(field %in% names(jlval)) {
         jlcall("getfield",jlval,jl_symbol(field))
     } else NULL
 }
 
-"$.jlStruct" <- function(jlval, field) jlval[field]
+"$.Struct" <- function(jlval, field) jlval[field]
+
+
+.jlValue_new_struct <- function(datatype, jlargs, jlnargs) {
+    if (!.jlrunning()) .jlinit()
+    return(.Call("jl4R_jlValue_new_struct", datatype, jlargs, jlnargs, PACKAGE = "jl4R"))
+}
+
+jl_new_struct <- function(datatype, ...) {
+    jlargs <- list(...)
+    jlnargs <- length(jlargs)
+    .jlValue_new_struct(datatype,jlargs,jlnargs)
+}

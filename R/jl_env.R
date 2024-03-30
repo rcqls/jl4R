@@ -6,22 +6,16 @@
     obj
 }
 
- `@.jlenv` <- function(obj, key) function(...) {jlcall(key, ...)}
+ ## Maybe later: `@.jlenv` <- function(obj, key) function(...) {jlcall(key, ...)}
 
-`[.jlenv` <- function(obj, field) {
-    field <- as.character(substitute(field))
-    jlget(field)
+`[.jlenv` <- function(obj, fikeyeld) {
+    key <- as.character(substitute(key))
+    function(...) {jlcall(key, ...)}
 }
 
 `$.jlenv` <- function(obj, field) {
     field <- as.character(substitute(field))
     jlget(field)
-}
-
-`[<-.jlenv` <- function(obj, field, value) {
-    field <- as.character(substitute(field))
-    jlset(field, value)
-    obj
 }
 
 `$<-.jlenv` <- function(obj, field, value) {

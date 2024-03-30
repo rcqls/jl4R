@@ -4,13 +4,13 @@ exportPattern("^\\jl_")
 exportPattern("^\\jlR_")
 export(
   jl,
-  jlrun, jlcall, jlcallR,
+  jlrun, jlcall, jlnew, jlcallR,
   jltypeof,
   jlset, jlget,
   jlshow, jldisplay,
   jlusing, jlpkg,
   R, toR,
-  is.jlValue, is.jlStruct,
+  is.jlValue, is.Struct,
   jl2R, jl2R_unsafe
 )
 
@@ -27,14 +27,13 @@ S3method("jl",factor)
 S3method("names",jlenv)
 S3method("[",jlenv)
 S3method("$",jlenv)
-S3method("[<-",jlenv)
 S3method("$<-",jlenv)
 S3method("print",jlenv)
-S3method("@",jlenv)
+#S3method("@",jlenv)
 
-S3method("names",jlStruct)
-S3method("[",jlStruct)
-S3method("$",jlStruct)
+S3method("names",Struct)
+S3method("[",Struct)
+S3method("$",Struct)
 
 S3method("names",NamedTuple)
 S3method("[",NamedTuple)

@@ -236,7 +236,7 @@ list(jltypeof(nt_jl), typeof(nt_jl), class(nt_jl))
     ## [1] "externalptr"
     ## 
     ## [[3]]
-    ## [1] "NamedTuple" "jlStruct"   "jlValue"
+    ## [1] "NamedTuple" "Struct"     "jlValue"
 
 - `CategoricalArray`
 
@@ -270,7 +270,7 @@ list(jltypeof(nt_jl), typeof(nt_jl), class(nt_jl))
     ## [1] "externalptr"
     ## 
     ## [[3]]
-    ## [1] "NamedTuple" "jlStruct"   "jlValue"
+    ## [1] "NamedTuple" "Struct"     "jlValue"
 
 ## R Finalizers
 
