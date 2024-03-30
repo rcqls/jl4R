@@ -8,7 +8,7 @@
 
  ## Maybe later: `@.jlenv` <- function(obj, key) function(...) {jlcall(key, ...)}
 
-`[.jlenv` <- function(obj, fikeyeld) {
+`[.jlenv` <- function(obj, key) {
     key <- as.character(substitute(key))
     function(...) {jlcall(key, ...)}
 }
