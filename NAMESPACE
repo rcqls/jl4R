@@ -27,6 +27,7 @@ S3method("jl",factor)
 
 S3method("names",jlEnv)
 S3method("[",jlEnv)
+S3method("[[",jlEnv)
 S3method("$",jlEnv)
 S3method("$<-",jlEnv)
 S3method("print",jlEnv)

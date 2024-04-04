@@ -1,5 +1,14 @@
 jl <- function(obj, ...) UseMethod("jl")
 
+# return External Pointer of julia object 
+jl.default <- function(expr) {
+  if(class(substitute(expr)) == "character") {
+    .jleval2jlValue(.jlsafe(expr))
+  } else {
+    .jleval2jlValue(.jlsafe(deparse(substitute(expr))))
+  }
+}
+
 jlget <- function(var) {
   if(!.jlrunning()) .jlinit()
   res <- jl(var)
@@ -13,15 +22,6 @@ jlset <- function(var, value, vector = FALSE) {
            else jl(value)
 	.External("jl4R_set_global_variable", var, jlval, PACKAGE = "jl4R")
 	return(invisible())
-}
-
-# return External Pointer of julia object 
-jl.default <- function(expr) {
-  if(class(substitute(expr)) == "character") {
-    .jleval2jlValue(.jlsafe(expr))
-  } else {
-    .jleval2jlValue(.jlsafe(deparse(substitute(expr))))
-  }
 }
 
 jl_unsafe <- function(expr) {

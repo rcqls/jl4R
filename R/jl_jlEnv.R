@@ -1,4 +1,4 @@
-## Facility function to 
+## Facility function to use julia inside R
 
 .jlEnv <- function() {
     obj <- new.env()
@@ -8,14 +8,35 @@
 
  ## Maybe later: `@.jlEnv` <- function(obj, key) function(...) {jlcall(key, ...)}
 
+# `[.jlEnv` <- function(obj, key) {
+#     # OLD version (to remove)
+#     # key <- deparse(substitute(key))
+#     # if((substr(key,1,1) == substr(key,nchar(key),nchar(key))) && (substr(key,1,1) %in% c("'", '"'))) {
+#     #     key <- substr(key,2,nchar(key) - 1)
+#     #     function(...) {jlnew(key, ...)}
+#     # } else {
+#     #     function(...) {jlcall(key, ...)}
+#     # }
+#     if(class(substitute(key)) == "character") {
+#         function(...) {jlnew(key, ...)}
+#     } else {
+#         key <- deparse(substitute(key))
+#         function(...) {jlcall(key, ...)}
+#     }
+# }
+
 `[.jlEnv` <- function(obj, key) {
-    key <- deparse(substitute(key))
-    if((substr(key,1,1) == substr(key,nchar(key),nchar(key))) && (substr(key,1,1) %in% c("'", '"'))) {
-        key <- substr(key,2,nchar(key) - 1)
-        function(...) {jlnew(key, ...)}
-    } else {
-        function(...) {jlcall(key, ...)}
+    if(class(substitute(key)) != "character") {
+        key <- deparse(substitute(key))
     }
+    function(...) {jlcall(key, ...)}
+}
+
+`[[.jlEnv` <- function(obj, key) {
+    if(class(substitute(key)) != "character") {
+        key <- deparse(substitute(key))
+    }
+    function(...) {jlnew(key, ...)}
 }
 
 `$.jlEnv` <- function(obj, field) {
