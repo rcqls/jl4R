@@ -1,4 +1,9 @@
 ## internals
+.jlValue2R <- function(jlval) {
+    if(!.jlrunning()) .jlinit()
+    res <- .External("jl4R_jlValue2R", jlval, PACKAGE = "jl4R")
+    res
+}
 
 .jleval2jlValue <- function(expr) {
   if(!.jlrunning()) .jlinit()
@@ -24,7 +29,7 @@
     .External("jl4R_jlValue_func_call1", jl_meth, jlv, PACKAGE = "jl4R")
 }
 
-jl_func1 <- function(jl_meth, jlv) .jlValue_func_call1(jl_meth, jlv)
+jlValue_func1 <- function(jl_meth, jlv) .jlValue_func_call1(jl_meth, jlv)
 
 .jlValue_call2 <- function(meth, jlv, jlarg) {
     if(!.jlrunning()) .jlinit()
@@ -41,7 +46,7 @@ jl_func1 <- function(jl_meth, jlv) .jlValue_func_call1(jl_meth, jlv)
     .Call("jl4R_jlValue_call", meth, jlargs, jlnargs, PACKAGE = "jl4R")
 }
 
-jl_call <- function(meth, ...) {
+jlValue_call <- function(meth, ...) {
     jlargs <- list(...)
     jlnargs <- length(jlargs)
     .jlValue_call(meth,jlargs,jlnargs)
@@ -52,15 +57,24 @@ jl_call <- function(meth, ...) {
     .Call("jl4R_jlValue_func_call", jlfunc, jlargs, jlnargs, PACKAGE = "jl4R")
 }
 
-jl_func <- function(jlfunc, ...) {
+jlValue_func <- function(jlfunc, ...) {
     jlargs <- list(...)
     jlnargs <- length(jlargs)
     .jlValue_func_call(jlfunc,jlargs,jlnargs)
 }
 
-jl_finalize_jlValues <- function(...) {
+jlValue_finalize <- function(...) {
   extptrs <- unlist(c(...))
   invisible(.Call("jl4R_finalizeExternalPtr", extptrs, PACKAGE="jl4R"))
+}
+
+
+jlValue_show_display <- function(jlval, ...) {
+    .Call("jl4R_show_preserved_ref", jlval, PACKAGE = "jl4R")
+}
+
+jlValue_capture_display <- function(jlval, ...) {
+    .Call("jl4R_capture_preserved_ref", jlval, PACKAGE = "jl4R")
 }
 
 

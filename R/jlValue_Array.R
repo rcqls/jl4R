@@ -1,3 +1,7 @@
+jlArray <- function(...) {
+    obj <- c(...)
+}
+
 length.Array <- function(jlval) {
     jlcallR("length",jlval)
 }

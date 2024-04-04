@@ -1,3 +1,4 @@
+## N.B.: This structure is obsolete now that we use jlValue 
 jlvector <- function(x,value) {
     obj <- list(var=x)
     if(!missing(value)) {

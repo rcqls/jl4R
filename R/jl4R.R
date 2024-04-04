@@ -35,7 +35,7 @@ jlcall <- function(meth , ...) {
         error("No julia method specified!")
     }
     if(length(args) > 3) {
-      jl_call(meth, ...)
+      jlValue_call(meth, ...)
     } else {
       switch(length(args) + 1,
           .jlValue_call0(meth),
@@ -51,7 +51,7 @@ jlnew <- function(datatype, ...) {
     if(!is.character(datatype)) {
         error("No julia DataType specified!")
     }
-      jl_new_struct(datatype, ...)
+    jl_new_struct(datatype, ...)
 }
 
 jlR <- function(expr) toR(jl(expr))

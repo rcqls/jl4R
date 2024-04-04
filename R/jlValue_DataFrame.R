@@ -1,3 +1,9 @@
+jlDataFrame <- function(...) {
+    df <- list(...)
+    ## TODO: check if elements of df have same dimension
+    .namedlist_to_jlDataFrame(df)
+}
+
 toR.DataFrame <- function(jlval) {
     nms <- toR(jlcall("names",jlval))
     res <- list()

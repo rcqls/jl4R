@@ -19,7 +19,7 @@ names.Struct <- function(jlval) toR(jl_fieldnames(jlval))
 }
 
 jl_new_struct <- function(datatype, ...) {
-    jlargs <- list(...)
+    jlargs <- lapply(list(...), jl)
     jlnargs <- length(jlargs)
     .jlValue_new_struct(datatype,jlargs,jlnargs)
 }
