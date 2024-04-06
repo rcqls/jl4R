@@ -11,7 +11,7 @@ as.jlValue.data.frame <- function(df, ...) {
     vars <- list()
     pairs <- list()
     for (nm in names(df)) {
-        vars[[nm]] <- jlValue_eval(df[[nm]])
+        vars[[nm]] <- as.jlValue(df[[nm]])
         pairs[[nm]] <- jlcall("=>", jl_symbol(nm), vars[[nm]])
         jlcall("push!", args, pairs[[nm]])
     }

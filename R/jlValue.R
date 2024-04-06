@@ -21,11 +21,6 @@ print.jlValue <- function(jlval, ...) {
     }
 }
 
-R <- function(jlval) UseMethod("toR")
-toR <- function(jlval) UseMethod("toR")
-
-toR.default <- function(obj) obj
-
 toR.jlValue <- function(jlval) {
     res <- .jlValue2R(jlval)
     if(typeof(res) == "externalptr") {

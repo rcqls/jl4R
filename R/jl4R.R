@@ -16,6 +16,11 @@ as.jlValue.default <- function(expr, ...) {
   NULL
 }
 
+R <- function(jlval) UseMethod("toR")
+toR <- function(jlval) UseMethod("toR")
+
+toR.default <- function(obj) obj
+
 jlget <- function(var) {
   if(!.jlrunning()) .jlinit()
   res <- jlValue_eval(var)
