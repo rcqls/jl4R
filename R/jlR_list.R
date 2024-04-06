@@ -1,28 +1,29 @@
 ## Convert to Tuple or NamedTuple
-jl.list <-  function(obj) {
+as.jlValue.list <-  function(obj, ...) {
     if(!.jlrunning()) .jlinit()
-    .namedlist_To_Named(obj)
+    .namedlist2NamedTuple(obj)
+   # .namedlist2Dict(obj)
 }
 
 ## internal
-.namedlist_To_Dict <- function(obj) {
-    jlval <- jl("Dict{Symbol, Any}()")
+.namedlist2Dict <- function(obj) {
+    jlval <- jlValue_eval("Dict{Symbol, Any}()")
     vars <- list()
     pairs <- list()
     for (nm in names(obj)) {
-        vars[[nm]] <- jl(obj[[nm]])
+        vars[[nm]] <- as.jlValue(obj[[nm]])
         pairs[[nm]] <- jlcall("=>", jl_symbol(nm), vars[[nm]])
         jlcall("push!", jlval, pairs[[nm]])
     }
     jlval
 }
 
-.namedlist_To_NamedTuple <- function(obj) {
-    jlval <- jl("Dict{Symbol, Any}()")
+.namedlist2NamedTuple <- function(obj) {
+    jlval <- jlValue_eval("Dict{Symbol, Any}()")
     vars <- list()
     pairs <- list()
     for (nm in names(obj)) {
-        vars[[nm]] <- jl(obj[[nm]])
+        vars[[nm]] <- as.jlValue(obj[[nm]])
         pairs[[nm]] <- jlcall("=>", jl_symbol(nm), vars[[nm]])
         jlcall("push!", jlval, pairs[[nm]])
     }

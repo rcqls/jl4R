@@ -1,4 +1,4 @@
-jl.data.frame <- function(df) {
+as.jlValue.data.frame <- function(df, ...) {
     .namedlist_to_jlDataFrame(df)
 }
 
@@ -6,12 +6,12 @@ jl.data.frame <- function(df) {
 
 .namedlist_to_jlDataFrame <- function(df) {
     jlusing("DataFrames")
-    splatdf <- jlcall("splat", jl("DataFrame"))
-    args <- jl("[]")
+    splatdf <- jlcall("splat", jlValue_eval("DataFrame"))
+    args <- jlValue_eval("[]")
     vars <- list()
     pairs <- list()
     for (nm in names(df)) {
-        vars[[nm]] <- jl(df[[nm]])
+        vars[[nm]] <- jlValue_eval(df[[nm]])
         pairs[[nm]] <- jlcall("=>", jl_symbol(nm), vars[[nm]])
         jlcall("push!", args, pairs[[nm]])
     }

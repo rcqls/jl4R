@@ -383,6 +383,10 @@ jl_value_t* jl_eval2jl(SEXP args) {
 
   cmdString=(char*)CHAR(STRING_ELT(CADR(args),0));
   res=jl_eval_string(cmdString);
+  if (jl_exception_occurred()) {
+    //printf("%s \n", jl_typeof_str(jl_exception_occurred()));
+    return (jl_value_t *)jl_exception_occurred(); //jl_eval_string("nothing");
+  }
   JL_GC_PUSH1(&res);
   jl_set_global(jl_main_module, jl_symbol("jl4R_ANSWER"),res);
   JL_GC_POP();
@@ -411,6 +415,8 @@ SEXP jl4R_run(SEXP args)
 
   cmdString=(char*)CHAR(STRING_ELT(CADR(args),0));
   jl_eval_string(cmdString);
+  if (jl_exception_occurred())
+    printf("Julia Error: %s \n", jl_typeof_str(jl_exception_occurred()));
   return R_NilValue;
 }
 
@@ -578,6 +584,7 @@ SEXP jlValue(jl_value_t* jlvalue) {
   R_RegisterCFinalizerEx(ans, jlValueFinalizer, TRUE);
   PROTECT(class=allocVector(STRSXP,2));
   jltype=(char*)jl_typeof_str(jlvalue);
+  // printf("jlValue jltype -> %s\n", jltype);
   SET_STRING_ELT(class,0, mkChar(jltype));
   SET_STRING_ELT(class,1, mkChar("jlValue"));
   SET_CLASS(ans,class);

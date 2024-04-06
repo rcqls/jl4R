@@ -1,3 +1,4 @@
+
 ## Facility function to use julia inside R
 
 .jlEnv <- function() {
@@ -5,8 +6,6 @@
     class(obj) <- "jlEnv"
     obj
 }
-
- ## Maybe later: `@.jlEnv` <- function(obj, key) function(...) {jlcall(key, ...)}
 
 # `[.jlEnv` <- function(obj, key) {
 #     # OLD version (to remove)
@@ -25,14 +24,19 @@
 #     }
 # }
 
-`[.jlEnv` <- function(obj, key) {
+`[[.jlEnv` <- function(obj, key) {
     if(class(substitute(key)) != "character") {
         key <- deparse(substitute(key))
     }
     function(...) {jlcall(key, ...)}
 }
 
-`[[.jlEnv` <- function(obj, key) {
+
+ `@.jlEnv` <- function(obj, key) function(...) {
+    jlcall(key, ...)
+}
+
+`[.jlEnv` <- function(obj, key) {
     if(class(substitute(key)) != "character") {
         key <- deparse(substitute(key))
     }
@@ -51,7 +55,7 @@
 }
 
 `names.jlEnv` <- function(obj) {
-    setdiff(R(jl("names(Main)")), c("Base","Core","Main","display_buffer","jl4R_ANSWER","preserved_refs"))
+    setdiff(R(jlValue_eval("names(Main)")), c("Base","Core","Main","display_buffer","jl4R_ANSWER","preserved_refs"))
 }
 
 `print.jlEnv` <- function(obj, ...) {

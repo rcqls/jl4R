@@ -1,25 +1,30 @@
-jl <- function(obj, ...) UseMethod("jl")
-
-# return External Pointer of julia object 
-jl.default <- function(expr) {
-  if(class(substitute(expr)) == "character") {
-    .jleval2jlValue(.jlsafe(expr))
-  } else {
-    .jleval2jlValue(.jlsafe(deparse(substitute(expr))))
+## IMPORTANT
+## 1) jl(`<multiline julia expression>`) redirect to jlValue_eval("<multiline julia expression>")
+## 2) jl(<R object>) is redirected to as.jlValue(<RObject>)
+jl <- function(obj, ..., name.class = TRUE) {
+  if(name.class && class(substitute(obj)) == "name") {
+    obj <- deparse(substitute(obj))
+    return(jlValue_eval(obj))
   }
+  UseMethod("as.jlValue", obj)
+}
+
+as.jlValue <- function(obj, ...) UseMethod("as.jlValue", obj)
+
+as.jlValue.default <- function(expr, ...) {
+  warning(paste0("No as.jlValue conversion for ", expr, " !"))
+  NULL
 }
 
 jlget <- function(var) {
   if(!.jlrunning()) .jlinit()
-  res <- jl(var)
+  res <- jlValue_eval(var)
 	return(res)
 }
 
 jlset <- function(var, value, vector = FALSE) {
   if (!.jlrunning()) .jlinit()
-  jlval <- if(is.jlValue(value)) value
-           else if(is.character(value)) jl.character(value, vector = vector) 
-           else jl(value)
+  jlval <- as.jlValue(value)
 	.External("jl4R_set_global_variable", var, jlval, PACKAGE = "jl4R")
 	return(invisible())
 }

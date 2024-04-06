@@ -1,4 +1,3 @@
-# jl_symbol <- function(field) jl(paste0(":",field))
 jl_symbol <- function(field) {
     if(!.jlrunning()) .jlinit()
     res <- .External("jl4R_jl_symbol", field, PACKAGE = "jl4R")
@@ -12,17 +11,17 @@ jl_isstructtype <- function(jlval) {
     jlcall("isstructtype", jlval)
 }
 
-jl_fieldnames <- function(jlv) {
-    jlcall("fieldnames",jlcall("typeof",jlv))
+jl_fieldnames <- function(jlval) {
+    jlcall("fieldnames",jlcall("typeof",jlval))
 }
 
-jl_getfield <- function(jlval,field) {
+jl_getfield <- function(jlval, field) {
     jlcall("getfield", jlval, jl_symbol(field))
 }
 
 jlR_isstructtype <- function(jlval) toR(jl_isstructtype(jlval))
 jlR_fieldnames <- function(jlval) toR(jl_fieldnames(jlval))
-jlR_getfield <- function(jlval,field) toR(jl_getfield(jlval,field))
+jlR_getfield <- function(jlval, field) toR(jl_getfield(jlval, field))
 
 
 

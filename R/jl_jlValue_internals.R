@@ -71,6 +71,7 @@ jlValue_finalize <- function(...) {
 
 jlValue_show_display <- function(jlval, ...) {
     .Call("jl4R_show_preserved_ref", jlval, PACKAGE = "jl4R")
+    NULL
 }
 
 jlValue_capture_display <- function(jlval, ...) {
