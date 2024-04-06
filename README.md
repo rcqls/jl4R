@@ -44,6 +44,12 @@ require(jl4R)
     ## Le chargement a nécessité le package : jl4R
 
 ``` r
+jl(`1.0`)
+```
+
+    ## 1.0
+
+``` r
 jl(1)
 ```
 
@@ -70,7 +76,7 @@ R(v_jl)
 ### `jl()` as evaluation of `julia` expressions given as an one-length `R` character vector
 
 ``` r
-jl("[1,3,2]")
+jl(`[1,3,2]`)
 ```
 
     ## 3-element Vector{Int64}:
@@ -79,7 +85,7 @@ jl("[1,3,2]")
     ##  2
 
 ``` r
-jl("[1.0,3.0,2.0]")
+jl(`[1.0,3.0,2.0]`)
 ```
 
     ## 3-element Vector{Float64}:
@@ -88,7 +94,7 @@ jl("[1.0,3.0,2.0]")
     ##  2.0
 
 ``` r
-jl("(a=1,b=[1,3])")
+jl(`(a=1,b=[1,3])`)
 ```
 
     ## (a = 1, b = [1, 3])
@@ -150,17 +156,11 @@ jl(1)
 
     ## 1.0
 
-Also, remember that `jl()` applied to a one-length character vector is
-devoted to the evaluation of a `julia` expression expressed as a string.
-To get a `julia` atomic String, one has to enclose this string inside
-another `R` single quote:
-
 ``` r
-require(jl4R)
-jl('"one"')
+jl("1")
 ```
 
-    ## "one"
+    ## "1"
 
 To get a vector of length 1 in `julia` one has
 
@@ -200,7 +200,7 @@ jl(1, TRUE)
 ``` r
 require(jl4R)
 jlusing(DataFrames)
-jl("(a=1,b=DataFrame(a=1:3,b=2:4))") -> nt_jl
+jl(`(a=1,b=DataFrame(a=1:3,b=2:4))`) -> nt_jl
 nt_jl
 ```
 
@@ -243,7 +243,7 @@ list(jltypeof(nt_jl), typeof(nt_jl), class(nt_jl))
 ``` r
 require(jl4R)
 jlusing(CategoricalArrays)
-ca_jl <- jl('categorical(["titi","toto","titi"])')
+ca_jl <- jl(`categorical(["titi","toto","titi"])`)
 ca_jl
 ```
 

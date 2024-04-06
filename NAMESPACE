@@ -4,13 +4,15 @@ exportPattern("^\\jl_")
 exportPattern("^\\jlR_")
 export(
   jl,
+  jlValue_eval,
+  as.jlValue, is.jlValue,
+  R, toR,
   jlrun, jlcall, jlnew, jlcallR,
   jltypeof,
   jlset, jlget,
   jlshow, jldisplay,
   jlusing, jlpkg,
-  R, toR,
-  is.jlValue, as.jlValue, is.Struct,
+  is.Struct,
   jl2R, jl2R_unsafe
 )
 
