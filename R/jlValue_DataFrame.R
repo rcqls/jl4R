@@ -1,7 +1,7 @@
 jlDataFrame <- function(...) {
     df <- list(...)
     ## TODO: check if elements of df have same dimension
-    .namedlist_to_jlDataFrame(df)
+    .RNamedList2jlDataFrame(df)
 }
 
 toR.DataFrame <- function(jlval) {

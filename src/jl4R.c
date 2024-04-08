@@ -309,8 +309,8 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
     if(strcmp(resTy,"Array")==0)
     //if(jl_is_array(res))
     {
-      nd = jl_array_rank(res);
-      //Rprintf("array_ndims=%d\n",(int)nd);
+      nd = (int)jl_array_ndims(res);
+      // Rprintf("array_ndims=%d\n",(int)nd);
       aryTy=(char*)jl_typename_str(jl_array_eltype(res));
       aryTy2=(char*)jl_typeof_str(jl_array_eltype(res));
       //Rprintf("type elt=%s,%s\n",aryTy,(char*)jl_typeof_str(jl_array_eltype(res)));
@@ -321,11 +321,16 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
       else if(strcmp(aryTy,"Complex")==0) aryTyR=CPLXSXP;
       else if(strcmp(aryTy,"Float64")==0 || strcmp(aryTy,"Float32")==0) aryTyR=REALSXP;
       else aryTyR=VECSXP;
-      if(nd==1) {//Vector
-        d = jl_array_size(res, 0);
-        //Rprintf("array_dim[1]=%d\n",(int)d);
+      //if(nd==1) {//Vector
+        d = 1; for(int dim=0; dim < nd; dim++) d *= (int)jl_array_size(res, dim); //jl_array_size is defined in jlapi.c, weirdly jl_array_dim does not work here!
+        // Rprintf("array_dim[1]=%d\n",(int)d);
         PROTECT(resR=allocVector(aryTyR,d));
-
+        if(nd > 1) { //nmsR corresponds here to R_DimSymbol attribute
+          PROTECT(nmsR = allocVector(INTSXP, nd));
+          for(int dim=0; dim < nd; dim++) {
+            INTEGER(nmsR)[dim] = (int)jl_array_size(res, dim);
+          }
+        }
         for(i=0;i<d;i++) {
           switch(aryTyR) {
             case STRSXP:
@@ -354,9 +359,13 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
               SET_ELEMENT(resR,i,jl_value_to_SEXP(jl_arrayref((jl_array_t *)res,i)));
           }
         }
+        if(nd > 1) {
+          setAttrib(resR, R_DimSymbol, nmsR);
+          UNPROTECT(1);
+        }
         UNPROTECT(1);
         return resR;
-      }
+      //}
     } else {
       resR = (SEXP)jlValue(res);
       // PROTECT(resR=allocVector(STRSXP,1));

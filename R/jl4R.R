@@ -1,18 +1,18 @@
 ## IMPORTANT
 ## 1) jl(`<multiline julia expression>`) redirect to jlValue_eval("<multiline julia expression>")
-## 2) jl(<R object>) is redirected to as.jlValue(<RObject>)
-jl <- function(obj, ..., name.class = TRUE) {
-  if(name.class && class(substitute(obj)) == "name") {
+## 2) jl(<R object>) is redirected to as_jlValue(<RObject>)
+jl <- function(obj, ..., name_class = TRUE) {
+  if (name_class && class(substitute(obj)) == "name") {
     obj <- deparse(substitute(obj))
     return(jlValue_eval(obj))
   }
-  UseMethod("as.jlValue", obj)
+  UseMethod("as_jlValue", obj)
 }
 
-as.jlValue <- function(obj, ...) UseMethod("as.jlValue", obj)
+as_jlValue <- function(obj, ...) UseMethod("as_jlValue", obj)
 
-as.jlValue.default <- function(expr, ...) {
-  warning(paste0("No as.jlValue conversion for ", expr, " !"))
+as_jlValue.default <- function(expr, ...) {
+  warning(paste0("No as_jlValue conversion for ", expr, " !"))
   NULL
 }
 
@@ -22,16 +22,16 @@ toR <- function(jlval) UseMethod("toR")
 toR.default <- function(obj) obj
 
 jlget <- function(var) {
-  if(!.jlrunning()) .jlinit()
+  if (!.jlrunning()) .jlinit()
   res <- jlValue_eval(var)
-	return(res)
+  return(res)
 }
 
 jlset <- function(var, value, vector = FALSE) {
   if (!.jlrunning()) .jlinit()
-  jlval <- as.jlValue(value)
-	.External("jl4R_set_global_variable", var, jlval, PACKAGE = "jl4R")
-	return(invisible())
+  jlval <- as_jlValue(value)
+  .External("jl4R_set_global_variable", var, jlval, PACKAGE = "jl4R")
+  return(invisible())
 }
 
 jl_unsafe <- function(expr) {
@@ -41,10 +41,10 @@ jl_unsafe <- function(expr) {
 # apply a method call 
 jlcall <- function(meth , ...) {
     args <- list(...)
-    if(!is.character(meth)) {
+    if (!is.character(meth)) {
         error("No julia method specified!")
     }
-    if(length(args) > 3) {
+    if (length(args) > 3) {
       jlValue_call(meth, ...)
     } else {
       switch(length(args) + 1,

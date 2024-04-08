@@ -9,7 +9,7 @@ jlValue_eval <- function(obj, ...) {
     }
 }
 
-as.jlValue.jlValue <- function(jlval, ...) jlval
+as_jlValue.jlValue <- function(jlval, ...) jlval
 
 is.jlValue <- function(obj) inherits(obj,"jlValue")
 

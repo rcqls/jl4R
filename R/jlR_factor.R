@@ -1,4 +1,4 @@
-as.jlValue.factor <- function(fa, ...) {
+as_jlValue.factor <- function(fa, ...) {
     jlusing("CategoricalArrays")
-    jlcall("categorical",as.jlValue(as.character(fa)))
+    jlcall("categorical", as_jlValue(as.character(fa)))
 }
