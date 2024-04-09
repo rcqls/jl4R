@@ -11,7 +11,7 @@ toR.Tuple <- function(jlval) {
     return(obj)
 }
 
-length.Tuple <- function(jlval) jlcallR("length", jlval)
+length.Tuple <- function(jlval) jlRcall("length", jlval)
 
 "[.Tuple" <- function(jlval, ind) {
      if (ind %in% seq(1,length(jlval))) {

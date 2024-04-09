@@ -4,7 +4,7 @@ jlArray <- function(...) {
 }
 
 length.Array <- function(jlval) {
-    jlcallR("length",jlval)
+    jlRcall("length",jlval)
 }
 
 "[.Array" <- function(jlval,i) {

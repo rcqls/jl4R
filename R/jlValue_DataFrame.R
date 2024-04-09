@@ -8,14 +8,14 @@ toR.DataFrame <- function(jlval) {
     nms <- toR(jlcall("names",jlval))
     res <- list()
     for(nm in nms) {
-        res[[nm]] <- jlcallR("getindex",jlval, jl_colon(), jl_symbol(nm))
+        res[[nm]] <- jlRcall("getindex",jlval, jl_colon(), jl_symbol(nm))
     }
     attr(res,"row.names") <- as.character(1:length(res[[1]]))
     class(res) <- "data.frame"
     res
 }
 
-names.DataFrame <- function(jlval) jlcallR("names",jlval)
+names.DataFrame <- function(jlval) jlRcall("names",jlval)
 
 "[.DataFrame" <- function(jlval, i, field) {
     if(missing(field)) {

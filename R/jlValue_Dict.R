@@ -14,7 +14,7 @@ jlDict <-  function(...) {
 
 ## TODO: toR.Dict
 
-names.Dict <- function(jlval) jlcallR("collect",jlcall("keys",jlval))
+names.Dict <- function(jlval) jlRcall("collect",jlcall("keys",jlval))
 
 "[.Dict" <- function(jlval, field) {
      if(field %in% names(jlval)) {

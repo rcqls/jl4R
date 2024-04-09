@@ -7,13 +7,16 @@ export(
   jlValue_eval,
   as_jlValue, is.jlValue,
   R, toR,
-  jlrun, jlcall, jlnew, jlcallR,
-  jltypeof,
+  jlrun, jlcall, jlnew,
   jlset, jlget,
   jlshow, jldisplay,
   jlusing, jlpkg,
   is.Struct,
-  jl2R, jl2R_unsafe
+  jl2R, jl2R_unsafe,
+  jltypeof, jlstring,
+  jlRcall,
+  jlRtypeof, jlRstring,
+  jlDataFrame, jlTuple, jlNamedTuple
 )
 
 S3method(print,jlValue)

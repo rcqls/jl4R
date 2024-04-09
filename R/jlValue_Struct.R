@@ -1,12 +1,12 @@
 is.Struct <- function(jlval) {
-    jlR_isstructtype(jlcall("typeof",jlval))
+    jlRisstructtype(jltypeof(jlval))
 }
 
 names.Struct <- function(jlval) toR(jl_fieldnames(jlval))
 
 "[.Struct" <- function(jlval, field) {
     if(field %in% names(jlval)) {
-        jlcall("getfield",jlval,jl_symbol(field))
+        jlgetfield(jlval,jl_symbol(field))
     } else NULL
 }
 

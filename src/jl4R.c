@@ -142,6 +142,15 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
   if(res!=NULL) { //=> get a result
     resTy=(char*)jl_typeof_str(res);
     //printf("typeof=%s\n",resTy);
+    if(strcmp(resTy,"Bool")==0) // Need to be before Integer
+    //if(jl_is_bool(res))
+    {
+      PROTECT(resR=NEW_LOGICAL(1));
+      LOGICAL(resR)[0]=(jl_unbox_bool(res)  ? TRUE : FALSE);
+      UNPROTECT(1);
+      return resR;
+    }
+    else
     if(jl4R_isa(res,"Integer")) 
     // if(strcmp(jl_typeof_str(res),"Int64")==0 || strcmp(jl_typeof_str(res),"Int32")==0 || strcmp(jl_typeof_str(res),"UInt64")==0 || strcmp(jl_typeof_str(res),"UInt32")==0)
     //if(jl_is_long(res)) //does not work because of DLLEXPORT
@@ -168,15 +177,6 @@ SEXP jl_value_to_SEXP(jl_value_t *res) {
 
       PROTECT(resR=NEW_NUMERIC(1));
       NUMERIC_POINTER(resR)[0]=jl_unbox_float32(res);
-      UNPROTECT(1);
-      return resR;
-    }
-    else
-    if(strcmp(resTy,"Bool")==0)
-    //if(jl_is_bool(res))
-    {
-      PROTECT(resR=NEW_LOGICAL(1));
-      LOGICAL(resR)[0]=(jl_unbox_bool(res)  ? TRUE : FALSE);
       UNPROTECT(1);
       return resR;
     }

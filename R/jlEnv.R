@@ -7,6 +7,9 @@
     obj
 }
 
+## get access to globalenv()$jl inside the package 
+jlEnv <- function() get("jl", envir = globalenv())
+
 # `[.jlEnv` <- function(obj, key) {
 #     # OLD version (to remove)
 #     # key <- deparse(substitute(key))

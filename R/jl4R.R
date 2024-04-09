@@ -66,7 +66,7 @@ jlnew <- function(datatype, ...) {
 
 jlR <- function(expr) toR(jl(expr))
 jlR_unsafe <- function(expr) toR(jl_unsafe(expr))
-jlcallR <- function(meth , ...) toR(jlcall(meth, ...))
+jlRcall <- function(meth , ...) toR(jlcall(meth, ...))
 
 jl2R <- function(expr) .jleval2R(.jlsafe(expr))
 jl2R_unsafe <- function(expr) .jleval2R(expr)
@@ -79,12 +79,6 @@ jlrun <- function(expr) {
 jlshow <- function(jlval) invisible(jlcall("show",jlval))
 
 jldisplay <- function(jlval) invisible(jlcall("display",jlval))
-
-jltypeof <- function(jlval) {
-    if(!.jlrunning()) .jlinit()
-    res <- .External("jl4R_typeof2R", jlval, PACKAGE = "jl4R")
-    res
-}
 
 ## Facility function
 
