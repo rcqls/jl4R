@@ -44,3 +44,16 @@
     jlval <- do.call("jlnew", args)
     jlval
 }
+
+.RList2jlTuple <- function(obj) {
+    splattuple <- jlcall("splat", jlValue_eval("tuple"))
+    args <- jlValue_eval("[]")
+    vars <- list()
+    obj <- unname(obj)
+    for (i in seq_along(obj)) {
+        vars[[i]] <- as_jlValue(obj[[i]])
+        jlcall("push!", args, vars[[i]])
+    }
+    jlval <- jlValue_func1(splattuple, args)
+    jlval
+}

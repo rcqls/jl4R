@@ -440,7 +440,7 @@ jl_value_t* Vector_SEXP_to_jl_array(SEXP ans) {
   int i;
 
   n=length(ans);
-  // printf("typeof %d\n",TYPEOF(ans));
+  // printf("typeof %d, isArray %d\n",TYPEOF(ans), isArray(ans));
   switch(TYPEOF(ans)) {
   case REALSXP:
     datatype = jl_float64_type;

@@ -1,6 +1,11 @@
 ## Convert to Tuple or NamedTuple
 as_jlValue.list <-  function(obj, ...) {
     if(!.jlrunning()) .jlinit()
-    .RNamedList2jlNamedTuple(obj)
-   # .RNamedlist2jlDict(obj)
+    if(is.null(names(obj))) {
+        .RList2jlTuple(obj)
+    } else {
+        names(obj)[names(obj) == ""] <- paste0("var",1:sum(names(obj) == ""))
+        .RNamedList2jlNamedTuple(obj)
+        # .RNamedlist2jlDict(obj)
+    }
 }
