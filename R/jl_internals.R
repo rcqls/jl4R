@@ -79,3 +79,9 @@ jlValue_capture_display <- function(jlval, ...) {
 }
 
 
+jlValue_new_struct <- function(datatype, jlargs, jlnargs) {
+    if (!.jlrunning()) .jlinit()
+    return(.Call("jl4R_jlValue_new_struct", datatype, jlargs, jlnargs, PACKAGE = "jl4R"))
+}
+
+

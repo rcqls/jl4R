@@ -28,7 +28,7 @@ jlEnv <- function() get("jl", envir = globalenv())
 # }
 
 `[[.jlEnv` <- function(obj, key) {
-    if(class(substitute(key)) != "character") {
+    if (class(substitute(key)) != "character") {
         key <- deparse(substitute(key))
     }
     function(...) {jlcall(key, ...)}

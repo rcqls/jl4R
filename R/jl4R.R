@@ -2,11 +2,23 @@
 ## 1) jl(`<multiline julia expression>`) redirect to jlValue_eval("<multiline julia expression>")
 ## 2) jl(<R object>) is redirected to as_jlValue(<RObject>)
 jl <- function(obj, ..., name_class = TRUE) {
-  if (name_class && class(substitute(obj)) == "name") {
-    obj <- deparse(substitute(obj))
-    return(jlValue_eval(obj))
+  if (name_class) {
+    res <- jl_rexpr(substitute(obj))
+    if (!is.null(res)) return(res)
   }
-  UseMethod("as_jlValue", obj)
+  as_jlValue(obj)
+}
+
+jlR <- function(obj, ..., name_class = TRUE) {
+  if (name_class) {
+    res <- jl_rexpr(substitute(obj))
+    if (!is.null(res)) return(toR(res))
+  }
+  toR(as_jlValue(obj))
+}
+
+jl_unsafe <- function(expr) {
+    .jleval2jlValue(expr)
 }
 
 as_jlValue <- function(obj, ...) UseMethod("as_jlValue", obj)
@@ -34,10 +46,6 @@ jlset <- function(var, value, vector = FALSE) {
   return(invisible())
 }
 
-jl_unsafe <- function(expr) {
-    .jleval2jlValue(expr)
-}
-
 # apply a method call 
 jlcall <- function(meth , ...) {
     args <- list(...)
@@ -57,14 +65,6 @@ jlcall <- function(meth , ...) {
     }
 }
 
-jlnew <- function(datatype, ...) {
-    if(!is.character(datatype)) {
-        error("No julia DataType specified!")
-    }
-    jl_new_struct(datatype, ...)
-}
-
-jlR <- function(expr) toR(jl(expr))
 jlR_unsafe <- function(expr) toR(jl_unsafe(expr))
 jlRcall <- function(meth , ...) toR(jlcall(meth, ...))
 

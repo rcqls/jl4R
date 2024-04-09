@@ -1,10 +1,10 @@
-jl_symbol <- function(field) {
+jlsymbol <- function(field) {
     if(!.jlrunning()) .jlinit()
     res <- .External("jl4R_jl_symbol", field, PACKAGE = "jl4R")
     res
 }
 
-jl_colon <- function() jl_unsafe(":")
+jlcolon <- function() jl_unsafe(":")
 
 ## TODO: jl_methods <- function(meth, ...) {
 ##  jlEnv()@size(jlEnv()@methods(jl(`names`),jl(`[Array]`)))
@@ -20,7 +20,7 @@ jlfieldnames <- function(jlval) {
 }
 
 jlgetfield <- function(jlval, field) {
-    jlcall("getfield", jlval, jl_symbol(field))
+    jlcall("getfield", jlval, jlsymbol(field))
 }
 
 jltypeof <- function(jlval) {

@@ -1,3 +1,7 @@
+jlCategoricalArray <- function(fa) {
+    as_jlValue.factor(fa)
+}
+
 toR.CategoricalArray <- function(jlval) {
     pool <- jlgetfield(jlval, "pool")
     res <- jlRgetfield(jlval, "refs")

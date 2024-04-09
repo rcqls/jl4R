@@ -1,13 +1,13 @@
 useDynLib(jl4R, .registration = TRUE)
 
-exportPattern("^\\jl_")
-exportPattern("^\\jlR_")
+# exportPattern("^\\jl_")
+# exportPattern("^\\jlR_")
 export(
-  jl,
+  jl, jlR,
   jlValue_eval,
   as_jlValue, is.jlValue,
   R, toR,
-  jlrun, jlcall, jlnew,
+  jlrun, jlcall,
   jlset, jlget,
   jlshow, jldisplay,
   jlusing, jlpkg,
@@ -16,7 +16,9 @@ export(
   jltypeof, jlstring,
   jlRcall,
   jlRtypeof, jlRstring,
-  jlDataFrame, jlTuple, jlNamedTuple
+  jlArray, jlCategoricalArray, jlDataFrame,
+  jlDict, jlTuple, jlNamedTuple, jlStruct,
+  jlcolon, jlsymbol
 )
 
 S3method(print,jlValue)
@@ -62,14 +64,14 @@ S3method("names",Dict)
 S3method("[",Dict)
 S3method("$",Dict)
 
-S3method("length",Array)
-S3method("[",Array)
+S3method("length", Array)
+S3method("[", Array)
 
-S3method("names",DataFrame)
-S3method("[",DataFrame)
-S3method("$",DataFrame)
+S3method("names", DataFrame)
+S3method("[", DataFrame)
+S3method("$", DataFrame)
 
-S3method("levels",CategoricalArray)
+S3method("levels", CategoricalArray)
 
 
 # S3method(print,jlvector)

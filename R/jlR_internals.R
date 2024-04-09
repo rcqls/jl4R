@@ -8,7 +8,7 @@
     pairs <- list()
     for (nm in names(df)) {
         vars[[nm]] <- as_jlValue(df[[nm]])
-        pairs[[nm]] <- jlcall("=>", jl_symbol(nm), vars[[nm]])
+        pairs[[nm]] <- jlcall("=>", jlsymbol(nm), vars[[nm]])
         jlcall("push!", args, pairs[[nm]])
     }
     jlval <- jlValue_func1(splatdf, args)
@@ -25,7 +25,7 @@
     pairs <- list()
     for (nm in names(obj)) {
         vars[[nm]] <- as_jlValue(obj[[nm]])
-        pairs[[nm]] <- jlcall("=>", jl_symbol(nm), vars[[nm]])
+        pairs[[nm]] <- jlcall("=>", jlsymbol(nm), vars[[nm]])
         jlcall("push!", jlval, pairs[[nm]])
     }
     jlval

@@ -1,16 +1,18 @@
 jlArray <- function(...) {
     obj <- c(...)
-    
+    as_jlvalue(obj)
 }
 
 length.Array <- function(jlval) {
     jlRcall("length",jlval)
 }
 
-"[.Array" <- function(jlval,i) {
+"[.Array" <- function(jlval, i) {
     s <- length(jlval)
-    if(i > 0 && i <= s) {
+    if (i > 0 && i <= s) {
         i <- jlValue_eval(as.character(i))
-        jlcall("getindex",jlval, i)
-    } else NULL
+        jlcall("getindex", jlval, i)
+    } else {
+        NULL
+    }
 }
