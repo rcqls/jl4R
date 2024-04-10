@@ -574,16 +574,16 @@ SEXP jl4R_finalizeExternalPtr(SEXP extptrlist) {
 
 //// R class jlvalue standing for jl_value_t External Pointer
 
-SEXP jlvalue(jl_value_t* jlvalue) {
+SEXP jlvalue(jl_value_t* jlval) {
   SEXP ans, class;
   char *jltype;
 
 #ifdef preserved
   jl_value_t *ref=NULL;
 
-  JL_GC_PUSH2(&ref,&jlvalue);
+  JL_GC_PUSH2(&ref,&jlval);
   // Wrap `jlvalue` in `RefValue{Any}` and push to `preserved_refs` to protect it.
-  ref = jl_new_struct(reft, jlvalue);
+  ref = jl_new_struct(reft, jlval);
   jl_add_preserved_ref(ref);
   PROTECT(ans=(SEXP)R_MakeExternalPtr((void *)ref, R_NilValue, R_NilValue));
   JL_GC_POP();
@@ -592,7 +592,7 @@ SEXP jlvalue(jl_value_t* jlvalue) {
  #endif
   R_RegisterCFinalizerEx(ans, jlvalueFinalizer, TRUE);
   PROTECT(class=allocVector(STRSXP,2));
-  jltype=(char*)jl_typeof_str(jlvalue);
+  jltype=(char*)jl_typeof_str(jlval);
   // printf("jlvalue jltype -> %s\n", jltype);
   SET_STRING_ELT(class,0, mkChar(jltype));
   SET_STRING_ELT(class,1, mkChar("jlvalue"));
