@@ -3,8 +3,7 @@
 ## 2) jl(<R object>) is redirected to as_jlvalue(<RObject>)
 jl <- function(obj, ..., name_class = TRUE) {
   if (name_class) {
-    res <- jl_rexpr(substitute(obj))
-    if (!is.null(res)) return(res)
+    return(jl_rexpr(substitute(obj), obj))
   }
   as_jlvalue(obj)
 }

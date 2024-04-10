@@ -41,7 +41,7 @@
     jlstruct <- paste0("@NamedTuple{", paste(names(obj), "::", types, collapse=",", sep=""), "}") 
     args <- c(jlstruct, unname(vars))
     ## print(args)
-    jlval <- do.call("jlnew", args)
+    jlval <- do.call("jlStruct", args)
     jlval
 }
 

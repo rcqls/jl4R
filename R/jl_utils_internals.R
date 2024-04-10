@@ -1,10 +1,16 @@
-jl_rexpr <- function(rexpr) { # rexpr is generally the result of substitute(obj) 
+jl_rexpr <- function(rexpr, obj) { # rexpr is generally the result of substitute(obj) 
     if (class(rexpr) == "name") {
         obj <- deparse(rexpr)
         return(jlvalue_eval(obj))
     } else {
-        NULL
+        as_jlvalue(obj)
     }
+}
+
+jl_rexprs <- function(rexprs, objs) { # rexpr is generally the result of substitute(obj) 
+    rexprs <- as.list(rexprs)[-1]
+    lapply(seq_along(rexprs), function(i) jl_rexpr(rexprs[[i]], objs[[i]]))
+
 }
 
 .jlmethod <- function(meth, value) paste0(meth,"(",value,")")

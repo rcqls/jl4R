@@ -31,19 +31,23 @@ jlEnv <- function() get("jl", envir = globalenv())
     if (class(substitute(key)) != "character") {
         key <- deparse(substitute(key))
     }
-    function(...) {jlcall(key, ...)}
+    function(...) {
+        args <- c(key, jl_rexprs(substitute(list(...)), list(...)))
+        do.call("jlcall", args)
+    }
 }
 
 
  `@.jlEnv` <- function(obj, key) function(...) {
-    jlcall(key, ...)
+    args <- c(key, jl_rexprs(substitute(list(...)), list(...)))
+    do.call("jlcall", args)
 }
 
 `[.jlEnv` <- function(obj, key) {
     if(class(substitute(key)) != "character") {
         key <- deparse(substitute(key))
     }
-    function(...) {jlnew(key, ...)}
+    function(...) {jlStruct(key, ...)}
 }
 
 `$.jlEnv` <- function(obj, field) {

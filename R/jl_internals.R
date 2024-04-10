@@ -9,7 +9,8 @@
   if(!.jlrunning()) .jlinit()
   jlval <- .External("jl4R_eval2jlvalue", expr, PACKAGE = "jl4R")
   if(is.Struct(jlval)) {
-    class(jlval) <- c(class(jlval)[1:(length(class(jlval))-1)],"Struct","jlvalue")
+    class(jlval) <- c(class(jlval)[1:(length(class(jlval)) - 1)],
+        "Struct", "jlvalue")
   }
   return(jlval)
 }
