@@ -1,5 +1,5 @@
 jlCategoricalArray <- function(fa) {
-    as_jlValue.factor(fa)
+    as_jlvalue.factor(fa)
 }
 
 toR.CategoricalArray <- function(jlval) {

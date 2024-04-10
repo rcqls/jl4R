@@ -99,7 +99,7 @@ jl(`(a=1,b=[1,3])`)
 
     ## (a = 1, b = [1, 3])
 
-All these results are `jlValue` objects which are `R` external pointers
+All these results are `jlvalue` objects which are `R` external pointers
 wrapping `jl_value_t*` values.
 
 ### `jl()` as `julia` converter of `R` vectors
@@ -169,29 +169,25 @@ require(jl4R)
 jl("one", vector=TRUE) # or simply jl("one", TRUE)
 ```
 
-    ## 1-element Vector{String}:
-    ##  "one"
+    ## "one"
 
 ``` r
 jl(TRUE, vector=TRUE) # or simply jl(TRUE, TRUE)
 ```
 
-    ## 1-element Vector{Bool}:
-    ##  1
+    ## true
 
 ``` r
 jl(1L, TRUE)
 ```
 
-    ## 1-element Vector{Int64}:
-    ##  1
+    ## 1
 
 ``` r
 jl(1, TRUE)
 ```
 
-    ## 1-element Vector{Float64}:
-    ##  1.0
+    ## 1.0
 
 ### Goal: conversion of `julia` structures used in statitictic to `R`
 
@@ -230,13 +226,13 @@ list(jltypeof(nt_jl), typeof(nt_jl), class(nt_jl))
 ```
 
     ## [[1]]
-    ## [1] "NamedTuple"
+    ## @NamedTuple{a::Int64, b::DataFrame}
     ## 
     ## [[2]]
     ## [1] "externalptr"
     ## 
     ## [[3]]
-    ## [1] "NamedTuple" "Struct"     "jlValue"
+    ## [1] "NamedTuple" "Struct"     "jlvalue"
 
 - `CategoricalArray`
 
@@ -264,19 +260,19 @@ list(jltypeof(nt_jl), typeof(nt_jl), class(nt_jl))
 ```
 
     ## [[1]]
-    ## [1] "NamedTuple"
+    ## @NamedTuple{a::Int64, b::DataFrame}
     ## 
     ## [[2]]
     ## [1] "externalptr"
     ## 
     ## [[3]]
-    ## [1] "NamedTuple" "Struct"     "jlValue"
+    ## [1] "NamedTuple" "Struct"     "jlvalue"
 
 ## R Finalizers
 
 Following the documentation on embedding `julia`, a system of preserved
 references to `julia` values has been created. An `R` finalizer is
-assiocated to each `jlValue` object (in fact, an `R` external pointer
-wrapping some `jl_value_t*` value). Whenever the `jlValue` is gabarged
+assiocated to each `jlvalue` object (in fact, an `R` external pointer
+wrapping some `jl_value_t*` value). Whenever the `jlvalue` is gabarged
 collected, the reference on the associated `julia` value is also
 dereferenced which is then cleaned up by the `julia` garbage collector.

@@ -1,87 +1,87 @@
 ## internals
-.jlValue2R <- function(jlval) {
+.jlvalue2R <- function(jlval) {
     if(!.jlrunning()) .jlinit()
-    res <- .External("jl4R_jlValue2R", jlval, PACKAGE = "jl4R")
+    res <- .External("jl4R_jlvalue2R", jlval, PACKAGE = "jl4R")
     res
 }
 
-.jleval2jlValue <- function(expr) {
+.jleval2jlvalue <- function(expr) {
   if(!.jlrunning()) .jlinit()
-  jlval <- .External("jl4R_eval2jlValue", expr, PACKAGE = "jl4R")
+  jlval <- .External("jl4R_eval2jlvalue", expr, PACKAGE = "jl4R")
   if(is.Struct(jlval)) {
-    class(jlval) <- c(class(jlval)[1:(length(class(jlval))-1)],"Struct","jlValue")
+    class(jlval) <- c(class(jlval)[1:(length(class(jlval))-1)],"Struct","jlvalue")
   }
   return(jlval)
 }
 
-.jlValue_call0 <- function(meth) {
+.jlvalue_call0 <- function(meth) {
     if(!.jlrunning()) .jlinit()
-    .External("jl4R_jlValue_call0", meth, PACKAGE = "jl4R")
+    .External("jl4R_jlvalue_call0", meth, PACKAGE = "jl4R")
 }
 
-.jlValue_call1 <- function(meth, jlv) {
+.jlvalue_call1 <- function(meth, jlv) {
     if(!.jlrunning()) .jlinit()
-    .External("jl4R_jlValue_call1", meth, jlv, PACKAGE = "jl4R")
+    .External("jl4R_jlvalue_call1", meth, jlv, PACKAGE = "jl4R")
 }
 
-.jlValue_func_call1 <- function(jl_meth, jlv) {
+.jlvalue_func_call1 <- function(jl_meth, jlv) {
     if(!.jlrunning()) .jlinit()
-    .External("jl4R_jlValue_func_call1", jl_meth, jlv, PACKAGE = "jl4R")
+    .External("jl4R_jlvalue_func_call1", jl_meth, jlv, PACKAGE = "jl4R")
 }
 
-jlValue_func1 <- function(jl_meth, jlv) .jlValue_func_call1(jl_meth, jlv)
+jlvalue_func1 <- function(jl_meth, jlv) .jlvalue_func_call1(jl_meth, jlv)
 
-.jlValue_call2 <- function(meth, jlv, jlarg) {
+.jlvalue_call2 <- function(meth, jlv, jlarg) {
     if(!.jlrunning()) .jlinit()
-    .External("jl4R_jlValue_call2", meth, jlv, jlarg, PACKAGE = "jl4R")
+    .External("jl4R_jlvalue_call2", meth, jlv, jlarg, PACKAGE = "jl4R")
 }
 
-.jlValue_call3 <- function(meth, jlv, jlarg, jlarg2) {
+.jlvalue_call3 <- function(meth, jlv, jlarg, jlarg2) {
     if(!.jlrunning()) .jlinit()
-    .External("jl4R_jlValue_call3", meth, jlv, jlarg, jlarg2, PACKAGE = "jl4R")
+    .External("jl4R_jlvalue_call3", meth, jlv, jlarg, jlarg2, PACKAGE = "jl4R")
 }
 
-.jlValue_call <- function(meth, jlargs, jlnargs) {
+.jlvalue_call <- function(meth, jlargs, jlnargs) {
     if(!.jlrunning()) .jlinit()
-    .Call("jl4R_jlValue_call", meth, jlargs, jlnargs, PACKAGE = "jl4R")
+    .Call("jl4R_jlvalue_call", meth, jlargs, jlnargs, PACKAGE = "jl4R")
 }
 
-jlValue_call <- function(meth, ...) {
+jlvalue_call <- function(meth, ...) {
     jlargs <- list(...)
     jlnargs <- length(jlargs)
-    .jlValue_call(meth,jlargs,jlnargs)
+    .jlvalue_call(meth,jlargs,jlnargs)
 }
 
-.jlValue_func_call <- function(jlfunc, jlargs, jlnargs) {
+.jlvalue_func_call <- function(jlfunc, jlargs, jlnargs) {
     if(!.jlrunning()) .jlinit()
-    .Call("jl4R_jlValue_func_call", jlfunc, jlargs, jlnargs, PACKAGE = "jl4R")
+    .Call("jl4R_jlvalue_func_call", jlfunc, jlargs, jlnargs, PACKAGE = "jl4R")
 }
 
-jlValue_func <- function(jlfunc, ...) {
+jlvalue_func <- function(jlfunc, ...) {
     jlargs <- list(...)
     jlnargs <- length(jlargs)
-    .jlValue_func_call(jlfunc,jlargs,jlnargs)
+    .jlvalue_func_call(jlfunc,jlargs,jlnargs)
 }
 
-jlValue_finalize <- function(...) {
+jlvalue_finalize <- function(...) {
   extptrs <- unlist(c(...))
   invisible(.Call("jl4R_finalizeExternalPtr", extptrs, PACKAGE="jl4R"))
 }
 
 
-jlValue_show_display <- function(jlval, ...) {
+jlvalue_show_display <- function(jlval, ...) {
     .Call("jl4R_show_preserved_ref", jlval, PACKAGE = "jl4R")
     NULL
 }
 
-jlValue_capture_display <- function(jlval, ...) {
+jlvalue_capture_display <- function(jlval, ...) {
     .Call("jl4R_capture_preserved_ref", jlval, PACKAGE = "jl4R")
 }
 
 
-jlValue_new_struct <- function(datatype, jlargs, jlnargs) {
+jlvalue_new_struct <- function(datatype, jlargs, jlnargs) {
     if (!.jlrunning()) .jlinit()
-    return(.Call("jl4R_jlValue_new_struct", datatype, jlargs, jlnargs, PACKAGE = "jl4R"))
+    return(.Call("jl4R_jlvalue_new_struct", datatype, jlargs, jlnargs, PACKAGE = "jl4R"))
 }
 
 

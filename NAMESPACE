@@ -4,8 +4,8 @@ useDynLib(jl4R, .registration = TRUE)
 # exportPattern("^\\jlR_")
 export(
   jl, jlR,
-  jlValue_eval,
-  as_jlValue, is.jlValue,
+  jlvalue_eval,
+  as_jlvalue, is.jlvalue,
   R, toR,
   jlrun, jlcall,
   jlset, jlget,
@@ -21,21 +21,21 @@ export(
   jlcolon, jlsymbol
 )
 
-S3method(print,jlValue)
+S3method(print,jlvalue)
 
 #S3methods are not viewable inside the R system. If you want this functionality available put it in the previous export
-S3method("as_jlValue",default)
-S3method("as_jlValue",jlValue)
-S3method("as_jlValue",data.frame)
-S3method("as_jlValue",list)
-S3method("as_jlValue",integer)
-S3method("as_jlValue",double)
-S3method("as_jlValue",logical)
-S3method("as_jlValue",character)
-S3method("as_jlValue",factor)
+S3method("as_jlvalue",default)
+S3method("as_jlvalue",jlvalue)
+S3method("as_jlvalue",data.frame)
+S3method("as_jlvalue",list)
+S3method("as_jlvalue",integer)
+S3method("as_jlvalue",double)
+S3method("as_jlvalue",logical)
+S3method("as_jlvalue",character)
+S3method("as_jlvalue",factor)
 
 S3method(toR,default)
-S3method(toR,jlValue)
+S3method(toR,jlvalue)
 S3method(toR,DataFrame)
 S3method(toR,CategoricalArray)
 S3method(toR,NamedTuple)

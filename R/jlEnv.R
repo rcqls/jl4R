@@ -58,7 +58,7 @@ jlEnv <- function() get("jl", envir = globalenv())
 }
 
 `names.jlEnv` <- function(obj) {
-    setdiff(R(jlValue_eval("names(Main)")), c("Base","Core","Main","display_buffer","jl4R_ANSWER","preserved_refs"))
+    setdiff(R(jlvalue_eval("names(Main)")), c("Base","Core","Main","display_buffer","jl4R_ANSWER","preserved_refs"))
 }
 
 `print.jlEnv` <- function(obj, ...) {

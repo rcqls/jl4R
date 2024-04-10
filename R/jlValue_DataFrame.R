@@ -22,7 +22,7 @@ names.DataFrame <- function(jlval) jlRcall("names",jlval)
         field <- i
         i <- jlcolon()
     } else {
-        i <- jlValue_eval(as.character(i))
+        i <- jlvalue_eval(as.character(i))
     }
     if (field %in% names(jlval)) {
         jlcall("getindex",jlval, i, jlsymbol(field))

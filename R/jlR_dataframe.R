@@ -1,3 +1,3 @@
-as_jlValue.data.frame <- function(df, ...) {
+as_jlvalue.data.frame <- function(df, ...) {
     .RNamedList2jlDataFrame(df)
 }

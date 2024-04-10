@@ -1,11 +1,11 @@
 jlDict <-  function(...) {
     obj <- list(...)
     if (!.jlrunning()) .jlinit()
-    jlval <- jlValue_eval("Dict{Symbol, Any}()")
+    jlval <- jlvalue_eval("Dict{Symbol, Any}()")
     vars <- list()
     pairs <- list()
     for (nm in names(obj)) {
-        vars[[nm]] <- jlValue_eval(obj[[nm]])
+        vars[[nm]] <- jlvalue_eval(obj[[nm]])
         pairs[[nm]] <- jlcall("=>", jlsymbol(nm), vars[[nm]])
         jlcall("push!", jlval, pairs[[nm]])
     }

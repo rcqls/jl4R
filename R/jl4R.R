@@ -1,12 +1,12 @@
 ## IMPORTANT
-## 1) jl(`<multiline julia expression>`) redirect to jlValue_eval("<multiline julia expression>")
-## 2) jl(<R object>) is redirected to as_jlValue(<RObject>)
+## 1) jl(`<multiline julia expression>`) redirect to jlvalue_eval("<multiline julia expression>")
+## 2) jl(<R object>) is redirected to as_jlvalue(<RObject>)
 jl <- function(obj, ..., name_class = TRUE) {
   if (name_class) {
     res <- jl_rexpr(substitute(obj))
     if (!is.null(res)) return(res)
   }
-  as_jlValue(obj)
+  as_jlvalue(obj)
 }
 
 jlR <- function(obj, ..., name_class = TRUE) {
@@ -14,17 +14,17 @@ jlR <- function(obj, ..., name_class = TRUE) {
     res <- jl_rexpr(substitute(obj))
     if (!is.null(res)) return(toR(res))
   }
-  toR(as_jlValue(obj))
+  toR(as_jlvalue(obj))
 }
 
 jl_unsafe <- function(expr) {
-    .jleval2jlValue(expr)
+    .jleval2jlvalue(expr)
 }
 
-as_jlValue <- function(obj, ...) UseMethod("as_jlValue", obj)
+as_jlvalue <- function(obj, ...) UseMethod("as_jlvalue", obj)
 
-as_jlValue.default <- function(expr, ...) {
-  warning(paste0("No as_jlValue conversion for ", expr, " !"))
+as_jlvalue.default <- function(expr, ...) {
+  warning(paste0("No as_jlvalue conversion for ", expr, " !"))
   NULL
 }
 
@@ -35,13 +35,13 @@ toR.default <- function(obj) obj
 
 jlget <- function(var) {
   if (!.jlrunning()) .jlinit()
-  res <- jlValue_eval(var)
+  res <- jlvalue_eval(var)
   return(res)
 }
 
 jlset <- function(var, value, vector = FALSE) {
   if (!.jlrunning()) .jlinit()
-  jlval <- as_jlValue(value)
+  jlval <- as_jlvalue(value)
   .External("jl4R_set_global_variable", var, jlval, PACKAGE = "jl4R")
   return(invisible())
 }
@@ -53,13 +53,13 @@ jlcall <- function(meth , ...) {
         error("No julia method specified!")
     }
     if (length(args) > 3) {
-      jlValue_call(meth, ...)
+      jlvalue_call(meth, ...)
     } else {
       switch(length(args) + 1,
-          .jlValue_call0(meth),
-          .jlValue_call1(meth, ...),
-          .jlValue_call2(meth, ...),
-          .jlValue_call3(meth, ...),
+          .jlvalue_call0(meth),
+          .jlvalue_call1(meth, ...),
+          .jlvalue_call2(meth, ...),
+          .jlvalue_call3(meth, ...),
           "Supposed to be done..."
       )
     }
