@@ -4,6 +4,16 @@ as_jlValue.double <- as_jlValue.integer <- as_jlValue.logical <- as_jlValue.char
     if(length(obj) == 1 && !vector) {
         jlval[1]
     } else {
-        jlval
+        if(is.null(dim(obj))) {
+            jlval
+        } else {
+            splatreshape <- jlcall("splat", jlValue_eval("reshape"))
+            args <- jlValue_eval("[]")
+            jlcall("push!", args, jlval)
+            for(d in dim(obj)) {
+                jlcall("push!", args, jl(as.integer(d)))
+            }
+            jlValue_func1(splatreshape, args)
+        }
     }
 }
