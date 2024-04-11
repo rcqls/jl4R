@@ -47,7 +47,11 @@ jlEnv <- function() get("jl", envir = globalenv())
     if(class(substitute(key)) != "character") {
         key <- deparse(substitute(key))
     }
-    function(...) {jlStruct(key, ...)}
+    #function(...) {jlStruct(key, ...)}
+    function(...) {
+        args <- c(key, jl_rexprs(substitute(list(...)), list(...)))
+        do.call("jlStruct", args)
+    }
 }
 
 `$.jlEnv` <- function(obj, field) {
