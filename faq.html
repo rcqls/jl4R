@@ -1,0 +1,371 @@
+
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Frequently Asked Questions</title>
+
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.css">
+  <style type="text/css">
+
+    .hidden.menu {
+      display: none;
+    }
+
+    .masthead.segment {
+      min-height: 100px;
+      padding: 1em 0em;
+    }
+    .masthead .logo.item img {
+      margin-right: 1em;
+    }
+    .masthead .ui.menu .ui.button {
+      margin-left: 0.5em;
+    }
+    .masthead h1.ui.header {
+      margin-top: 3em;
+      margin-bottom: 0em;
+      font-size: 4em;
+      font-weight: normal;
+    }
+    .masthead h2 {
+      font-size: 1.7em;
+      font-weight: normal;
+    }
+
+    .ui.vertical.stripe {
+      padding: 8em 0em;
+    }
+    .ui.vertical.stripe h3 {
+      font-size: 2em;
+    }
+    .ui.vertical.stripe .button + h3,
+    .ui.vertical.stripe p + h3 {
+      margin-top: 3em;
+    }
+    .ui.vertical.stripe .floated.image {
+      clear: both;
+    }
+    .ui.vertical.stripe p {
+      font-size: 1.33em;
+    }
+    .ui.vertical.stripe .horizontal.divider {
+      margin: 3em 0em;
+    }
+
+    .quote.stripe.segment {
+      padding: 0em;
+    }
+    .quote.stripe.segment .grid .column {
+      padding-top: 5em;
+      padding-bottom: 5em;
+    }
+
+    .footer.segment {
+      padding: 5em 0em;
+    }
+
+    .secondary.pointing.menu .toc.item {
+      display: none;
+    }
+
+    @media only screen and (max-width: 768px) {
+      .ui.fixed.menu {
+        display: none !important;
+      }
+      .secondary.pointing.menu .item,
+      .secondary.pointing.menu .menu {
+        display: none;
+      }
+      .secondary.pointing.menu .toc.item {
+        display: block;
+      }
+      .masthead.segment {
+        min-height: 200px;
+      }
+      .masthead h1.ui.header {
+        font-size: 2em;
+        margin-top: 1.5em;
+      }
+      .masthead h2 {
+        margin-top: 0.5em;
+        font-size: 1.5em;
+      }
+    }
+
+    .menu.inverted .dropdown.item.current{
+      background-color: transparent !important;
+      font-weight: bold !important;
+      border-color: #fff !important;
+    }
+
+    .menu .dropdown.item.current{
+      background-color:  rgba(0, 0, 0, 0.03);
+    }
+
+  </style>
+
+
+<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.js"></script>
+ <script>
+  $(document)
+    .ready(function() {
+
+      // fix menu when passed
+      $('.masthead')
+        .visibility({
+          once: false,
+          onBottomPassed: function() {
+            $('.fixed.menu').transition('fade in');
+          },
+          onBottomPassedReverse: function() {
+            $('.fixed.menu').transition('fade out');
+          }
+        })
+      ;
+
+      // create sidebar and attach to menu open
+      $('.ui.sidebar')
+        .sidebar('attach events', '.toc.item')
+      ;
+
+      $(".menu .ui.dropdown.item")
+        .dropdown({on: 'hover'})
+      ;
+
+    })
+  ;
+  </script>
+
+<script src="/tools/clipboard/clipboard.min.js"></script>
+<script src="/tools/clipboard/clipboard.min.js"></script>
+<style type="text/css" media="screen">
+.demoR:hover {cursor: zoom-in;}
+.demoJl:hover {cursor: zoom-in;}
+.demoPy:hover {cursor: zoom-in;}
+</style>
+<script type="text/javascript">
+var demoRFigs={};
+var demoJlFigs={};
+var demoPyFigs={};
+</script>
+
+
+</head>
+<body>
+
+
+<!-- Following Menu -->
+<div class="ui large top fixed hidden menu">
+  <div class="ui container">
+<a class="item" href="/Web/rcqls/Research/Tools/jl4R/index.html#start">Jl4R package</a><a class="item" href="/Web/rcqls/Research/Tools/jl4R/doc.html#start">Documentation</a><a class="item" href="/Web/rcqls/Research/Tools/jl4R/gallery.html#start">Gallery</a><a class="active item" href="/Web/rcqls/Research/Tools/jl4R/faq.html#start">FAQ</a>
+  </div>
+</div>
+
+<!-- Sidebar Menu -->
+<div class="ui vertical inverted sidebar menu">
+<a class="item" href="/Web/rcqls/Research/Tools/jl4R/index.html">Jl4R package</a><a class="item" href="/Web/rcqls/Research/Tools/jl4R/doc.html">Documentation</a><a class="item" href="/Web/rcqls/Research/Tools/jl4R/gallery.html">Gallery</a><a class="active item" href="/Web/rcqls/Research/Tools/jl4R/faq.html">Frequently Asked Questions</a>
+</div>
+
+
+<!-- Page Contents -->
+<div class="pusher">
+  <div class="ui inverted vertical masthead center aligned segment" style="background-color: purple">
+    <div class="ui container">
+      <div class="ui large secondary inverted pointing menu">
+        <a class="toc item">
+          <i class="sidebar icon"></i>
+        </a>
+        <a class="item" href="https://cran.r-project.org/">
+        <img src="/users/RCqls/StatInf/img/logoR.png" width="50">"
+        </a>
+        <a class="item" href="/Web/rcqls/Research/Tools/jl4R/index.html">Jl4R package</a><a class="item" href="/Web/rcqls/Research/Tools/jl4R/doc.html">Documentation</a><a class="item" href="/Web/rcqls/Research/Tools/jl4R/gallery.html">Gallery</a><a class="active item" href="/Web/rcqls/Research/Tools/jl4R/faq.html">FAQ</a>
+      </div>
+    </div>
+<br/>
+</div>
+
+<div class="ui container">
+<br/><div id="start"></div><br/>
+
+<h1>Frequently Asked Questions</h1>
+
+  <div class="ui grid container">
+    <div class="sixteen wide column">
+
+
+
+<ol>
+<li>TODO
+
+<ul>
+<li><em>R</em> list</li>
+</ul></li>
+</ol>
+
+    </div>
+  </div>
+<br/><br/><br/>
+
+
+<script type="text/javascript">
+if (typeof clipboardDemo == 'undefined') {
+	clipboardDemo = new Clipboard('.clipboard');
+	stateClip=false; //global variable
+}
+stateClip=false; //global variable
+$(".clipboard").click(function(e) {stateClip=true;});
+$(".demoR").click(function() {
+  if(stateClip) {
+    stateClip=false;
+  } else {
+    var state=$( this ).attr("state");
+    var link_id=$( this ).attr("link_id");
+    if(state=="on") {
+      $("#code-"+link_id).hide();
+      $("#session-"+link_id).show();
+      $( this ).attr("state","off");
+    } else {
+      $("#code-"+link_id).show();
+      $("#session-"+link_id).hide();
+      $( this ).attr("state","on");
+    }
+  }
+});
+function prev_DemoRFigs(fig) {
+  var curfig=demoRFigs[fig]['current'];
+  var prevfig=demoRFigs[fig]['prev'][curfig];
+  demoRFigs[fig]['figs'].forEach(function(e) {
+    if(e == prevfig) {
+      $("#img-"+fig+"-"+e).show();$("#code-"+fig+"-"+e).show();
+    } else {
+      $("#img-"+fig+"-"+e).hide();$("#code-"+fig+"-"+e).hide();
+    }
+  });
+  demoRFigs[fig]['current']=prevfig;
+}
+function next_DemoRFigs(fig) {
+  var curfig=demoRFigs[fig]['current'];
+  var nextfig=demoRFigs[fig]['next'][curfig];
+  demoRFigs[fig]['figs'].forEach(function(e) {
+    if(e == nextfig) {
+      $("#img-"+fig+"-"+e).show();$("#code-"+fig+"-"+e).show();
+    } else {
+      $("#img-"+fig+"-"+e).hide();$("#code-"+fig+"-"+e).hide();
+    }
+  });
+  demoRFigs[fig]['current']=nextfig;
+}
+//init
+$(".demoRSession").hide();
+if (typeof clipboardDemo == 'undefined') {
+	clipboardDemo = new Clipboard('.clipboard');
+	stateClip=false; //global variable
+}
+
+$(".clipboard").click(function(e) {stateClip=true;});
+$(".demoJl").click(function() {
+  if(stateClip) {
+    stateClip=false;
+  } else {
+	var state=$( this ).attr("state");
+	var link_id=$( this ).attr("link_id");
+	if(state=="on") {
+		$("#code-"+link_id).hide();
+		$("#session-"+link_id).show();
+		$( this ).attr("state","off");
+	} else {
+		$("#code-"+link_id).show();
+		$("#session-"+link_id).hide();
+		$( this ).attr("state","on");
+	}
+  }
+});
+function prev_demoJlFigs(fig) {
+  var curfig=demoJlFigs[fig]['current'];
+  var prevfig=demoJlFigs[fig]['prev'][curfig];
+  demoJlFigs[fig]['figs'].forEach(function(e) {
+    if(e == prevfig) {
+      $("#img-"+fig+"-"+e).show();$("#code-"+fig+"-"+e).show();
+    } else {
+      $("#img-"+fig+"-"+e).hide();$("#code-"+fig+"-"+e).hide();
+    }
+  });
+  demoJlFigs[fig]['current']=prevfig;
+}
+function next_demoJlFigs(fig) {
+  var curfig=demoJlFigs[fig]['current'];
+  var nextfig=demoJlFigs[fig]['next'][curfig];
+  demoJlFigs[fig]['figs'].forEach(function(e) {
+    if(e == nextfig) {
+      $("#img-"+fig+"-"+e).show();$("#code-"+fig+"-"+e).show();
+    } else {
+      $("#img-"+fig+"-"+e).hide();$("#code-"+fig+"-"+e).hide();
+    }
+  });
+  demoJlFigs[fig]['current']=nextfig;
+}
+//init
+$(".demoJlSession").hide();
+$(".demoPy").click(function() {
+  if(stateClip) {
+    stateClip=false;
+  } else {
+	var state=$( this ).attr("state");
+	var link_id=$( this ).attr("link_id");
+	if(state=="on") {
+		$("#code-"+link_id).hide();
+		$("#session-"+link_id).show();
+		$( this ).attr("state","off");
+	} else {
+		$("#code-"+link_id).show();
+		$("#session-"+link_id).hide();
+		$( this ).attr("state","on");
+	}
+  }
+});
+function prev_demoPyFigs(fig) {
+  var curfig=demoPyFigs[fig]['current'];
+  var prevfig=demoPyFigs[fig]['prev'][curfig];
+  demoPyFigs[fig]['figs'].forEach(function(e) {
+    if(e == prevfig) {
+      $("#img-"+fig+"-"+e).show();$("#code-"+fig+"-"+e).show();
+    } else {
+      $("#img-"+fig+"-"+e).hide();$("#code-"+fig+"-"+e).hide();
+    }
+  });
+  demoPyFigs[fig]['current']=prevfig;
+}
+function next_demoPyFigs(fig) {
+  var curfig=demoPyFigs[fig]['current'];
+  var nextfig=demoPyFigs[fig]['next'][curfig];
+  demoPyFigs[fig]['figs'].forEach(function(e) {
+    if(e == nextfig) {
+      $("#img-"+fig+"-"+e).show();$("#code-"+fig+"-"+e).show();
+    } else {
+      $("#img-"+fig+"-"+e).hide();$("#code-"+fig+"-"+e).hide();
+    }
+  });
+  demoPyFigs[fig]['current']=nextfig;
+}
+//init
+$(".demoPySession").hide();
+</script>
+<link rel="stylesheet" href="/tools/uv/solarized.css" />
+
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+</br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br>
+</div>
+</body>
+</html>

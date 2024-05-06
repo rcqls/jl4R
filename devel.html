@@ -1,0 +1,158 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Devel of jl4R</title>
+
+<script src="/tools/h/jquery-1.11.3/jquery.min.js"></script>
+
+
+
+<link href="/tools/uv/solarized.css" media="screen,projection,print" rel="Stylesheet" type="text/css" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
+<link rel="stylesheet" href="/tools/css/ascidoctor.css">
+<link rel="stylesheet"  href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+
+<link rel="stylesheet" type="text/css" href="/tools/Semantic-UI-CSS/components/message.min.css"><link rel="stylesheet" type="text/css" href="/tools/Semantic-UI-CSS/components/icon.min.css"><link rel="stylesheet" type="text/css" href="/tools/Semantic-UI-CSS/components/label.min.css">
+
+
+<link rel="stylesheet" href="/tools/uv/solarized.css" />
+
+
+</head>
+<body><div class="ui  container">
+
+<div id="content">
+
+
+<h2>Development of jl4R</h2>
+
+<p>L&#39;objectif du package est de manipuler un package développé en <code>julia</code> et de
+rendre les résultats accessibles en <code>R</code> (en gros, un remplacement du <code>C++</code> de <code>Rcpp</code> par <code>julia</code>).</p>
+<pre class="solarized">require(<span class="Variable">jl4R</span>)
+jlrun(<span class="QuotedString"><span class="Quotes">&quot;</span>using DataFrames<span class="Quotes">&quot;</span></span>)
+jl2R(jlptr(<span class="QuotedString"><span class="Quotes">&quot;</span>(a=1,b=DataFrame(a=1,b=2))<span class="Quotes">&quot;</span></span>))
+<span class="Comment"><span class="Comment">#</span> ou en 2 étapes</span>
+<span class="Variable">nm_jlptr</span> <span class="Keyword">&lt;-</span> jlptr(<span class="QuotedString"><span class="Quotes">&quot;</span>(a=1,b=DataFrame(a=1,b=2))<span class="Quotes">&quot;</span></span>)
+jl2R(<span class="Variable">nm_jlptr</span>)
+</pre>
+
+
+Dans cette suite d'instruction, un objet R est retourné qui peut être exploité en `R`.
+
+
+<h3>Idée actuelle:</h3>
+
+<ol>
+<li>Création d&#39;un pointeur
+
+<ul>
+<li><code>C</code>: <code>jl4R_eval2jlPtr</code></li>
+<li><code>R</code> internal: .jleval2jlPtr (call <code>jl4R_eval2jlPtr</code>)</li>
+<li><code>R</code>: <code>jlptr</code> and  <code>jlptr_unsafe</code> (appelant directement <code>.jleval2jlPtr</code>)</li>
+</ul></li>
+<li>Action sur les pointeurs
+
+<ul>
+<li><code>C</code>: <code>jl4R_jlPtr_call1</code>, <code>jl4R_jlPtr_call2</code>, <code>jl4R_jlPtr_call3</code></li>
+<li><code>R</code> internal: <code>.jlPtr_call1</code>, <code>.jlPtr_call2</code>, <code>.jlPtr_call3</code></li>
+<li><code>R</code>: <code>jlptr_call</code></li>
+</ul></li>
+<li>Conversion en <code>R</code>:
+
+<ul>
+<li><code>C</code>: <code>jl4R_jlPtr2R</code> (calling <code>jl_value_to_SEXP</code>)</li>
+<li><code>R</code> internal: <code>.jlPtr2R</code> (call directly <code>jl4R_jlPtr2R</code>)</li>
+<li><code>R</code>: <code>jl2R</code> 
+Note: <code>jlPtr(jlexpr)</code> dans l&#39;API <code>C</code> crée un external pointer de classe <code>c(&quot;&lt;typeof(jlexpr)&gt;&quot;, &quot;jlPtr&quot;)</code></li>
+</ul></li>
+</ol>
+
+<h3>Objectif avancé: conversion de structure <code>julia</code> stat en <code>R</code></h3>
+
+<ul>
+<li><code>DataFrame</code></li>
+</ul>
+<pre class="solarized">
+<span class="Variable">R</span><span class="Keyword">&gt;</span> require(<span class="Variable">jl4R</span>)
+<span class="Variable">R</span><span class="Keyword">&gt;</span> jlusing(<span class="QuotedString"><span class="Quotes">&quot;</span>DataFrames<span class="Quotes">&quot;</span></span>)
+<span class="Variable">R</span><span class="Keyword">&gt;</span> jl(<span class="Number">1</span>)
+<span class="Number">1.0</span>
+<span class="Variable">R</span><span class="Keyword">&gt;</span> interactive()
+[<span class="Number">1</span>] <span class="BuiltInConstant">FALSE</span>
+<span class="Variable">R</span><span class="Keyword">&gt;</span> jl(<span class="QuotedString"><span class="Quotes">&quot;</span>(a=1,b=DataFrame(a=1:3,b=2:4))<span class="Quotes">&quot;</span></span>) <span class="Keyword">-</span><span class="Keyword">&gt;</span> <span class="Variable">nt_jl</span>
+<span class="Variable">R</span><span class="Keyword">&gt;</span> <span class="Variable">nt_jl</span>
+(<span class="FunctionArgument">a</span> <span class="Keyword">=</span> <span class="Number">1</span>, <span class="FunctionArgument">b</span> <span class="Keyword">=</span> <span class="Number">3</span>×<span class="Number">2</span> <span class="Variable">DataFrame</span>
+ <span class="Variable">Row</span> │ <span class="Variable">a</span>      <span class="Variable">b</span>
+     │ <span class="Variable">Int64</span>  <span class="Variable">Int64</span>
+─────┼──────────────
+   <span class="Number">1</span> │     <span class="Number">1</span>      <span class="Number">2</span>
+   <span class="Number">2</span> │     <span class="Number">2</span>      <span class="Number">3</span>
+   <span class="Number">3</span> │     <span class="Number">3</span>      <span class="Number">4</span>)
+<span class="Variable">R</span><span class="Keyword">&gt;</span> toR(<span class="Variable">nt_jl</span>)
+<span class="Keyword">$</span><span class="Variable">a</span>
+[<span class="Number">1</span>] <span class="Number">1</span>
+
+<span class="Keyword">$</span><span class="Variable">b</span>
+  <span class="Variable">a</span> <span class="Variable">b</span>
+<span class="Number">1</span> <span class="Number">1</span> <span class="Number">2</span>
+<span class="Number">2</span> <span class="Number">2</span> <span class="Number">3</span>
+<span class="Number">3</span> <span class="Number">3</span> <span class="Number">4</span>
+
+<span class="Variable">R</span><span class="Keyword">&gt;</span> R(<span class="Variable">nt_jl</span>)
+<span class="Keyword">$</span><span class="Variable">a</span>
+[<span class="Number">1</span>] <span class="Number">1</span>
+
+<span class="Keyword">$</span><span class="Variable">b</span>
+  <span class="Variable">a</span> <span class="Variable">b</span>
+<span class="Number">1</span> <span class="Number">1</span> <span class="Number">2</span>
+<span class="Number">2</span> <span class="Number">2</span> <span class="Number">3</span>
+<span class="Number">3</span> <span class="Number">3</span> <span class="Number">4</span>
+
+<span class="Variable">R</span><span class="Keyword">&gt;</span> jl_typeof(<span class="Variable">nt_jl</span>)
+[<span class="Number">1</span>] <span class="QuotedString"><span class="Quotes">&quot;</span>NamedTuple<span class="Quotes">&quot;</span></span>
+<span class="Variable">R</span><span class="Keyword">&gt;</span> typeof(<span class="Variable">nt_jl</span>)
+[<span class="Number">1</span>] <span class="QuotedString"><span class="Quotes">&quot;</span>externalptr<span class="Quotes">&quot;</span></span>
+
+</pre><ul>
+<li><code>CategoricalArray</code></li>
+</ul>
+<pre class="solarized">
+<span class="Variable">R</span><span class="Keyword">&gt;</span> jlrun(<span class="QuotedString"><span class="Quotes">&quot;</span>using CategoricalArrays<span class="Quotes">&quot;</span></span>)
+<span class="Variable">R</span><span class="Keyword">&gt;</span> <span class="Variable">ca_jl</span> <span class="Keyword">&lt;-</span> jl(<span class="QuotedString"><span class="Quotes">&#39;</span>categorical([&quot;titi&quot;,&quot;toto&quot;,&quot;titi&quot;])<span class="Quotes">&#39;</span></span>)
+<span class="Variable">R</span><span class="Keyword">&gt;</span> <span class="Variable">ca_jl</span>
+<span class="Number">3</span><span class="Keyword">-</span><span class="Variable">element</span> <span class="Variable">CategoricalArray</span>{<span class="Variable">String</span>,<span class="Number">1</span>,<span class="Variable">UInt32</span>}<span class="Keyword">:</span>
+ <span class="QuotedString"><span class="Quotes">&quot;</span>titi<span class="Quotes">&quot;</span></span>
+ <span class="QuotedString"><span class="Quotes">&quot;</span>toto<span class="Quotes">&quot;</span></span>
+ <span class="QuotedString"><span class="Quotes">&quot;</span>titi<span class="Quotes">&quot;</span></span>
+<span class="Variable">R</span><span class="Keyword">&gt;</span> jlshow(<span class="Variable">ca_jl</span>)
+<span class="Variable">R</span><span class="Keyword">&gt;</span> R(<span class="Variable">ca_jl</span>)
+[<span class="Number">1</span>] <span class="Variable">titi</span> <span class="Variable">toto</span> <span class="Variable">titi</span>
+<span class="Variable">Levels</span><span class="Keyword">:</span> <span class="Variable">titi</span> <span class="Variable">toto</span>
+
+</pre><p>et plus généralement:</p>
+
+<ul>
+<li>les <code>struct</code></li>
+</ul>
+
+
+</div>
+
+<script type="text/javascript">
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+
+</div></body>
+</html>
