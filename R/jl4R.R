@@ -3,17 +3,17 @@
 ## 2) jl(<R object>) is redirected to as_jlvalue(<RObject>)
 jl <- function(obj, ..., name_class = TRUE) {
   if (name_class) {
-    return(jl_rexpr(substitute(obj), obj))
+    return(jl_rexpr(substitute(obj), obj, ...))
   }
-  as_jlvalue(obj)
+  as_jlvalue(obj, ...)
 }
 
 jlR <- function(obj, ..., name_class = TRUE) {
   if (name_class) {
-    res <- jl_rexpr(substitute(obj))
+    res <- jl_rexpr(substitute(obj), ...)
     if (!is.null(res)) return(toR(res))
   }
-  toR(as_jlvalue(obj))
+  toR(as_jlvalue(obj, ...))
 }
 
 jl_unsafe <- function(expr) {
