@@ -20,9 +20,8 @@ don’t forget to select `PATH` in the installer.
 - Install [RTools](https://cran.r-project.org/bin/windows/Rtools/) and a
   terminal with bash (for instance, [Git
   Bash](https://gitforwindows.org/))
-- Ajout de Rscript dans le `PATH` (see for example [this
-  page](https://www.hanss.info/sebastian/post/rtools-path/) for adding R
-  path in the `PATH` environment variable)
+- Add Rscript in the `PATH` environment variable (see for example [this
+  page](https://www.hanss.info/sebastian/post/rtools-path/))
 
 3.  Bash installation (all Operating Systems)
 
@@ -192,6 +191,16 @@ jl(1, TRUE)
 
     ## 1-element Vector{Float64}:
     ##  1.0
+
+Notice that there is no need to set `vector=TRUE` when `dim` is not
+`NULL`:
+
+``` r
+jl(matrix("one"))
+```
+
+    ## 1×1 Matrix{String}:
+    ##  "one"
 
 ### Goal: conversion of `julia` structures used in statitictic to `R`
 
