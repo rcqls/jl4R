@@ -1,0 +1,478 @@
+pre.solarized .PerlQuotes {
+   color: #2AA198;
+}
+pre.solarized .TexVar {
+   color: #BD3800;
+}
+pre.solarized .ClassName {
+   color: #268BD2;
+}
+pre.solarized .CStorageType {
+   color: #A57800;
+}
+pre.solarized .JavaClass {
+   color: #A57800;
+}
+pre.solarized .PhpInheritedClass {
+   color: #536871;
+}
+pre.solarized .HtmlSomething {
+   color: #708284;
+}
+pre.solarized {
+   color: #586E75;
+   background-color: #FDF6E3;
+}
+pre.solarized .RubyVariable {
+   color: #469186;
+}
+pre.solarized .HtmlText {
+   color: #BD3800;
+   font-weight: bold;
+}
+pre.solarized .PhpOtherProperty {
+   color: #899090;
+}
+pre.solarized .ShellDot_files {
+   color: #268BD2;
+}
+pre.solarized .TexConstantMath {
+   color: #269186;
+}
+pre.solarized .Storage {
+   color: #073642;
+   font-weight: bold;
+}
+pre.solarized .CssId {
+   color: #268BD2;
+}
+pre.solarized .JavaComment {
+   color: #536871;
+}
+pre.solarized .JavaMetaImport {
+   color: #586E75;
+}
+pre.solarized .PythonStorage {
+   color: #748B00;
+}
+pre.solarized .RestRaw {
+   color: #269186;
+}
+pre.solarized .MarkdownLinebreak {
+   color: #E0EDDD;
+   background-color: #A57706;
+}
+pre.solarized .PhpArrayConstruct {
+   color: #A57800;
+}
+pre.solarized .RubySymbol {
+   color: #269186;
+}
+pre.solarized .DiffHeader {
+   color: #E0EDDD;
+   background-color: #A57706;
+   font-style: italic;
+}
+pre.solarized .RubyErb1 {
+   color: #269186;
+}
+pre.solarized .JsSource {
+   color: #A57800;
+}
+pre.solarized .PhpStorageTypeFunction {
+   color: #BD3800;
+}
+pre.solarized .TexSupportFunction {
+   color: #269186;
+}
+pre.solarized .Tex1 {
+   color: #D3201F;
+}
+pre.solarized .RubyFunction {
+   color: #268BD2;
+}
+pre.solarized .CssTag {
+   color: #738A13;
+}
+pre.solarized .InheritedClass {
+}
+pre.solarized .xx1 {
+   color: #268BD2;
+}
+pre.solarized .line-numbers {
+   color: #FFFFFF;
+   background-color: #073642;
+}
+pre.solarized .CConstant {
+   color: #269186;
+}
+pre.solarized .PhpFunction {
+   color: #899090;
+}
+pre.solarized .Css {
+   color: #5A74CF;
+}
+pre.solarized .CssNumericValue {
+   color: #269186;
+}
+pre.solarized .CssProperty {
+   color: #A57800;
+}
+pre.solarized .JavaImport {
+   color: #BD3800;
+}
+pre.solarized .PhpComment {
+   color: #899090;
+}
+pre.solarized .HtmlEmbeddable {
+   color: #819090;
+   font-style: italic;
+}
+pre.solarized .Shell {
+   color: #748B00;
+}
+pre.solarized .RubySpecialMethod1 {
+   color: #BD3800;
+}
+pre.solarized .CssClass {
+   color: #268BD2;
+}
+pre.solarized .TexReferenceLabel {
+   color: #269186;
+}
+pre.solarized .TexLabel {
+   color: #269186;
+}
+pre.solarized .PhpArrayBegin {
+   color: #D31E1E;
+}
+pre.solarized .PhpNew {
+   color: #CB4B16;
+}
+pre.solarized .Html1 {
+   color: #269186;
+}
+pre.solarized .FunctionName {
+   color: #268BD2;
+}
+pre.solarized .JsFunction {
+   color: #268BD2;
+}
+pre.solarized .Shell1 {
+   color: #CD1E1D;
+}
+pre.solarized .Special {
+   color: #CB4B16;
+}
+pre.solarized .SupportConstruct {
+   color: #D30102;
+}
+pre.solarized .RubyConstant {
+   color: #269186;
+}
+pre.solarized .JsStorageType {
+   color: #268BD2;
+}
+pre.solarized .HtmlStyle1 {
+   font-style: italic;
+}
+pre.solarized .PhpArray {
+   color: #536871;
+}
+pre.solarized .TagAttribute {
+   color: #93A1A1;
+}
+pre.solarized .Js {
+   color: #268BD2;
+}
+pre.solarized .LibraryVariable {
+}
+pre.solarized .Css1 {
+   color: #536871;
+}
+pre.solarized .HtmlScript {
+   font-style: italic;
+}
+pre.solarized .Comment {
+   color: #93A1A1;
+}
+pre.solarized .JavaParam {
+   color: #536871;
+}
+pre.solarized .PythonSupportException {
+   color: #A57800;
+}
+pre.solarized .Continuation {
+   color: #D30102;
+}
+pre.solarized .RubyConstantOther {
+   color: #A57800;
+}
+pre.solarized .CIncludeSomethingC {
+   color: #269186;
+}
+pre.solarized .RubyKeywordControl {
+   color: #738A05;
+   font-weight: bold;
+}
+pre.solarized .Php {
+   color: #D31E1E;
+}
+pre.solarized .ShellMetaBlock {
+   color: #536871;
+}
+pre.solarized .CKeyword {
+   color: #BB3700;
+}
+pre.solarized .LibraryException {
+   color: #CB4B16;
+}
+pre.solarized .Number {
+   color: #D33682;
+}
+pre.solarized .HtmlTag {
+   color: #268BD2;
+   font-weight: bold;
+}
+pre.solarized .Stringnumber {
+   color: #586E75;
+}
+pre.solarized .PerlComments {
+   color: #586E75;
+   font-style: italic;
+}
+pre.solarized .TexOtherMathString {
+   color: #A57800;
+}
+pre.solarized .TagName {
+   color: #268BD2;
+   font-weight: bold;
+}
+pre.solarized .CFunctionPreprocessor {
+   color: #BB3700;
+}
+pre.solarized .PerlChar {
+   color: #DC322F;
+}
+pre.solarized .OtherAdd {
+   color: #269186;
+}
+pre.solarized .CssFontFace {
+   color: #D01F1E;
+}
+pre.solarized .TexLabel1 {
+   color: #D01F1E;
+}
+pre.solarized .Keyword {
+   color: #859900;
+}
+pre.solarized .CMetaPreprocessor {
+   color: #BB3700;
+}
+pre.solarized .JsNumericConstant {
+   color: #269186;
+}
+pre.solarized .ShellMetaScopeInLoop {
+   color: #536871;
+}
+pre.solarized .CssImportant {
+   color: #D01F1E;
+}
+pre.solarized .TagStartEnd {
+   color: #93A1A1;
+}
+pre.solarized .RubySpecialMethod {
+   color: #748B00;
+}
+pre.solarized .HtmlStyle {
+   color: #269186;
+}
+pre.solarized .String {
+   color: #2AA198;
+}
+pre.solarized .RubySupportClass {
+   color: #A57800;
+}
+pre.solarized .TexComment {
+   font-style: italic;
+}
+pre.solarized .TexOtherMath {
+   color: #A57705;
+}
+pre.solarized .CssSelector {
+   color: #536871;
+}
+pre.solarized .JsFunctionName {
+   color: #A57800;
+}
+pre.solarized .QuotedString {
+   color: #269186;
+}
+pre.solarized .RubyClassName {
+   color: #A57800;
+}
+pre.solarized .PhpInclude {
+   color: #BD3800;
+}
+pre.solarized .PerlFunctions {
+   color: #859900;
+}
+pre.solarized .ShellVariable {
+   color: #BD3800;
+}
+pre.solarized .ShellBuiltin {
+   color: #748B00;
+}
+pre.solarized .Invalid {
+}
+pre.solarized .PythonImport {
+   color: #BD3800;
+}
+pre.solarized .TexFunction {
+   color: #748B00;
+}
+pre.solarized .RubyVariableDefinition {
+   color: #268BD2;
+}
+pre.solarized .PhpArray1 {
+   color: #A57800;
+}
+pre.solarized .BuiltInConstant {
+   color: #B58900;
+}
+pre.solarized .RubyFunctionName {
+   color: #708284;
+}
+pre.solarized .RubyErb {
+   color: #819090;
+}
+pre.solarized .LibraryFunction {
+   color: #268BD2;
+}
+pre.solarized .HtmlDoctype {
+   color: #899090;
+   font-style: italic;
+}
+pre.solarized .ShellComment {
+   font-style: italic;
+}
+pre.solarized .VariableStart {
+   color: #859900;
+}
+pre.solarized .CssStandardValue {
+   color: #269186;
+}
+pre.solarized .PerlVariables {
+   color: #B58900;
+}
+pre.solarized .FunctionArgument {
+}
+pre.solarized .Tex {
+   color: #B81D1C;
+}
+pre.solarized .OtherRemoval {
+   color: #D3201F;
+}
+pre.solarized .CssPseudo {
+   color: #BD3800;
+}
+pre.solarized .C {
+   color: #269186;
+}
+pre.solarized .Quotes {
+   color: #C60000;
+}
+pre.solarized .DiffDeleted {
+   color: #D3201F;
+   background-color: #EAE3CA;
+}
+pre.solarized .PhpFunctionCall {
+   color: #839496;
+}
+pre.solarized .CssValue {
+   color: #269186;
+}
+pre.solarized .TexMath {
+   color: #D01F1E;
+}
+pre.solarized .Html {
+   color: #708284;
+}
+pre.solarized .CFunction {
+   color: #536871;
+}
+pre.solarized .LibraryConstant {
+}
+pre.solarized .EmbeddedCodeMarkers {
+   color: #D30102;
+}
+pre.solarized .PhpFunctionConstruct {
+   color: #748B00;
+}
+pre.solarized .DiffChanged {
+   color: #BF3904;
+   background-color: #EAE3CA;
+}
+pre.solarized .xx {
+   color: #93A1A1;
+}
+pre.solarized .RubyClass {
+   color: #748B00;
+}
+pre.solarized .RubyKeyword {
+   color: #748B00;
+}
+pre.solarized .UserDefinedConstant {
+   color: #CB4B16;
+}
+pre.solarized .PhpSourceEmebedded {
+   color: #BD3613;
+}
+pre.solarized .Html3 {
+}
+pre.solarized .LibraryClassType {
+   color: #859900;
+}
+pre.solarized .PhpQuotedSingle {
+   color: #839496;
+}
+pre.solarized .PhpNumericConstant {
+   color: #269186;
+}
+pre.solarized .Php1 {
+   color: #536871;
+}
+pre.solarized .Variable {
+   color: #268BD2;
+}
+pre.solarized .HtmlCommentBlock {
+   color: #839496;
+   font-style: italic;
+}
+pre.solarized .PhpStorageType {
+   color: #748B00;
+}
+pre.solarized .TexSupportFunctionSection {
+   color: #BD3800;
+}
+pre.solarized .MarkdownRaw {
+   color: #269186;
+}
+pre.solarized .HtmlStyle3 {
+}
+pre.solarized .TexText {
+   color: #A57705;
+}
+pre.solarized .DiffInserted {
+   color: #219186;
+   background-color: #EAE3CA;
+}
+pre.solarized .PhpClass {
+   color: #A57800;
+}
+pre.solarized .Regexp {
+   color: #D30102;
+}
+pre.solarized .RubyPunctuationSection {
+   color: #D01F1E;
+}
