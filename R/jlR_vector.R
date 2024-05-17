@@ -1,4 +1,4 @@
-as_jlvalue.double <- as_jlvalue.integer <- as_jlvalue.logical <- as_jlvalue.character <-function(obj, vector=FALSE, ...) {
+jlvalue.double <- jlvalue.integer <- jlvalue.logical <- jlvalue.character <-function(obj, vector=FALSE, ...) {
     if(!.jlrunning()) .jlinit()
     jlval <- .Call("jl4R_VECSXP_to_jl_array_EXTPTRSXP", obj, PACKAGE = "jl4R")
     if(length(obj) == 1 && !vector) {

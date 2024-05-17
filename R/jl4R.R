@@ -1,11 +1,11 @@
 ## IMPORTANT
 ## 1) jl(`<multiline julia expression>`) redirect to jlvalue_eval("<multiline julia expression>")
-## 2) jl(<R object>) is redirected to as_jlvalue(<RObject>)
+## 2) jl(<R object>) is redirected to jlvalue(<RObject>)
 jl <- function(obj, ..., name_class = TRUE) {
   if (name_class) {
     return(jl_rexpr(substitute(obj), obj, ...))
   }
-  as_jlvalue(obj, ...)
+  jlvalue(obj, ...)
 }
 
 jlR <- function(obj, ..., name_class = TRUE) {
@@ -13,17 +13,17 @@ jlR <- function(obj, ..., name_class = TRUE) {
     res <- jl_rexpr(substitute(obj), ...)
     if (!is.null(res)) return(toR(res))
   }
-  toR(as_jlvalue(obj, ...))
+  toR(jlvalue(obj, ...))
 }
 
 jl_unsafe <- function(expr) {
     .jleval2jlvalue(expr)
 }
 
-as_jlvalue <- function(obj, ...) UseMethod("as_jlvalue", obj)
+jlvalue <- function(obj, ...) UseMethod("jlvalue", obj)
 
-as_jlvalue.default <- function(expr, ...) {
-  warning(paste0("No as_jlvalue conversion for ", expr, " !"))
+jlvalue.default <- function(expr, ...) {
+  warning(paste0("No jlvalue conversion for ", expr, " !"))
   NULL
 }
 
@@ -40,7 +40,7 @@ jlget <- function(var) {
 
 jlset <- function(var, value, vector = FALSE) {
   if (!.jlrunning()) .jlinit()
-  jlval <- as_jlvalue(value)
+  jlval <- jlvalue(value)
   .External("jl4R_set_global_variable", var, jlval, PACKAGE = "jl4R")
   return(invisible())
 }

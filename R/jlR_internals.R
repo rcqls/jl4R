@@ -7,7 +7,7 @@
     vars <- list()
     pairs <- list()
     for (nm in names(df)) {
-        vars[[nm]] <- as_jlvalue(df[[nm]])
+        vars[[nm]] <- jlvalue(df[[nm]])
         pairs[[nm]] <- jlcall("=>", jlsymbol(nm), vars[[nm]])
         jlcall("push!", args, pairs[[nm]])
     }
@@ -24,7 +24,7 @@
     vars <- list()
     pairs <- list()
     for (nm in names(obj)) {
-        vars[[nm]] <- as_jlvalue(obj[[nm]])
+        vars[[nm]] <- jlvalue(obj[[nm]])
         pairs[[nm]] <- jlcall("=>", jlsymbol(nm), vars[[nm]])
         jlcall("push!", jlval, pairs[[nm]])
     }
@@ -35,7 +35,7 @@
     vars <- list()
     types <- c()
     for (nm in names(obj)) {
-        vars[[nm]] <- as_jlvalue(obj[[nm]])
+        vars[[nm]] <- jlvalue(obj[[nm]])
         types <- c(types, jlRtypeof(vars[[nm]]))
     }
     jlstruct <- paste0("@NamedTuple{", paste(names(obj), "::", types, collapse=",", sep=""), "}") 
@@ -51,7 +51,7 @@
     vars <- list()
     obj <- unname(obj)
     for (i in seq_along(obj)) {
-        vars[[i]] <- as_jlvalue(obj[[i]])
+        vars[[i]] <- jlvalue(obj[[i]])
         jlcall("push!", args, vars[[i]])
     }
     jlval <- jlvalue_func1(splattuple, args)

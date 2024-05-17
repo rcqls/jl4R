@@ -1,6 +1,6 @@
 jlArray <- function(...) {
     obj <- c(...)
-    as_jlvalue(obj)
+    jlvalue(obj)
 }
 
 length.Array <- function(jlval) {

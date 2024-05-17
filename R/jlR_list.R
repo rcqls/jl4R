@@ -1,5 +1,5 @@
 ## Convert to Tuple or NamedTuple
-as_jlvalue.list <-  function(obj, ...) {
+jlvalue.list <-  function(obj, ...) {
     if(!.jlrunning()) .jlinit()
     if(is.null(names(obj))) {
         .RList2jlTuple(obj)

@@ -9,10 +9,10 @@ jlvalue_eval <- function(obj, ...) {
     }
 }
 
-as_jlvalue.jlvalue <- function(jlval, ...) jlval
+jlvalue.jlvalue <- function(jlval, ...) jlval
 
 ## used to evaluate jl(as.name("<julia expresssion>"))
-as_jlvalue.name <- function(name) jlvalue_eval(deparse(name))
+jlvalue.name <- function(name) jlvalue_eval(deparse(name))
 
 is.jlvalue <- function(obj) inherits(obj,"jlvalue")
 
