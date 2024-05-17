@@ -26,6 +26,7 @@ S3method(print,jlvalue)
 #S3methods are not viewable inside the R system. If you want this functionality available put it in the previous export
 S3method("as_jlvalue",default)
 S3method("as_jlvalue",jlvalue)
+S3method("as_jlvalue",name)
 S3method("as_jlvalue",data.frame)
 S3method("as_jlvalue",list)
 S3method("as_jlvalue",integer)
