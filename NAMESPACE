@@ -20,7 +20,8 @@ export(
   jlArray, jlCategoricalArray, jlDataFrame,
   jlDict, jlTuple, jlNamedTuple, jlStruct,
   jlcolon, jlsymbol,
-  rand
+  rand,
+  rexpr2jlexpr
 )
 
 S3method(print,jlvalue)
