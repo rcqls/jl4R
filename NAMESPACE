@@ -80,6 +80,9 @@ S3method("$", DataFrame)
 
 S3method("levels", CategoricalArray)
 
+S3method("print", jlexception)
+S3method("summary", jlexception)
+
 
 # S3method(print,jlvector)
 # S3method("[<-",jlvector)
