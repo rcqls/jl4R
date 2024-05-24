@@ -13,6 +13,16 @@ jlusing <- function(...) {
   jlrun(paste0("using ",paste(pkgs,collapse=", ")))
 }
 
+## Trick for jlusing badly called because of dlopen error
+jlusing_force <- function(pkg, n = 10) {
+  repeat {
+    res <- jlvalue_eval(paste0("using ", pkg))
+    n <- n - 1
+    if(!inherits(res, "jlexception") || n < 0) break
+  }
+  if( n >= 0) invisible(NULL) else res
+}
+
 jlpkgadd <- function(..., url = NULL) {
     if (!is.null(url)) {
         jlrun(paste0("import Pkg;Pkg.add(url=\"", url, "\")"))

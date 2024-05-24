@@ -1,10 +1,26 @@
 ## Used to eval `<julia expression>` in jl function
-jlvalue_eval <- function(obj, ...) {
+.jlvalue_eval <- function(obj, ...) {
     if (!.jlrunning()) .jlinit()
     if (length(obj) == 1 && is.character(obj)) {
         .jleval2jlvalue(.jlsafe(obj))
     } else {
-        warning("Bad input for jl function!")
+        warning("Bad input for .jlvalue_eval function!")
+        NULL
+    }
+}
+
+jlvalue_eval <- function(obj, ...) {
+    if (!.jlrunning()) .jlinit()
+    if (length(obj) == 1 && is.character(obj)) {
+        jlval <- .jleval2jlvalue(.jlsilentsafe(obj))
+        if( toR(jlcall("<:", jltypeof(jlval) , .jlvalue_eval("Exception")))) {
+            jlexception(obj, jlval)
+        } else {
+            jlval
+        }
+
+    } else {
+        warning("Bad input for jlvalue_eval function!")
         NULL
     }
 }

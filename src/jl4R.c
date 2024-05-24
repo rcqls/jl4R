@@ -391,9 +391,10 @@ jl_value_t* jl_eval2jl(SEXP args) {
   SEXP resR;
 
   cmdString=(char*)CHAR(STRING_ELT(CADR(args),0));
+  // printf("exec: %s\n",cmdString);
   res=jl_eval_string(cmdString);
   if (jl_exception_occurred()) {
-    //printf("%s \n", jl_typeof_str(jl_exception_occurred()));
+    // printf("%s \n", jl_typeof_str(jl_exception_occurred()));
     return (jl_value_t *)jl_exception_occurred(); //jl_eval_string("nothing");
   }
   JL_GC_PUSH1(&res);

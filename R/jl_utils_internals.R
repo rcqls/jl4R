@@ -42,5 +42,9 @@ jl_rexprs <- function(rexprs, objs) { # rexpr is generally the result of substit
 # }
 
 .jlsafe <- function(expr) {
-  paste0("try\n", expr, "\ncatch e\n showerror(stdout,e)\n end")
+  paste0("try\n", expr, "\ncatch e\n showerror(stdout,e); e\n end")
+}
+
+.jlsilentsafe <- function(expr) {
+  paste0("try\n", expr, "\ncatch e\n e\n end")
 }
