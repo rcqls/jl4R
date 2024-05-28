@@ -9,7 +9,7 @@ jl <- function(obj, ..., name_class = TRUE) {
 }
 
 jlR <- function(obj, ..., name_class = TRUE) {
-  if (name_class) {
+  if (name_class && !(deparse(substitute(obj)) %in% ls(parent.frame()))) {
     res <- jl_rexpr(substitute(obj), ...)
     if (!is.null(res)) return(toR(res))
   }
