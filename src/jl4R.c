@@ -650,7 +650,6 @@ SEXP jl4R_jlvalue_func_call1(SEXP args) {
   jl_value_t *jlv=NULL, *res=NULL;
   jl_function_t *func=NULL;
   SEXP resR;
-
   JL_GC_PUSH3(&jlv,&func,&res);
   func = (jl_function_t*)get_preserved_jlvalue_from_R_ExternalPtrAddr(CADR(args));
   jlv=(jl_value_t*)get_preserved_jlvalue_from_R_ExternalPtrAddr(CADDR(args));
@@ -675,6 +674,7 @@ SEXP jl4R_jlvalue_call2(SEXP args) {
   res = jl_call2(func, jlv,jlarg);
   resR=(SEXP)jlvalue(res);
   JL_GC_POP();
+  
   return resR;
 }
 

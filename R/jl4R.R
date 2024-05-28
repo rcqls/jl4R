@@ -2,7 +2,7 @@
 ## 1) jl(`<multiline julia expression>`) redirect to jlvalue_eval("<multiline julia expression>")
 ## 2) jl(<R object>) is redirected to jlvalue(<RObject>)
 jl <- function(obj, ..., name_class = TRUE) {
-  if (name_class) {
+  if (name_class && !(deparse(substitute(obj)) %in% ls(parent.frame()))) {
     return(jl_rexpr(substitute(obj), obj, ...))
   }
   jlvalue(obj, ...)

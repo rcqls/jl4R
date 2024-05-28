@@ -15,3 +15,23 @@ summary.jlexception <- function(obj) {
     cat("Julia Exception:",class(obj)[[1]],"\n")
     cat(toR(jlstring(obj$err)),"\n")
 }
+
+is.jlexception <- function(exc) inherits(exc, "jlexception")
+
+jlexceptions <- function(excs) {
+    excs <- excs[sapply(excs, is.jlexception)]
+    class(excs) <- "jlexceptions"
+    excs
+}
+
+print.jlexceptions <- function(obj, ...) {
+    for(exc in obj) {
+        print(exc)
+    }
+}
+
+summary.jlexceptions <- function(obj) {
+    for(exc in obj) {
+        summary(exc)
+    }
+}

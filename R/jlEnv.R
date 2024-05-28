@@ -31,17 +31,27 @@ jlEnv <- function() get("jl", envir = globalenv())
     if (class(substitute(key)) != "character") {
         key <- deparse(substitute(key))
     }
-    function(...) {
-        args <- c(key, jl_rexprs(substitute(list(...)), list(...)))
-        do.call("jlcall", args)
+    ## check if key is a generic function
+    gen = jlvalue_eval(key)
+    if(is.jlexception(gen)) {
+        function(...) gen
+    } else {
+        function(...) {
+            args <- c(key, jl_rexprs(substitute(list(...)), list(...)))
+            if(any(sapply(args, is.jlexception))) {
+                jlexceptions(args[-1])
+            } else {
+                do.call("jlcall", args)
+            }
+        }
     }
 }
 
 
- `@.jlEnv` <- function(obj, key) function(...) {
-    args <- c(key, jl_rexprs(substitute(list(...)), list(...)))
-    do.call("jlcall", args)
-}
+# `@.jlEnv` <- function(obj, key) function(...) {
+#     args <- c(key, jl_rexprs(substitute(list(...)), list(...)))
+#     do.call("jlcall", args)
+# }
 
 `[.jlEnv` <- function(obj, key) {
     if(class(substitute(key)) != "character") {

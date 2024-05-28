@@ -21,7 +21,8 @@ export(
   jlDict, jlTuple, jlNamedTuple, jlStruct,
   jlcolon, jlsymbol,
   rand,
-  rexpr2jlexpr
+  rexpr2jlexpr,
+  is.jlexception
 )
 
 S3method(print,jlvalue)
@@ -54,7 +55,7 @@ S3method("[[",jlEnv)
 S3method("$",jlEnv)
 S3method("$<-",jlEnv)
 S3method("print",jlEnv)
-S3method("@",jlEnv)
+# S3method("@",jlEnv)
 
 S3method("names",Struct)
 S3method("[",Struct)
@@ -82,7 +83,8 @@ S3method("levels", CategoricalArray)
 
 S3method("print", jlexception)
 S3method("summary", jlexception)
-
+S3method("print", jlexceptions)
+S3method("summary", jlexceptions)
 
 # S3method(print,jlvector)
 # S3method("[<-",jlvector)
