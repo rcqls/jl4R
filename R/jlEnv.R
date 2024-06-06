@@ -37,14 +37,11 @@ jlEnv <- function() get("jl", envir = globalenv())
         function(...) gen
     } else {
         function(...) {
-            args <- jl_rexprs(substitute(list(...)), list(...))
+            args <- jl_rexprs2(substitute(list(...)), parent.frame())
             if(any(sapply(args, is.jlexception))) {
                 jlexceptions(args)
             } else {
-                # print(args)
-                # print(sapply(args,class))
-                # print(sapply(lapply(args, jlvalue),class))
-                do.call("jlcall", c(key, lapply(args, jlvalue)))
+                do.call("jlcall", c(key, lapply(args, jl)))
             }
         }
     }
