@@ -11,7 +11,7 @@ jlfunction <- function(jlval) {
             if(any(sapply(args, is.jlexception))) {
                 jlexceptions(args)
             } else {
-                do.call("jlcall", c(key, lapply(args, jl)))
+                do.call("jlcall", c(key, lapply(args, jlvalue)))
             }
         }
         attributes(jlf) <- attrsR
