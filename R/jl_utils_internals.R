@@ -1,7 +1,12 @@
 jl_rexpr <- function(rexpr, obj, ...) { # rexpr is generally the result of substitute(obj) 
     if (class(rexpr) == "name") {
         obj <- deparse(rexpr)
-        return(jlvalue_eval(obj))
+        jlval <- jlvalue_eval(obj)
+        if(is.jlfunction(jlval)$ok) {
+            jlfunction(jlval) 
+        } else {
+            jlval
+        }
     } else {
         jlvalue(obj, ...)
     }
