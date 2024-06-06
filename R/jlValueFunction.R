@@ -7,15 +7,15 @@ jlfunction <- function(jlval) {
             jlvalue = jlval
         )
         jlf <- function(...) {
-            args <- c(key, jl_rexprs(substitute(list(...)), list(...)))
+            args <- jl_rexprs(substitute(list(...)), list(...))
             if(any(sapply(args, is.jlexception))) {
-                jlexceptions(args[-1])
+                jlexceptions(args)
             } else {
-                do.call("jlcall", args)
+                do.call("jlcall", c(key, lapply(args, jlvalue)))
             }
         }
         attributes(jlf) <- attrsR
-        class(jlf) <- c("jlfunction", class(jlval))
+        class(jlf) <- "jlfunction"
         jlf
     } else {
         function(...) {

@@ -3,7 +3,7 @@ jl_rexpr <- function(rexpr, obj, ...) { # rexpr is generally the result of subst
         obj <- deparse(rexpr)
         jlval <- jlvalue_eval(obj)
         if(is.jlfunction(jlval)$ok) {
-            jlfunction(jlval) 
+           jlfunction(jlval) 
         } else {
             jlval
         }
