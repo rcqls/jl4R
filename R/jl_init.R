@@ -4,7 +4,8 @@
 .jlinit<-function() {
   # .External("jl4R_init",imgdir ,PACKAGE="jl4R")
   .External("jl4R_init",PACKAGE="jl4R")
-  .jl_load_display_buffer()
+  #.jl_load_display_buffer()
+  jl_load_jl4r_module()
   return(invisible())
 }
 
@@ -12,6 +13,14 @@
   # .External("jl4R_init",imgdir ,PACKAGE="jl4R")
   .External("jl4R_exit",PACKAGE="jl4R")
   return(invisible())
+}
+
+.jl_load_jl4r_module <- function() {
+  f <- system.file(file.path("julia","JL4R.jl"), package="jl4R")
+  if(f != "") {
+    cmd <-  paste0('include("',f,'")')
+    jlrun(cmd)
+  }
 }
 
 .jl_load_display_buffer <- function() {

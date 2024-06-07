@@ -844,8 +844,9 @@ SEXP jl4R_capture_preserved_ref(SEXP ans) {
   jl_function_t* display=NULL;
   SEXP outR;
 
+  jl_module_t *jl_jl4r_module = (jl_module_t*)jl_get_global(jl_main_module, jl_symbol("JL4R"));
   JL_GC_PUSH3(&res,&display,&out);
-    display = jl_get_function(jl_main_module, "display_buffer");
+    display = jl_get_function(jl_jl4r_module, "display_buffer");
   res = get_preserved_jlvalue_from_R_ExternalPtrAddr(ans);
   out=jl_call1(display, res);
   outR=(SEXP)jl_value_to_SEXP(out);
