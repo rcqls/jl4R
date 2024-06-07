@@ -5,7 +5,7 @@
   # .External("jl4R_init",imgdir ,PACKAGE="jl4R")
   .External("jl4R_init",PACKAGE="jl4R")
   #.jl_load_display_buffer()
-  jl_load_jl4r_module()
+  .jl_load_jl4r_module()
   return(invisible())
 }
 
