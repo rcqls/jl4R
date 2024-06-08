@@ -37,11 +37,11 @@
 
 ## the main julia parsing expression !!!
 
-.jleval2R <- function(expr) {
-  if(!.jlrunning()) .jlinit()
-  res <- .External("jl4R_eval2R", expr, PACKAGE = "jl4R")
-  return(res)
-}
+# .jleval2R <- function(expr) {
+#   if(!.jlrunning()) .jlinit()
+#   res <- .External("jl4R_eval2R", expr, PACKAGE = "jl4R")
+#   return(res)
+# }
 
 .jlans <- function() {
   if(!.jlrunning()) .jlinit()

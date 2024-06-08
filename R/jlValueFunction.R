@@ -6,17 +6,6 @@ jlfunction <- function(jlval) {
             name = key,
             jlvalue = jlval
         )
-        # jlf <- function(...) {
-        #     args <- jl_rexprs2(substitute(list(...)), parent.frame())
-        #     # print(args)
-        #     # print(any(sapply(args, is.jlexception)))
-        #     if(any(sapply(args, is.jlexception))) {
-        #         jlexceptions(args)
-        #     } else {
-        #         # print(c(key, lapply(args, jlvalue)))
-        #         do.call("jlcall", c(key, lapply(args, jlvalue)))
-        #     }
-        # }
         jlf <- function(...) {
             jlval <- jltrycall(key, ...)
             jlvalue_or_jlexception(match.call(), jlval)

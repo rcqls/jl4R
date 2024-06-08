@@ -1,6 +1,6 @@
 module JL4R
 
-export jlcall_safe, funcfind
+export jltrycall, funcfind
 
 function display_buffer(res)
     buf = IOBuffer();

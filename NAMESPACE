@@ -3,27 +3,28 @@ useDynLib(jl4R, .registration = TRUE)
 # exportPattern("^\\jl_")
 # exportPattern("^\\jlR_")
 export(
-  jl, jlR,
+  jl, jlrun, jltrycall,
+  R, toR, 
+  jlR, jltrycallR,
+  ## unsafe function (closest to julia C API)
   jlvalue_eval,
   jlvalue, is.jlvalue,
+  jlvalue_call, jlvalue_callR,
   jlfunction, is.jlfunction,
-  R, toR,
-  jlrun, jlcall, jltrycall,
-  jlset, jlget,
+  jlvalue_set, jlvalue_get,
+  ## User sugar
   jlshow, jldisplay,
   jlusing, jlpkg,
   jlpkgisinstalled, jlpkgadd, 
   is.Struct,
-  jl2R, jl2R_unsafe,
   jltypeof, jlstring,
-  jlRcall,
   jlRtypeof, jlRstring,
   jlArray, jlCategoricalArray, jlDataFrame,
   jlDict, jlTuple, jlNamedTuple, jlStruct,
   jlcolon, jlsymbol,
   rand,
-  rexpr2jlexpr,
-  is.jlexception
+  ## 
+  rexpr2jlexpr
 )
 
 S3method(print,jlvalue)

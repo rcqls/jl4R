@@ -47,15 +47,15 @@ jlvalue_func1 <- function(jl_meth, jlv) .jlvalue_func_call1(jl_meth, jlv)
     .External("jl4R_jlvalue_call3", meth, jlv, jlarg, jlarg2, PACKAGE = "jl4R")
 }
 
-.jlvalue_call <- function(meth, jlargs, jlnargs) {
+.jlvalue_call_ <- function(meth, jlargs, jlnargs) {
     if(!.jlrunning()) .jlinit()
     .Call("jl4R_jlvalue_call", meth, jlargs, jlnargs, PACKAGE = "jl4R")
 }
 
-jlvalue_call <- function(meth, ...) {
+.jlvalue_call <- function(meth, ...) {
     jlargs <- list(...)
     jlnargs <- length(jlargs)
-    .jlvalue_call(meth,jlargs,jlnargs)
+    .jlvalue_call_(meth,jlargs,jlnargs)
 }
 
 .jlvalue_func_call <- function(jlfunc, jlargs, jlnargs) {

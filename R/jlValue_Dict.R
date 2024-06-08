@@ -6,19 +6,19 @@ jlDict <-  function(...) {
     pairs <- list()
     for (nm in names(obj)) {
         vars[[nm]] <- jlvalue_eval(obj[[nm]])
-        pairs[[nm]] <- jlcall("=>", jlsymbol(nm), vars[[nm]])
-        jlcall("push!", jlval, pairs[[nm]])
+        pairs[[nm]] <- jlvalue_call("=>", jlsymbol(nm), vars[[nm]])
+        jlvalue_call("push!", jlval, pairs[[nm]])
     }
     jlval
 }
 
 ## TODO: toR.Dict
 
-names.Dict <- function(jlval) jlRcall("collect",jlcall("keys",jlval))
+names.Dict <- function(jlval) jlvalue_callR("collect",jlvalue_call("keys",jlval))
 
 "[.Dict" <- function(jlval, field) {
      if (field %in% names(jlval)) {
-        jlcall("getindex",jlval,jlsymbol(field))
+        jlvalue_call("getindex",jlval,jlsymbol(field))
     } else {
         NULL
     }

@@ -16,8 +16,9 @@ jlR <- function(obj, ..., name_class = TRUE) {
   toR(jlvalue(obj, ...))
 }
 
-jl_unsafe <- function(expr) {
-    .jleval2jlvalue(expr)
+jlrun <- function(expr) {
+  if(!.jlrunning()) .jlinit()
+  invisible(.External("jl4R_run", .jlsafe(expr), PACKAGE = "jl4R"))
 }
 
 jlvalue <- function(obj, ...) UseMethod("jlvalue", obj)
@@ -32,20 +33,20 @@ toR <- function(jlval) UseMethod("toR")
 
 toR.default <- function(obj) obj
 
-jlget <- function(var) {
+jlvalue_get <- function(var) {
   if (!.jlrunning()) .jlinit()
   res <- jlvalue_eval(var)
   return(res)
 }
 
-jlset <- function(var, value, vector = FALSE) {
+jlvalue_set <- function(var, value, vector = FALSE) {
   if (!.jlrunning()) .jlinit()
   jlval <- jlvalue(value)
   .External("jl4R_set_global_variable", var, jlval, PACKAGE = "jl4R")
   return(invisible())
 }
 
-# jltrycall safe version of jlcall
+# jltrycall safe version of jlvalue_call
 
 jltrycall <- function(meth, ...) {
   args <- jl_rexprs2(substitute(list(...)), parent.frame())
@@ -60,14 +61,16 @@ jltrycall <- function(meth, ...) {
   .jlvalue_trycall(jlvalue(meth), jl(lapply(args, jl)), .RNamedList2jlNamedTuple(kwargs))
 }
 
+jltrycallR <- function(meth, ...) toR(jltrycall(meth, ...))
+
 # apply a method call 
-jlcall <- function(meth , ...) {
+jlvalue_call <- function(meth , ...) {
     args <- list(...)
     if (!is.character(meth)) {
         error("No julia method specified!")
     }
     if (length(args) > 3) {
-      jlvalue_call(meth, ...)
+      .jlvalue_call(meth, ...)
     } else {
       switch(length(args) + 1,
           .jlvalue_call0(meth),
@@ -79,17 +82,4 @@ jlcall <- function(meth , ...) {
     }
 }
 
-jlR_unsafe <- function(expr) toR(jl_unsafe(expr))
-jlRcall <- function(meth , ...) toR(jlcall(meth, ...))
-
-jl2R <- function(expr) .jleval2R(.jlsafe(expr))
-jl2R_unsafe <- function(expr) .jleval2R(expr)
-
-jlrun <- function(expr) {
-  if(!.jlrunning()) .jlinit()
-  invisible(.External("jl4R_run", .jlsafe(expr), PACKAGE = "jl4R"))
-}
-
-jlshow <- function(jlval) invisible(jlcall("show",jlval))
-
-jldisplay <- function(jlval) invisible(jlcall("display",jlval))
+jlvalue_callR <- function(meth , ...) toR(jlvalue_call(meth, ...))

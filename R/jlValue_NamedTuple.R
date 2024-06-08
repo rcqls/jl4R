@@ -13,11 +13,11 @@ toR.NamedTuple <- function(jlval) {
     return(obj)
 }
 
-names.NamedTuple <- function(jlval) jlRcall("keys",jlval)
+names.NamedTuple <- function(jlval) jlvalue_callR("keys",jlval)
 
 "[.NamedTuple" <- function(jlval, field) {
      if (field %in% names(jlval)) {
-        jlcall("getfield",jlval,jlsymbol(field))
+        jlvalue_call("getfield",jlval,jlsymbol(field))
     } else {
         NULL
     }

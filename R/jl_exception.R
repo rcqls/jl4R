@@ -1,5 +1,5 @@
 jlvalue_or_jlexception <-  function(code, jlval) { 
-    if( toR(jlcall("<:", jltypeof(jlval) , .jlvalue_eval("Exception")))) {
+    if( toR(jlvalue_call("<:", jltypeof(jlval) , .jlvalue_eval("Exception")))) {
         jlexception(code, jlval)
     } else {
         jlval

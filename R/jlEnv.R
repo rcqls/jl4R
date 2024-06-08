@@ -17,13 +17,13 @@ jlEnv <- function() get("jl", envir = globalenv())
 #     #     key <- substr(key,2,nchar(key) - 1)
 #     #     function(...) {jlnew(key, ...)}
 #     # } else {
-#     #     function(...) {jlcall(key, ...)}
+#     #     function(...) {jlvalue_call(key, ...)}
 #     # }
 #     if(class(substitute(key)) == "character") {
 #         function(...) {jlnew(key, ...)}
 #     } else {
 #         key <- deparse(substitute(key))
-#         function(...) {jlcall(key, ...)}
+#         function(...) {jlvalue_call(key, ...)}
 #     }
 # }
 
@@ -37,22 +37,19 @@ jlEnv <- function() get("jl", envir = globalenv())
         function(...) gen
     } else {
         function(...) {
-            args <- jl_rexprs2(substitute(list(...)), parent.frame())
-            if(any(sapply(args, is.jlexception))) {
-                jlexceptions(args)
-            } else {
-                do.call("jlcall", c(key, lapply(args, jl)))
-            }
+            # args <- jl_rexprs2(substitute(list(...)), parent.frame())
+            # if(any(sapply(args, is.jlexception))) {
+            #     jlexceptions(args)
+            # } else {
+            #     do.call("jlvalue_call", c(key, lapply(args, jl)))
+            # }
+            jlval <- jltrycall(key, ...)
+            jlvalue_or_jlexception(match.call(), jlval)
         }
     }
 }
 
-
-# `@.jlEnv` <- function(obj, key) function(...) {
-#     args <- c(key, jl_rexprs(substitute(list(...)), list(...)))
-#     do.call("jlcall", args)
-# }
-
+## TODO: same spirit than jltrycall or at least jl_rexprs2
 `[.jlEnv` <- function(obj, key) {
     if(class(substitute(key)) != "character") {
         key <- deparse(substitute(key))
@@ -66,12 +63,12 @@ jlEnv <- function() get("jl", envir = globalenv())
 
 `$.jlEnv` <- function(obj, field) {
     field <- as.character(substitute(field))
-    jlget(field)
+    jlvalue_get(field)
 }
 
 `$<-.jlEnv` <- function(obj, field, value) {
     field <- as.character(substitute(field))
-    jlset(field, value)
+    jlvalue_set(field, value)
     obj
 }
 

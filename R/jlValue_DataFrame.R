@@ -5,17 +5,17 @@ jlDataFrame <- function(...) {
 }
 
 toR.DataFrame <- function(jlval) {
-    nms <- toR(jlcall("names",jlval))
+    nms <- toR(jlvalue_call("names",jlval))
     res <- list()
     for(nm in nms) {
-        res[[nm]] <- jlRcall("getindex",jlval, jlcolon(), jlsymbol(nm))
+        res[[nm]] <- jlvalue_callR("getindex",jlval, jlcolon(), jlsymbol(nm))
     }
     attr(res,"row.names") <- as.character(1:length(res[[1]]))
     class(res) <- "data.frame"
     res
 }
 
-names.DataFrame <- function(jlval) jlRcall("names",jlval)
+names.DataFrame <- function(jlval) jlvalue_callR("names",jlval)
 
 "[.DataFrame" <- function(jlval, i, field) {
     if(missing(field)) {
@@ -25,7 +25,7 @@ names.DataFrame <- function(jlval) jlRcall("names",jlval)
         i <- jlvalue_eval(as.character(i))
     }
     if (field %in% names(jlval)) {
-        jlcall("getindex",jlval, i, jlsymbol(field))
+        jlvalue_call("getindex",jlval, i, jlsymbol(field))
     } else {
         NULL
     }

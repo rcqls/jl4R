@@ -403,21 +403,22 @@ jl_value_t* jl_eval2jl(SEXP args) {
   return res;
 }
 
-SEXP jl4R_eval2R(SEXP args)
-{
-  jl_value_t *res=NULL;
-  SEXP resR;
-  JL_GC_PUSH1(&res);
-  res = jl_eval2jl(args);
+// USE toR instead
+// SEXP jl4R_eval2R(SEXP args)
+// {
+//   jl_value_t *res=NULL;
+//   SEXP resR;
+//   JL_GC_PUSH1(&res);
+//   res = jl_eval2jl(args);
   
-  resR=jl_value_to_SEXP(res);
-  if(res==NULL) {
-    if(resR != R_NilValue) resR=R_NilValue;
-    else  resR=R_NilValue;//newJLObj(res);
-  }
-  JL_GC_POP();
-  return resR;
-}
+//   resR=jl_value_to_SEXP(res);
+//   if(res==NULL) {
+//     if(resR != R_NilValue) resR=R_NilValue;
+//     else  resR=R_NilValue;//newJLObj(res);
+//   }
+//   JL_GC_POP();
+//   return resR;
+// }
 
 SEXP jl4R_run(SEXP args)
 {
@@ -881,7 +882,7 @@ static const R_CMethodDef cMethods[] = {
 static const R_ExternalMethodDef externalMethods[] = {
   {"jl4R_init",(DL_FUNC) &jl4R_init,-1},
   {"jl4R_exit",(DL_FUNC) &jl4R_exit,-1},
-  {"jl4R_eval2R",(DL_FUNC) &jl4R_eval2R,-1},
+  // {"jl4R_eval2R",(DL_FUNC) &jl4R_eval2R,-1},
   {"jl4R_run",(DL_FUNC) &jl4R_run,-1},
   {"jl4R_set_global_variable",(DL_FUNC)&jl4R_set_global_variable,-1},
    // {"jl4R_as_Rvector",(DL_FUNC)&jl4R_as_Rvector,-1},

@@ -7,11 +7,11 @@ jlvalue.double <- jlvalue.integer <- jlvalue.logical <- jlvalue.character <-func
         if(is.null(dim(obj))) {
             jlval
         } else {
-            splatreshape <- jlcall("splat", jlvalue_eval("reshape"))
+            splatreshape <- jlvalue_call("splat", jlvalue_eval("reshape"))
             args <- jlvalue_eval("[]")
-            jlcall("push!", args, jlval)
+            jlvalue_call("push!", args, jlval)
             for(d in dim(obj)) {
-                jlcall("push!", args, jl(as.integer(d)))
+                jlvalue_call("push!", args, jl(as.integer(d)))
             }
             jlvalue_func1(splatreshape, args)
         }

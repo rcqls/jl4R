@@ -1,34 +1,34 @@
+jlshow <- function(jlval) invisible(jlvalue_call("show",jlval))
+
+jldisplay <- function(jlval) invisible(jlvalue_call("display",jlval))
+
 jlsymbol <- function(field) {
     if(!.jlrunning()) .jlinit()
     res <- .External("jl4R_jl_symbol", field, PACKAGE = "jl4R")
     res
 }
 
-jlcolon <- function() jl_unsafe(":")
+jlcolon <- function() jlvalue_eval_unsafe(":")
 
-## TODO: jl_methods <- function(meth, ...) {
-##  jlEnv()@size(jlEnv()@methods(jl(`names`),jl(`[Array]`)))
-## }
-## Struct facility
 
 jlisstructtype <- function(jlval) {
-    jlcall("isstructtype", jlval)
+    jlvalue_call("isstructtype", jlval)
 }
 
 jlfieldnames <- function(jlval) {
-    jlcall("fieldnames", jlcall("typeof", jlval))
+    jlvalue_call("fieldnames", jlvalue_call("typeof", jlval))
 }
 
 jlgetfield <- function(jlval, field) {
-    jlcall("getfield", jlval, jlsymbol(field))
+    jlvalue_call("getfield", jlval, jlsymbol(field))
 }
 
 jltypeof <- function(jlval) {
     if(!.jlrunning()) .jlinit()
     # res <- .External("jl4R_typeof2R", jlval, PACKAGE = "jl4R")
-    jlcall("typeof", jlval)
+    jlvalue_call("typeof", jlval)
 }
-jlstring <- function(jlval) jlcall("string", jlval)
+jlstring <- function(jlval) jlvalue_call("string", jlval)
 
 jlRtypeof <- function(jlval) jlRstring(jltypeof(jlval))
 jlRstring <- function(jlval) toR(jlstring(jlval))
