@@ -23,13 +23,11 @@ jl_rexprs <- function(rexprs, objs) { # rexpr is generally the result of substit
 ## jl() would benefit too of jl_rexpr2 instead of jl_rexpr 
 
 jl_rexpr2 <- function(rexpr, parent_envir= parent.frame()) { # rexpr is generally the result of substitute(obj) 
-    # 
-    print(list(rexpr=rexpr,class=class(rexpr)))
+    # print(list(rexpr=rexpr,class=class(rexpr)))
     if (class(rexpr) == "name") {
         obj <- deparse(rexpr)
         jlval <- jlvalue_eval(obj)
-        # 
-        print(list(obj=obj, isjlf=is.jlfunction(jlval), robj = obj %in% ls(parent_envir), envir=ls(parent_envir)))
+        # print(list(obj=obj, isjlf=is.jlfunction(jlval), robj = obj %in% ls(parent_envir), envir=ls(parent_envir)))
         if(is.jlfunction(jlval)$ok) {
            jlfunction(jlval) 
         } else if (obj %in% ls(parent_envir) ) {
@@ -50,8 +48,10 @@ jl_rexpr2 <- function(rexpr, parent_envir= parent.frame()) { # rexpr is generall
 
 jl_rexprs2 <- function(rexprs, parent_envir) { # rexpr is generally the result of substitute(obj) 
     rexprs <- as.list(rexprs)[-1]
-    lapply(seq_along(rexprs), function(i) jl_rexpr2(rexprs[[i]], parent_envir))
-
+    nms <- names(rexprs)
+    res <- lapply(seq_along(rexprs), function(i) jl_rexpr2(rexprs[[i]], parent_envir))
+    names(res) <- nms
+    res
 }
 
 .jlmethod <- function(meth, value) paste0(meth,"(",value,")")

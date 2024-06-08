@@ -13,12 +13,12 @@ jlvalue_eval <- function(obj, ...) {
     if (!.jlrunning()) .jlinit()
     if (length(obj) == 1 && is.character(obj)) {
         jlval <- .jleval2jlvalue(.jlsilentsafe(obj))
-        if( toR(jlcall("<:", jltypeof(jlval) , .jlvalue_eval("Exception")))) {
-            jlexception(obj, jlval)
-        } else {
-            jlval
-        }
-
+        # if( toR(jlcall("<:", jltypeof(jlval) , .jlvalue_eval("Exception")))) {
+        #     jlexception(obj, jlval)
+        # } else {
+        #     jlval
+        # }
+        jlvalue_or_jlexception(obj, jlval)
     } else {
         warning("Bad input for jlvalue_eval function!")
         NULL

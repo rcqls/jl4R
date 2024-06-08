@@ -8,7 +8,7 @@ export(
   jlvalue, is.jlvalue,
   jlfunction, is.jlfunction,
   R, toR,
-  jlrun, jlcall,
+  jlrun, jlcall, jltrycall,
   jlset, jlget,
   jlshow, jldisplay,
   jlusing, jlpkg,

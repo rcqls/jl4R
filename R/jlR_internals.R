@@ -32,6 +32,7 @@
 }
 
 .RNamedList2jlNamedTuple <- function(obj) {
+    if(length(obj)==0) return(jlTuple())
     vars <- list()
     types <- c()
     for (nm in names(obj)) {

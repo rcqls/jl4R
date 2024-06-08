@@ -45,6 +45,21 @@ jlset <- function(var, value, vector = FALSE) {
   return(invisible())
 }
 
+# jltrycall safe version of jlcall
+
+jltrycall <- function(meth, ...) {
+  args <- jl_rexprs2(substitute(list(...)), parent.frame())
+  ## print(args)
+  nmargs <- names(args)
+  if(is.null(nmargs)) nmargs <- rep("",length(args))
+  kwargs <- args[nmargs != ""]
+  args <- args[nmargs == ""]
+  ## print(list(args=args, kwargs=kwargs))
+  ## print(lapply(args, jl))
+  ## print(.RNamedList2jlNamedTuple(kwargs))
+  .jlvalue_trycall(jlvalue(meth), jl(lapply(args, jl)), .RNamedList2jlNamedTuple(kwargs))
+}
+
 # apply a method call 
 jlcall <- function(meth , ...) {
     args <- list(...)

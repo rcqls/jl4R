@@ -1,3 +1,11 @@
+jlvalue_or_jlexception <-  function(code, jlval) { 
+    if( toR(jlcall("<:", jltypeof(jlval) , .jlvalue_eval("Exception")))) {
+        jlexception(code, jlval)
+    } else {
+        jlval
+    }
+ }
+
 jlexception <- function(code, jlval) {
      exc <- list(
         code = code,

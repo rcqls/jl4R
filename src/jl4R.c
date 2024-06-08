@@ -723,6 +723,24 @@ SEXP jl4R_jlvalue_call(SEXP jl_meth, SEXP jl_args, SEXP jl_nargs) {
   return resR;
 }
 
+SEXP jl4R_jlvalue_trycall(SEXP args) {
+  jl_value_t *jlv=NULL, *res=NULL, *jlarg=NULL, *jlarg2=NULL;
+  jl_function_t *func=NULL;
+  SEXP resR;
+
+  jl_module_t *jl_jl4r_module = (jl_module_t*)jl_get_global(jl_main_module, jl_symbol("JL4R"));
+  func = jl_get_function(jl_jl4r_module, "jltrycall");
+
+  JL_GC_PUSH4(&jlv,&res,&jlarg,&jlarg2);
+  jlv=(jl_value_t*)get_preserved_jlvalue_from_R_ExternalPtrAddr(CADR(args));
+  jlarg=(jl_value_t*)get_preserved_jlvalue_from_R_ExternalPtrAddr(CADDR(args));
+  jlarg2=(jl_value_t*)get_preserved_jlvalue_from_R_ExternalPtrAddr(CADDDR(args));
+  res = jl_call3(func, jlv, jlarg, jlarg2);
+  resR=(SEXP)jlvalue(res);
+  JL_GC_POP();
+  return resR;
+}
+
 SEXP jl4R_jlvalue_func_call(SEXP jl_func, SEXP jl_args, SEXP jl_nargs) {
   int nargs;
   jl_value_t **args;
@@ -874,6 +892,7 @@ static const R_ExternalMethodDef externalMethods[] = {
   {"jl4R_jlvalue_call2",(DL_FUNC) &jl4R_jlvalue_call2,-1},
   {"jl4R_jlvalue_call3",(DL_FUNC) &jl4R_jlvalue_call3,-1},
   {"jl4R_jlvalue_func_call1",(DL_FUNC) &jl4R_jlvalue_func_call1,-1},
+  {"jl4R_jlvalue_trycall",(DL_FUNC) &jl4R_jlvalue_trycall,-1},
   {"jl4R_jlvalue2R",(DL_FUNC) &jl4R_jlvalue2R,-1},
   {"jl4R_typeof2R",(DL_FUNC) &jl4R_typeof2R,-1},
   {"jl4R_jl_symbol",(DL_FUNC) &jl4R_jl_symbol,-1},
