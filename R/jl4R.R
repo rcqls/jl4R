@@ -1,6 +1,8 @@
 ## IMPORTANT
 ## 1) jl(`<multiline julia expression>`) redirect to jlvalue_eval("<multiline julia expression>")
 ## 2) jl(<R object>) is redirected to jlvalue(<RObject>)
+
+
 jl <- function(obj, ..., name_class = TRUE) {
   if (name_class && !(deparse(substitute(obj)) %in% ls(parent.frame()))) {
     return(jl_rexpr(substitute(obj), obj, ...))
@@ -11,6 +13,21 @@ jl <- function(obj, ..., name_class = TRUE) {
 jlR <- function(obj, ..., name_class = TRUE) {
   if (name_class && !(deparse(substitute(obj)) %in% ls(parent.frame()))) {
     res <- jl_rexpr(substitute(obj), ...)
+    if (!is.null(res)) return(toR(res))
+  }
+  toR(jlvalue(obj, ...))
+}
+
+jl2 <- function(obj, ..., name_class = TRUE) {
+  if (name_class && !(deparse(substitute(obj)) %in% ls(parent.frame()))) {
+    return(jl_rexpr2(substitute(obj), parent.frame()))
+  }
+  jlvalue(obj)
+}
+
+jl2R <- function(obj, ..., name_class = TRUE) {
+  if (name_class && !(deparse(substitute(obj)) %in% ls(parent.frame()))) {
+    res <- jl_rexpr2(substitute(obj), parent.frame())
     if (!is.null(res)) return(toR(res))
   }
   toR(jlvalue(obj, ...))
@@ -28,8 +45,7 @@ jlvalue.default <- function(expr, ...) {
   NULL
 }
 
-R <- function(jlval) UseMethod("toR")
-toR <- function(jlval) UseMethod("toR")
+R <- toR <- function(jlval) UseMethod("toR")
 
 toR.default <- function(obj) obj
 
@@ -48,9 +64,9 @@ jlvalue_set <- function(var, value, vector = FALSE) {
 
 # jltrycall safe version of jlvalue_call
 
-jltrycall <- function(meth, ...) {
-  args <- jl_rexprs2(substitute(list(...)), parent.frame())
-  ## print(args)
+jltrycall <- function(meth, ..., parent_envir =  parent.frame()) {
+  args <- jl_rexprs2(substitute(list(...)), parent_envir)
+  ## print(list(jltcargs=args, call=match.call(), s = substitute(list(...)),env=ls(parent_envir)))
   nmargs <- names(args)
   if(is.null(nmargs)) nmargs <- rep("",length(args))
   kwargs <- args[nmargs != ""]

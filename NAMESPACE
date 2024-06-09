@@ -13,15 +13,15 @@ export(
   jlfunction, is.jlfunction,
   jlvalue_set, jlvalue_get,
   ## User sugar
-  jlshow, jldisplay,
   jlusing, jlpkg,
   jlpkgisinstalled, jlpkgadd, 
   is.Struct,
   jltypeof, jlstring,
-  jlRtypeof, jlRstring,
+  jltypeofR, jlstringR,
   jlArray, jlCategoricalArray, jlDataFrame,
   jlDict, jlTuple, jlNamedTuple, jlStruct,
   jlcolon, jlsymbol,
+  jlshow, jldisplay,
   rand,
   ## 
   rexpr2jlexpr
@@ -37,6 +37,7 @@ S3method(rand, default)
 S3method("jlvalue",default)
 S3method("jlvalue",jlvalue)
 S3method("jlvalue",jlfunction)
+S3method("jlvalue",jlexception)
 S3method("jlvalue",name)
 S3method("jlvalue",data.frame)
 S3method("jlvalue",list)

@@ -24,6 +24,14 @@ jlvalue_eval_unsafe <- function(expr) {
     .jleval2jlvalue(expr)
 }
 
+jlvalue_invisible <- function(jlval) {
+    if(jlvalue_callR("isnothing", jlval)) {
+        invisible(jlval)
+    } else {
+        jlval
+    }
+}
+
 jlvalue.jlvalue <- function(jlval, ...) jlval
 
 ## used to evaluate jl(as.name("<julia expresssion>"))

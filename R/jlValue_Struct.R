@@ -8,10 +8,10 @@ jlStruct <- function(datatype, ...) {
 }
 
 is.Struct <- function(jlval) {
-    jlRisstructtype(jltypeof(jlval))
+    R(jlvalue_isstructtype(jlvalue_typeof(jlval)))
 }
 
-names.Struct <- function(jlval) list(type=jlRtypeof(jlval), fields=jlRfieldnames(jltypeof(jlval)))
+names.Struct <- function(jlval) list(type=R(jlvalue_typeof(jlval)), fields=jlfieldnamesR(jlvalue_typeof(jlval)))
 
 "[.Struct" <- function(jlval, field) {
     if (field %in% names(jlval)) {

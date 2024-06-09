@@ -1,8 +1,10 @@
 jlvalue_or_jlexception <-  function(code, jlval) { 
-    if( toR(jlvalue_call("<:", jltypeof(jlval) , .jlvalue_eval("Exception")))) {
+    if( toR(jlvalue_call("<:", jlvalue_call("typeof", jlval), .jlvalue_eval("Exception")))) {
         jlexception(code, jlval)
     } else {
-        jlval
+        attr(jlval, "code") <- code
+        jlvalue_invisible(jlval)
+        ##jlval
     }
  }
 
@@ -11,9 +13,11 @@ jlexception <- function(code, jlval) {
         code = code,
         err = jlval
     )
-    class(exc) <- c(toR(jlstring(jltypeof(jlval))) , "jlexception")
+    class(exc) <- c(toR(jlvalue_call("string", jlvalue_call("typeof",jlval))) , "jlexception")
     exc
 }
+
+jlvalue.jlexception <- function(jlex) jlex$err
 
 print.jlexception <- function(obj, ...) {
     cat("Julia Exception:",class(obj)[[1]],"\n")

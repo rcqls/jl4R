@@ -29,7 +29,7 @@ jl_rexpr2 <- function(rexpr, parent_envir= parent.frame()) { # rexpr is generall
         jlval <- jlvalue_eval(obj)
         # print(list(obj=obj, isjlf=is.jlfunction(jlval), robj = obj %in% ls(parent_envir), envir=ls(parent_envir)))
         if(is.jlfunction(jlval)$ok) {
-           jlfunction(jlval) 
+           jlfunction(jlval, parent_envir) 
         } else if (obj %in% ls(parent_envir) ) {
             obj <- eval(rexpr, envir=parent_envir)
             jlvalue(obj)
@@ -38,6 +38,7 @@ jl_rexpr2 <- function(rexpr, parent_envir= parent.frame()) { # rexpr is generall
         }
     } else {
         if(class(rexpr) == "call") {
+            # print(list(rexpr=rexpr, envir=ls(parent_envir)))
             obj <- eval(rexpr, envir = parent_envir)
             jlvalue(obj)
         } else {
@@ -52,6 +53,15 @@ jl_rexprs2 <- function(rexprs, parent_envir) { # rexpr is generally the result o
     res <- lapply(seq_along(rexprs), function(i) jl_rexpr2(rexprs[[i]], parent_envir))
     names(res) <- nms
     res
+}
+
+
+.jlsafe <- function(expr) {
+  paste0("try\n", expr, "\ncatch e\n showerror(stdout,e); e\n end")
+}
+
+.jlsilentsafe <- function(expr) {
+  paste0("try\n", expr, "\ncatch e\n e\n end")
 }
 
 .jlmethod <- function(meth, value) paste0(meth,"(",value,")")
@@ -81,11 +91,3 @@ jl_rexprs2 <- function(rexprs, parent_envir) { # rexpr is generally the result o
 # .jlsafe <- function(expr) {
 #   paste0("try\n", .jlglobalsoft(expr), "\ncatch e\n showerror(stdout,e)\n end")
 # }
-
-.jlsafe <- function(expr) {
-  paste0("try\n", expr, "\ncatch e\n showerror(stdout,e); e\n end")
-}
-
-.jlsilentsafe <- function(expr) {
-  paste0("try\n", expr, "\ncatch e\n e\n end")
-}

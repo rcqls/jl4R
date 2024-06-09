@@ -37,7 +37,7 @@
     types <- c()
     for (nm in names(obj)) {
         vars[[nm]] <- jlvalue(obj[[nm]])
-        types <- c(types, jlRtypeof(vars[[nm]]))
+        types <- c(types, jltypeofR(vars[[nm]]))
     }
     jlstruct <- paste0("@NamedTuple{", paste(names(obj), "::", types, collapse=",", sep=""), "}") 
     args <- c(jlstruct, unname(vars))

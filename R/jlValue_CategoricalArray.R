@@ -4,7 +4,7 @@ jlCategoricalArray <- function(fa) {
 
 toR.CategoricalArray <- function(jlval) {
     pool <- jlgetfield(jlval, "pool")
-    res <- jlRgetfield(jlval, "refs")
+    res <- jlgetfieldR(jlval, "refs")
     attr(res,"levels") <- jlvalue_callR("levels", pool)
     class(res) <- "factor"
     res

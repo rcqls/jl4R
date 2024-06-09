@@ -36,6 +36,7 @@ jlEnv <- function() get("jl", envir = globalenv())
     if(is.jlexception(gen)) {
         function(...) gen
     } else {
+        parent_envir <- parent.frame()
         function(...) {
             # args <- jl_rexprs2(substitute(list(...)), parent.frame())
             # if(any(sapply(args, is.jlexception))) {
@@ -43,7 +44,7 @@ jlEnv <- function() get("jl", envir = globalenv())
             # } else {
             #     do.call("jlvalue_call", c(key, lapply(args, jl)))
             # }
-            jlval <- jltrycall(key, ...)
+            jlval <- jltrycall(key, ..., parent_envir = parent_envir)
             jlvalue_or_jlexception(match.call(), jlval)
         }
     }
