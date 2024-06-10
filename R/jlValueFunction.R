@@ -11,7 +11,7 @@ jlfunction <- function(jlval, parent_envir = parent.frame(3)) {
         ## parent_envir is required for the next closure to know parent_envir inside
         jlf <- function(...) {
             jlval <- jltrycall(key, ..., parent_envir = parent_envir)
-            jlvalue_or_jlexception(match.call(), jlval)
+            jlval #jlvalue_or_jlexception(match.call(), jlval)
         }
         body(jlf)[[2]][[3]][[2]] <- key
         attributes(jlf) <- attrsR

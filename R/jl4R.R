@@ -74,7 +74,8 @@ jltrycall <- function(meth, ..., parent_envir =  parent.frame()) {
   ## print(list(args=args, kwargs=kwargs))
   ## print(lapply(args, jl))
   ## print(.RNamedList2jlNamedTuple(kwargs))
-  .jlvalue_trycall(jlvalue(meth), jl(lapply(args, jl)), .RNamedList2jlNamedTuple(kwargs))
+  jlval <- .jlvalue_trycall(jlvalue(meth), jl(lapply(args, jl)), .RNamedList2jlNamedTuple(kwargs))
+  jlvalue_or_jlexception(match.call(), jlval)
 }
 
 jltrycallR <- function(meth, ...) toR(jltrycall(meth, ...))

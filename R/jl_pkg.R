@@ -13,6 +13,15 @@ jlusing <- function(...) {
   jlrun(paste0("using ",paste(pkgs,collapse=", ")))
 }
 
+# if package is specified the file path is relative to inst folder package
+jlinclude <- function(jlfile, package="") {
+  if(package != "") jlfile <- system.file(jlfile, package=package)
+  if(jlfile != "") {
+    cmd <-  paste0('include("',jlfile,'")')
+    jlrun(cmd)
+  }
+}
+
 ## Trick for jlusing badly called because of dlopen error
 jlusing_force <- function(pkg, n = 10) {
   repeat {

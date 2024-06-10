@@ -25,7 +25,8 @@ print.jlexception <- function(obj, ...) {
 
 summary.jlexception <- function(obj) {
     cat("Julia Exception:",class(obj)[[1]],"\n")
-    cat(toR(jlstring(obj$err)),"\n")
+    invisible(jl(showerror)(stdout, obj$err))
+    # cat(toR(jlstring(obj$err)),"\n")
 }
 
 is.jlexception <- function(exc) inherits(exc, "jlexception")
