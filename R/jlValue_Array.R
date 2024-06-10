@@ -16,3 +16,11 @@ length.Array <- function(jlval) {
         NULL
     }
 }
+
+`[.AbstractArray` <- function(jlval, index) {
+    jltrycall("getindex", jlval, index)
+}
+
+# `[<-.AbstractArray` <- function(jlval, index, value) {
+#     jltrycall("setindex!", jlval, value, index)
+# }

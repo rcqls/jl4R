@@ -5,12 +5,22 @@
     res
 }
 
-.jleval2jlvalue <- function(expr) {
+.jleval2jlvalue_ <- function(expr) {
   if(!.jlrunning()) .jlinit()
   jlval <- .External("jl4R_eval2jlvalue", expr, PACKAGE = "jl4R")
+  return(jlval)
+}
+
+.jleval2jlvalue <- function(expr) {
+  if(!.jlrunning()) .jlinit()
+  jlval <- .jleval2jlvalue_(expr)
   if(is.Struct(jlval)) {
+    addclass <- "Struct"
+    if(jlvalue_callR("isa",jlval,.jleval2jlvalue_("AbstractArray"))) {
+        addclass <- c("AbstractArray", addclass)
+    }
     class(jlval) <- c(class(jlval)[1:(length(class(jlval)) - 1)],
-        "Struct", "jlvalue")
+        addclass, "jlvalue")
   }
   return(jlval)
 }

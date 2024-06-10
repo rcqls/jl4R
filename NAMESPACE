@@ -79,6 +79,8 @@ S3method("$",Dict)
 
 S3method("length", Array)
 S3method("[", Array)
+S3method("[",AbstractArray)
+# S3method("[<-",AbstractArray)
 
 S3method("names", DataFrame)
 S3method("[", DataFrame)
