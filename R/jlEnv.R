@@ -32,7 +32,7 @@ jlEnv <- function() get("jl", envir = globalenv())
         key <- deparse(substitute(key))
     }
     ## check if key is a generic function
-    gen = jlvalue_eval(key)
+    gen = jleval(key)
     if(is.jlexception(gen)) {
         function(...) gen
     } else {
@@ -74,9 +74,9 @@ jlEnv <- function() get("jl", envir = globalenv())
 }
 
 `names.jlEnv` <- function(obj) {
-    ## setdiff(R(jlvalue_eval("names(Main)")), c("Base","Core","Main","display_buffer","jl4R_ANSWER","preserved_refs"))
+    ## setdiff(R(jleval("names(Main)")), c("Base","Core","Main","display_buffer","jl4R_ANSWER","preserved_refs"))
     # No Module returned
-    setdiff(R(jlvalue_eval("tmp=names(Main);tmp[.!(convert.(Bool, isa.(eval.(tmp),Module)))]")), c("display_buffer","jl4R_ANSWER","preserved_refs"))
+    setdiff(R(julia_eval("tmp=names(Main);tmp[.!(convert.(Bool, isa.(eval.(tmp),Module)))]")), c("display_buffer","jl4R_ANSWER","preserved_refs"))
 }
 
 `print.jlEnv` <- function(obj, ...) {

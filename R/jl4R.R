@@ -1,5 +1,5 @@
 ## IMPORTANT
-## 1) jl(`<multiline julia expression>`) redirect to jlvalue_eval("<multiline julia expression>")
+## 1) jl(`<multiline julia expression>`) redirect to jleval("<multiline julia expression>")
 ## 2) jl(<R object>) is redirected to jlvalue(<RObject>)
 
 
@@ -33,16 +33,24 @@ jl2R <- function(obj, ..., name_class = TRUE) {
   toR(jlvalue(obj, ...))
 }
 
-jlrun <- function(expr) {
+# jlrun_safe <- function(expr) {
+#   if(!.jlrunning()) .jlinit()
+#   invisible(.External("jl4R_run", .jlsafe(expr), PACKAGE = "jl4R"))
+# }
+
+jlrun_ <- function(expr) {
   if(!.jlrunning()) .jlinit()
-  invisible(.External("jl4R_run", .jlsafe(expr), PACKAGE = "jl4R"))
+  invisible(.External("jl4R_run", expr, PACKAGE = "jl4R"))
 }
 
-jlvalue <- function(obj, ...) UseMethod("jlvalue", obj)
-
-jlvalue.default <- function(expr, ...) {
-  warning(paste0("No jlvalue conversion for ", expr, " !"))
-  NULL
+jlrun <- jlrun_with_jlexception <- function(expr) {
+  if(!.jlrunning()) .jlinit()
+  res <- .External("jl4R_run_with_exception", expr, PACKAGE = "jl4R")
+  if(!is.null(res)) {
+    res <- jlexception(expr, res)
+    summary(res)
+  }
+  invisible(res)
 }
 
 R <- toR <- function(jlval) UseMethod("toR")
@@ -51,7 +59,7 @@ toR.default <- function(obj) obj
 
 jlvalue_get <- function(var) {
   if (!.jlrunning()) .jlinit()
-  res <- jlvalue_eval(var)
+  res <- jleval(var)
   return(res)
 }
 
@@ -64,7 +72,7 @@ jlvalue_set <- function(var, value, vector = FALSE) {
 
 # jltrycall safe version of jlvalue_call
 
-jltrycall <- function(meth, ..., parent_envir =  parent.frame()) {
+jlcall <- jltrycall <- function(meth, ..., parent_envir =  parent.frame()) {
   args <- jl_rexprs2(substitute(list(...)), parent_envir)
   ## print(list(jltcargs=args, call=match.call(), s = substitute(list(...)),env=ls(parent_envir)))
   nmargs <- names(args)
@@ -78,7 +86,7 @@ jltrycall <- function(meth, ..., parent_envir =  parent.frame()) {
   jlvalue_or_jlexception(match.call(), jlval)
 }
 
-jltrycallR <- function(meth, ...) toR(jltrycall(meth, ...))
+jlcallR <- jltrycallR <- function(meth, ...) toR(jltrycall(meth, ...))
 
 # apply a method call 
 jlvalue_call <- function(meth , ...) {

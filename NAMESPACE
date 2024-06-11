@@ -3,9 +3,9 @@ useDynLib(jl4R, .registration = TRUE)
 # exportPattern("^\\jl_")
 # exportPattern("^\\jlR_")
 export(
-  jl, jlrun, jltrycall,
+  jl, jleval, jlrun, jlcall,
   R, toR, 
-  jlR, jltrycallR,
+  jlR, jlcallR, 
   ## unsafe function (closest to julia C API)
   jlvalue_eval,
   jlvalue, is.jlvalue,
