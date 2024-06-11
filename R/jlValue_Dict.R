@@ -5,7 +5,7 @@ jlDict <-  function(...) {
     vars <- list()
     pairs <- list()
     for (nm in names(obj)) {
-        vars[[nm]] <- jlvalue_eval(obj[[nm]])
+        vars[[nm]] <- jleval(obj[[nm]])
         pairs[[nm]] <- jlvalue_call("=>", jlsymbol(nm), vars[[nm]])
         jlvalue_call("push!", jlval, pairs[[nm]])
     }

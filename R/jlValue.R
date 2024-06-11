@@ -1,18 +1,23 @@
+jlvalue <- function(obj, ...) UseMethod("jlvalue", obj)
+
+jlvalue.default <- function(expr, ...) {
+  warning(paste0("No jlvalue conversion for ", expr, " !"))
+  NULL
+}
+
 ## Used to eval `<julia expression>` in jl function
-.jlvalue_eval <- function(obj, ...) {
-    if (!.jlrunning()) .jlinit()
+jlvalue_eval <- function(obj, ...) {
     if (length(obj) == 1 && is.character(obj)) {
-        .jleval2jlvalue(.jlsafe(obj))
+        .jlvalue_eval_addclass(obj)
     } else {
         warning("Bad input for .jlvalue_eval function!")
         NULL
     }
 }
 
-jlvalue_eval <- function(obj, ...) {
-    if (!.jlrunning()) .jlinit()
+jleval <- function(obj, ...) {
     if (length(obj) == 1 && is.character(obj)) {
-        jlval <- .jleval2jlvalue(.jlsilentsafe(obj))
+        jlval <- .jlvalue_eval_addclass(obj)
         jlvalue_or_jlexception(obj, jlval)
     } else {
         warning("Bad input for jlvalue_eval function!")
@@ -21,7 +26,7 @@ jlvalue_eval <- function(obj, ...) {
 }
 
 jlvalue_eval_unsafe <- function(expr) {
-    .jleval2jlvalue(expr)
+    .jlvalue_eval_addclass(expr)
 }
 
 jlvalue_invisible <- function(jlval) {
@@ -35,7 +40,7 @@ jlvalue_invisible <- function(jlval) {
 jlvalue.jlvalue <- function(jlval, ...) jlval
 
 ## used to evaluate jl(as.name("<julia expresssion>"))
-jlvalue.name <- function(name) jlvalue_eval(deparse(name))
+jlvalue.name <- function(name) jleval(deparse(name))
 
 is.jlvalue <- function(obj) inherits(obj,"jlvalue")
 

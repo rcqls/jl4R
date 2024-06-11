@@ -431,6 +431,17 @@ SEXP jl4R_run(SEXP args)
   return R_NilValue;
 }
 
+SEXP jl4R_run_with_exception(SEXP args)
+{
+  char *cmdString;
+
+  cmdString=(char*)CHAR(STRING_ELT(CADR(args),0));
+  jl_eval_string(cmdString);
+  if (jl_exception_occurred())
+    // printf("Julia Error: %s \n", jl_typeof_str(jl_exception_occurred()));
+    return jlvalue(jl_exception_occurred()); //jl_eval_string("nothing");
+  return R_NilValue;
+}
 
 /************ the converse **************/
 jl_value_t* Vector_SEXP_to_jl_array(SEXP ans) {
@@ -604,7 +615,7 @@ SEXP jlvalue(jl_value_t* jlval) {
   return ans;
 }
 
-SEXP jl4R_eval2jlvalue(SEXP args)
+SEXP jl4R_jlvalue_eval(SEXP args)
 {
   SEXP resR;
   jl_value_t *res=NULL;
@@ -884,10 +895,11 @@ static const R_ExternalMethodDef externalMethods[] = {
   {"jl4R_exit",(DL_FUNC) &jl4R_exit,-1},
   // {"jl4R_eval2R",(DL_FUNC) &jl4R_eval2R,-1},
   {"jl4R_run",(DL_FUNC) &jl4R_run,-1},
+  {"jl4R_run_with_exception",(DL_FUNC) &jl4R_run_with_exception,-1},
   {"jl4R_set_global_variable",(DL_FUNC)&jl4R_set_global_variable,-1},
    // {"jl4R_as_Rvector",(DL_FUNC)&jl4R_as_Rvector,-1},
   // {"jl4R_as_jlRvector",(DL_FUNC)&jl4R_as_jlRvector,-1},
-  {"jl4R_eval2jlvalue",(DL_FUNC) &jl4R_eval2jlvalue,-1},
+  {"jl4R_jlvalue_eval",(DL_FUNC) &jl4R_jlvalue_eval,-1},
   {"jl4R_jlvalue_call0",(DL_FUNC) &jl4R_jlvalue_call0,-1},
   {"jl4R_jlvalue_call1",(DL_FUNC) &jl4R_jlvalue_call1,-1},
   {"jl4R_jlvalue_call2",(DL_FUNC) &jl4R_jlvalue_call2,-1},

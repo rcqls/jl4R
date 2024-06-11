@@ -5,18 +5,18 @@
     res
 }
 
-.jleval2jlvalue_ <- function(expr) {
+.jlvalue_eval_ <- function(expr) {
   if(!.jlrunning()) .jlinit()
-  jlval <- .External("jl4R_eval2jlvalue", expr, PACKAGE = "jl4R")
+  jlval <- .External("jl4R_jlvalue_eval", expr, PACKAGE = "jl4R")
   return(jlval)
 }
 
-.jleval2jlvalue <- function(expr) {
+.jlvalue_eval_addclass <- function(expr) {
   if(!.jlrunning()) .jlinit()
-  jlval <- .jleval2jlvalue_(expr)
+  jlval <- .jlvalue_eval_(expr)
   if(is.Struct(jlval)) {
     addclass <- "Struct"
-    if(jlvalue_callR("isa",jlval,.jleval2jlvalue_("AbstractArray"))) {
+    if(jlvalue_callR("isa",jlval,.jlvalue_eval_("AbstractArray"))) {
         addclass <- c("AbstractArray", addclass)
     }
     class(jlval) <- c(class(jlval)[1:(length(class(jlval)) - 1)],
