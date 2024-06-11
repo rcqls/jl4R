@@ -76,7 +76,7 @@ jlEnv <- function() get("jl", envir = globalenv())
 `names.jlEnv` <- function(obj) {
     ## setdiff(R(jleval("names(Main)")), c("Base","Core","Main","display_buffer","jl4R_ANSWER","preserved_refs"))
     # No Module returned
-    setdiff(R(julia_eval("tmp=names(Main);tmp[.!(convert.(Bool, isa.(eval.(tmp),Module)))]")), c("display_buffer","jl4R_ANSWER","preserved_refs"))
+    setdiff(R(jlvalue_eval("tmp=names(Main);tmp[.!(convert.(Bool, isa.(eval.(tmp),Module)))]")), c("display_buffer","jl4R_ANSWER","preserved_refs"))
 }
 
 `print.jlEnv` <- function(obj, ...) {
