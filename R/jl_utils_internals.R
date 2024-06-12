@@ -2,7 +2,7 @@ jl_rexpr <- function(rexpr, obj, ...) { # rexpr is generally the result of subst
     if (class(rexpr) == "name") {
         obj <- deparse(rexpr)
         jlval <- jlvalue_eval(obj)
-        if(is.jlfunction(jlval)$ok) {
+        if(is.jlfunction(jlval)) {
            jlfunction(jlval) 
         } else {
             jlval
@@ -28,7 +28,7 @@ jl_rexpr2 <- function(rexpr, parent_envir= parent.frame()) { # rexpr is generall
         obj <- deparse(rexpr)
         jlval <- jlvalue_eval(obj)
         # print(list(obj=obj, isjlf=is.jlfunction(jlval), robj = obj %in% ls(parent_envir), envir=ls(parent_envir)))
-        if(is.jlfunction(jlval)$ok) {
+        if(is.jlfunction(jlval)) {
            jlfunction(jlval, parent_envir) 
         } else if (obj %in% ls(parent_envir) ) {
             obj <- eval(rexpr, envir=parent_envir)
