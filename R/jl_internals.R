@@ -30,6 +30,11 @@
     .External("jl4R_jlvalue_trycall", meth, jlargs, jlkwargs, PACKAGE = "jl4R")
 }
 
+.jlvalue_tryfunc <- function(meth, jlargs, jlkwargs = jlvalue_eval("[]")) {
+    if(!.jlrunning()) .jlinit()
+    .External("jl4R_jlvalue_tryfunc", meth, jlargs, jlkwargs, PACKAGE = "jl4R")
+}
+
 .jlvalue_call0 <- function(meth) {
     if(!.jlrunning()) .jlinit()
     .External("jl4R_jlvalue_call0", meth, PACKAGE = "jl4R")

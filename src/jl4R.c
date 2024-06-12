@@ -753,6 +753,24 @@ SEXP jl4R_jlvalue_trycall(SEXP args) {
   return resR;
 }
 
+SEXP jl4R_jlvalue_tryfunc(SEXP args) {
+  jl_value_t *res=NULL, *jlarg=NULL, *jlarg2=NULL;
+  jl_function_t *func=NULL, *jlv=NULL;
+  SEXP resR;
+
+  jl_module_t *jl_jl4r_module = (jl_module_t*)jl_get_global(jl_main_module, jl_symbol("JL4R"));
+  func = jl_get_function(jl_jl4r_module, "jltryfunc");
+
+  JL_GC_PUSH4(&jlv,&res,&jlarg,&jlarg2);
+  jlv = (jl_function_t*)get_preserved_jlvalue_from_R_ExternalPtrAddr(CADR(args));
+  jlarg=(jl_value_t*)get_preserved_jlvalue_from_R_ExternalPtrAddr(CADDR(args));
+  jlarg2=(jl_value_t*)get_preserved_jlvalue_from_R_ExternalPtrAddr(CADDDR(args));
+  res = jl_call3(func, jlv, jlarg, jlarg2);
+  resR=(SEXP)jlvalue(res);
+  JL_GC_POP();
+  return resR;
+}
+
 SEXP jl4R_jlvalue_func_call(SEXP jl_func, SEXP jl_args, SEXP jl_nargs) {
   int nargs;
   jl_value_t **args;
@@ -900,12 +918,13 @@ static const R_ExternalMethodDef externalMethods[] = {
    // {"jl4R_as_Rvector",(DL_FUNC)&jl4R_as_Rvector,-1},
   // {"jl4R_as_jlRvector",(DL_FUNC)&jl4R_as_jlRvector,-1},
   {"jl4R_jlvalue_eval",(DL_FUNC) &jl4R_jlvalue_eval,-1},
+  {"jl4R_jlvalue_trycall",(DL_FUNC) &jl4R_jlvalue_trycall,-1},
+  {"jl4R_jlvalue_tryfunc",(DL_FUNC) &jl4R_jlvalue_tryfunc,-1},
   {"jl4R_jlvalue_call0",(DL_FUNC) &jl4R_jlvalue_call0,-1},
   {"jl4R_jlvalue_call1",(DL_FUNC) &jl4R_jlvalue_call1,-1},
   {"jl4R_jlvalue_call2",(DL_FUNC) &jl4R_jlvalue_call2,-1},
   {"jl4R_jlvalue_call3",(DL_FUNC) &jl4R_jlvalue_call3,-1},
   {"jl4R_jlvalue_func_call1",(DL_FUNC) &jl4R_jlvalue_func_call1,-1},
-  {"jl4R_jlvalue_trycall",(DL_FUNC) &jl4R_jlvalue_trycall,-1},
   {"jl4R_jlvalue2R",(DL_FUNC) &jl4R_jlvalue2R,-1},
   {"jl4R_typeof2R",(DL_FUNC) &jl4R_typeof2R,-1},
   {"jl4R_jl_symbol",(DL_FUNC) &jl4R_jl_symbol,-1},

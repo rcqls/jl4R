@@ -27,4 +27,12 @@ function jltrycall(fname, args, kwargs)
     end;
 end
 
+function jltryfunc(f, args, kwargs)
+    try
+        f(args...; kwargs...);
+    catch e
+        e #showerror(stdout,e)
+    end;
+end
+
 end

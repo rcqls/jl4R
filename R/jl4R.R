@@ -86,7 +86,22 @@ jlcall <- jltrycall <- function(meth, ..., parent_envir =  parent.frame()) {
   jlvalue_or_jlexception(match.call(), jlval)
 }
 
+jlfunc <- jltryfunc <- function(meth, ..., parent_envir =  parent.frame()) {
+  args <- jl_rexprs2(substitute(list(...)), parent_envir)
+  ## print(list(jltcargs=args, call=match.call(), s = substitute(list(...)),env=ls(parent_envir)))
+  nmargs <- names(args)
+  if(is.null(nmargs)) nmargs <- rep("",length(args))
+  kwargs <- args[nmargs != ""]
+  args <- args[nmargs == ""]
+  ## print(list(args=args, kwargs=kwargs))
+  ## print(lapply(args, jl))
+  ## print(.RNamedList2jlNamedTuple(kwargs))
+  jlval <- .jlvalue_tryfunc(meth, jl(lapply(args, jl)), .RNamedList2jlNamedTuple(kwargs))
+  jlvalue_or_jlexception(match.call(), jlval)
+}
+
 jlcallR <- jltrycallR <- function(meth, ...) toR(jltrycall(meth, ...))
+jlfuncR <- jltryfuncR <- function(meth, ...) toR(jltryfunc(meth, ...))
 
 # apply a method call 
 jlvalue_call <- function(meth , ...) {
