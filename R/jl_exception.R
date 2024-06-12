@@ -3,7 +3,11 @@ jlvalue_or_jlexception <-  function(code, jlval) {
         jlexception(code, jlval)
     } else {
         attr(jlval, "code") <- code
-        jlvalue_invisible(jlval)
+        if(is.jlfunction(jlval)) {
+            jlfunction(jlval,parent_envir=parent.frame())
+        } else {
+            jlvalue_invisible(jlval)
+        }
         ##jlval
     }
  }
