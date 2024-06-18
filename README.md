@@ -2,6 +2,9 @@ Julia for R
 ================
 RCqls
 
+`WARNING`: jl4R moving to [Rulia](https://github.com/rcqls/Rulia.git) repository to design refactoring. 
+
+
 # Julia for R
 
 This is an attempt to embed the julia language in R. Actually, very
