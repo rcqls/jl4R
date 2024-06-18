@@ -4,18 +4,20 @@
 
 
 jl <- function(obj, ..., name_class = TRUE) {
-  if (name_class && !(deparse(substitute(obj)) %in% ls(parent.frame()))) {
+  name <- deparse(substitute(obj))
+  if( name_class && !is.variable(name, parent.frame())) {
     return(jl_rexpr(substitute(obj), obj, ...))
   }
-  jlvalue(obj, ...)
+  jlvalue_or_jlexception(name, jlvalue(obj, ...))
 }
 
 jlR <- function(obj, ..., name_class = TRUE) {
-  if (name_class && !(deparse(substitute(obj)) %in% ls(parent.frame()))) {
+  name <- deparse(substitute(obj))
+  if (name_class && !(is.variable(name, parent.frame()))) {
     res <- jl_rexpr(substitute(obj), ...)
     if (!is.null(res)) return(toR(res))
   }
-  toR(jlvalue(obj, ...))
+  toR(jlvalue_or_jlexception(name, jlvalue(obj, ...)))
 }
 
 jl2 <- function(obj, ..., name_class = TRUE) {

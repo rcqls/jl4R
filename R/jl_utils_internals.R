@@ -5,7 +5,7 @@ jl_rexpr <- function(rexpr, obj, ...) { # rexpr is generally the result of subst
         if(is.jlfunction(jlval)) {
            jlfunction(jlval) 
         } else {
-            jlval
+            jlvalue_or_jlexception(rexpr, jlval)
         }
     } else {
         jlvalue(obj, ...)
@@ -30,7 +30,7 @@ jl_rexpr2 <- function(rexpr, parent_envir= parent.frame()) { # rexpr is generall
         # print(list(obj=obj, isjlf=is.jlfunction(jlval), robj = obj %in% ls(parent_envir), envir=ls(parent_envir)))
         if(is.jlfunction(jlval)) {
            jlfunction(jlval, parent_envir) 
-        } else if (obj %in% ls(parent_envir) ) {
+        } else if(is.variable(obj, parent_envir)) {# (obj %in% ls(parent_envir) ) {
             obj <- eval(rexpr, envir=parent_envir)
             jlvalue(obj)
         } else {

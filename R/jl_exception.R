@@ -29,7 +29,7 @@ print.jlexception <- function(obj, ...) {
 
 summary.jlexception <- function(obj) {
     cat("Julia Exception:",class(obj)[[1]],"\n")
-    jl(showerror)(stdout, obj$err)
+    jlvalue_call("showerror", jlvalue_eval("stdout"), obj$err)
     invisible(cat("\n"))
     # cat(toR(jlstring(obj$err)),"\n")
 }

@@ -22,9 +22,11 @@ export(
   jlDict, jlTuple, jlNamedTuple, jlStruct,
   jlcolon, jlsymbol,
   jlshow, jldisplay,
-  rand,
-  ## 
-  rexpr2jlexpr
+  "%<:%", "%isa%",
+  rand, jl_set.seed,
+  ## extra
+  rexpr2jlexpr, 
+  jlvalue_capture_display # useful for testthat
 )
 
 S3method(print,jlvalue)

@@ -68,7 +68,7 @@ jl_value_t* get_preserved_jlvalue_from_R_ExternalPtrAddr(SEXP ans) {
 
 SEXP jl4R_init(SEXP args)
 {
-  char *julia_home_dir;
+  // char *julia_home_dir;
 
   if(!jl4R_julia_running) {
     // if(!isValidString(CADR(args)))
@@ -90,8 +90,8 @@ void jl4R_exit()
 {
   if(jl4R_julia_running) {
     jl_atexit_hook(0);
-    jl4R_julia_running=0;
-    printf("julia finalize!!!\n");
+    jl4R_julia_running = 0;
+    printf("julia stopped!!!\n");
   }
 }
 
