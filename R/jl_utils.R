@@ -57,3 +57,5 @@ jldisplay <- function(jlval) invisible(jltrycall("display",jlval))
 "%<:%" <- function(a, b) {args <- jl4R:::jl_rexprs2(substitute(list(a,b)), parent_envir=parent.frame());jl(`<:`)(args[[1]],args[[2]])}
 
 "%isa%" <- function(a, b) {args <- jl4R:::jl_rexprs2(substitute(list(a,b)), parent_envir=parent.frame());jl(isa)(args[[1]],args[[2]])}
+
+expect_jlequal <- function(jlval, res, ...) expect_equal(jl4R:::jlvalue_capture_display(jlval), paste0(res, "\n"), ...)

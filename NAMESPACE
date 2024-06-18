@@ -26,7 +26,7 @@ export(
   rand, jl_set.seed,
   ## extra
   rexpr2jlexpr, 
-  jlvalue_capture_display # useful for testthat
+  expect_jlequal # useful for testthat
 )
 
 S3method(print,jlvalue)
