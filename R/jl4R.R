@@ -13,23 +13,24 @@ jl <- function(obj, ..., name_class = TRUE) {
 
 jlR <- function(obj, ..., name_class = TRUE) {
   name <- deparse(substitute(obj))
-  if (name_class && !(is.variable(name, parent.frame()))) {
+  if (name_class && !is.variable(name, parent.frame())) {
     res <- jl_rexpr(substitute(obj), ...)
     if (!is.null(res)) return(toR(res))
   }
   toR(jlvalue_or_jlexception(name, jlvalue(obj, ...)))
 }
 
-jl2 <- function(obj, ..., name_class = TRUE) {
-  if (name_class && !(deparse(substitute(obj)) %in% ls(parent.frame()))) {
-    return(jl_rexpr2(substitute(obj), parent.frame()))
+jl2 <- function(obj, ..., parent_envir = parent.frame(), name_class = TRUE) {
+  name <- deparse(substitute(obj))
+  if (name_class && !is.variable(name, parent_envir)) {
+    return(jl_rexpr2(substitute(obj), parent_envir))
   }
-  jlvalue(obj)
+  jlvalue_or_jlexception(name, jlvalue(obj, ...))
 }
 
-jl2R <- function(obj, ..., name_class = TRUE) {
-  if (name_class && !(deparse(substitute(obj)) %in% ls(parent.frame()))) {
-    res <- jl_rexpr2(substitute(obj), parent.frame())
+jl2R <- function(obj, ..., parent_envir = parent.frame(), name_class = TRUE) {
+  if (name_class && !is.variable(name, parent_envir)) {
+    res <- jl_rexpr2(substitute(obj), parent_envir)
     if (!is.null(res)) return(toR(res))
   }
   toR(jlvalue(obj, ...))

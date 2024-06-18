@@ -5,16 +5,15 @@ jlvalue.default <- function(expr, ...) {
   NULL
 }
 
-## Used to eval `<julia expression>` in jl function
-jlvalue_eval <- function(obj, ...) {
-    if (length(obj) == 1 && is.character(obj)) {
-        .jlvalue_eval_addclass(obj)
-    } else {
-        warning("Bad input for .jlvalue_eval function!")
-        NULL
-    }
+########################
+## eval functions
+## 1) jlvalue mode 
+## IMPORTANT: the user knows that the argument is a character and the content is a valid julia code
+jlvalue_eval <- function(expr) {
+    .jlvalue_eval_addclass(expr)
 }
 
+## 2) jl mode: test on length on obj and jlexception 
 jleval <- function(obj, ...) {
     if (length(obj) == 1 && is.character(obj)) {
         jlval <- .jlvalue_eval_addclass(obj)
@@ -23,10 +22,6 @@ jleval <- function(obj, ...) {
         warning("Bad input for jlvalue_eval function!")
         NULL
     }
-}
-
-jlvalue_eval_unsafe <- function(expr) {
-    .jlvalue_eval_addclass(expr)
 }
 
 jlvalue_invisible <- function(jlval) {

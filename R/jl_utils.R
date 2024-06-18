@@ -9,7 +9,7 @@ jlsymbol <- function(field) {
     res
 }
 
-jlcolon <- function() jlvalue_eval_unsafe(":")
+jlcolon <- function() jlvalue_eval(":")
 
 jlisstructtype <- function(jlval) {
     jltrycall("isstructtype", jlval)
