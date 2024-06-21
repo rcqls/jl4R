@@ -1,8 +1,7 @@
 Julia for R
 ================
-RCqls
 
-`WARNING`: jl4R moving to [Rulia](https://github.com/rcqls/Rulia.git) repository to design refactoring. 
+`WARNING`: `jl4R` is moving to [`Rulia`](https://github.com/rcqls/Rulia.git) repository to design refactoring. There would be no more development of `jl4R` since the next step is now [`Rulia`](https://github.com/rcqls/Rulia.git) project.
 
 
 # Julia for R
